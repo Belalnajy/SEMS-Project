@@ -5,6 +5,9 @@ import { User } from '../entities/User';
 import { Subject } from '../entities/Subject';
 import { Section } from '../entities/Section';
 import { Student } from '../entities/Student';
+import { ExamModel } from '../entities/ExamModel';
+import { Question } from '../entities/Question';
+import { Answer } from '../entities/Answer';
 import bcrypt from 'bcryptjs';
 
 export const seedDatabase = async (req: Request, res: Response) => {
@@ -17,6 +20,7 @@ export const seedDatabase = async (req: Request, res: Response) => {
     const subjectRepo = AppDataSource.getRepository(Subject);
     const sectionRepo = AppDataSource.getRepository(Section);
     const studentRepo = AppDataSource.getRepository(Student);
+    const examRepo = AppDataSource.getRepository(ExamModel);
 
     const logs: string[] = [];
 
@@ -99,6 +103,56 @@ export const seedDatabase = async (req: Request, res: Response) => {
         user: savedUser,
       });
       logs.push('Student set: 1122334455 / 123456');
+    }
+
+    // 7. Exam Models & Questions
+    const mathSubject = await subjectRepo.findOne({
+      where: { name: 'الرياضيات' },
+    });
+    if (mathSubject) {
+      // Clear existing demo exams to avoid duplicates
+      const existingExams = await examRepo.find({
+        where: { name: 'اختبار تجريبي - رياضيات' },
+      });
+      if (existingExams.length > 0) {
+        await examRepo.remove(existingExams);
+      }
+
+      const exam = new ExamModel();
+      exam.name = 'اختبار تجريبي - رياضيات';
+      exam.duration_minutes = 30;
+      exam.is_active = true;
+      exam.subject = mathSubject;
+
+      const q1 = new Question();
+      q1.question_text = 'ما هو ناتج 5 + 7؟';
+      const a1_1 = new Answer();
+      a1_1.answer_text = '10';
+      a1_1.is_correct = false;
+      const a1_2 = new Answer();
+      a1_2.answer_text = '12';
+      a1_2.is_correct = true;
+      const a1_3 = new Answer();
+      a1_3.answer_text = '15';
+      a1_3.is_correct = false;
+      q1.answers = [a1_1, a1_2, a1_3];
+
+      const q2 = new Question();
+      q2.question_text = 'ما هو جذر التربيعي للعدد 16؟';
+      const a2_1 = new Answer();
+      a2_1.answer_text = '2';
+      a2_1.is_correct = false;
+      const a2_2 = new Answer();
+      a2_2.answer_text = '4';
+      a2_2.is_correct = true;
+      const a2_3 = new Answer();
+      a2_3.answer_text = '8';
+      a2_3.is_correct = false;
+      q2.answers = [a2_1, a2_2, a2_3];
+
+      exam.questions = [q1, q2];
+      await examRepo.save(exam);
+      logs.push('Exam Model and Questions initialized for Mathematics');
     }
 
     res.json({ message: 'Seeding completed successfully', logs });
