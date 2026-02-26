@@ -149,7 +149,11 @@ export class ReportService {
   }
 
   async generatePdfBuffer(data: any[]): Promise<Buffer> {
-    const isProduction = process.env.NODE_ENV === 'production';
+    const isProduction =
+      process.env.NODE_ENV === 'production' || !!process.env.VERCEL;
+    console.log(
+      `[PDF] Env Info - NODE_ENV: ${process.env.NODE_ENV}, VERCEL: ${process.env.VERCEL}, isProduction: ${isProduction}`,
+    );
     console.log(
       `[PDF] Current Info - CWD: ${process.cwd()}, Dirname: ${__dirname}`,
     );
