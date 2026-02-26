@@ -153,15 +153,20 @@ export class ReportService {
 
     // Find base path for assets/templates
     const possibleBases = [
-      path.join(process.cwd(), 'backend/src'),
-      path.join(process.cwd(), 'src'),
+      path.join(__dirname, '../src'), // Typical for Vercel/Serverless
+      path.join(process.cwd(), 'backend/src'), // Local
+      path.join(process.cwd(), 'src'), // Local variant
       path.join(__dirname, '..'),
       path.join(__dirname, '../..'),
+      path.join('/var/task/backend/src'), // Specific Vercel path
+      path.join('/var/task/src'), // Another Vercel variant
     ];
 
     let basePath = '';
     for (const b of possibleBases) {
-      if (fs.existsSync(path.join(b, 'templates/report.ejs'))) {
+      const checkPath = path.join(b, 'templates/report.ejs');
+      console.log(`[PDF] Checking: ${checkPath}`);
+      if (fs.existsSync(checkPath)) {
         basePath = b;
         console.log(`[PDF] Found resources at: ${basePath}`);
         break;
@@ -169,12 +174,9 @@ export class ReportService {
     }
 
     if (!basePath) {
-      console.error(
-        `[PDF] Error: Could not find templates directory. Checked: ${possibleBases.join(', ')}`,
-      );
-      throw new Error(
-        'تعذر العثور على ملفات التقارير (Template files not found)',
-      );
+      const errorMsg = `تعذر العثور على ملفات التقارير. تم فحص: ${possibleBases.map((b) => path.join(b, 'templates/report.ejs')).join(' | ')}`;
+      console.error(`[PDF] Error: ${errorMsg}`);
+      throw new Error(errorMsg);
     }
 
     const templatePath = path.join(basePath, 'templates/report.ejs');

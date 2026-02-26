@@ -3,7 +3,10 @@
   "builds": [
     {
       "src": "backend/api/index.ts",
-      "use": "@vercel/node"
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": ["../src/templates/**", "../src/assets/**"]
+      }
     },
     {
       "src": "frontend/package.json",
