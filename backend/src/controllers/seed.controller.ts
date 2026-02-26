@@ -109,13 +109,31 @@ export const seedDatabase = async (req: Request, res: Response) => {
     }
 
     // 7. Bulk Import from /questions directory
-    const QUESTIONS_DIR = path.join(process.cwd(), '../questions');
-    if (fs.existsSync(QUESTIONS_DIR)) {
+    const possiblePaths = [
+      path.join(process.cwd(), '../questions'), // If running from backend folder
+      path.join(process.cwd(), 'questions'), // If running from root
+      path.join(__dirname, '../../questions'), // Relative to controller
+      path.join(__dirname, '../../../questions'), // Relative to dist/api
+    ];
+
+    let QUESTIONS_DIR = '';
+    for (const p of possiblePaths) {
+      console.log(`[Seed] Checking for questions dir at: ${p}`);
+      if (fs.existsSync(p)) {
+        QUESTIONS_DIR = p;
+        break;
+      }
+    }
+
+    if (QUESTIONS_DIR) {
+      logs.push(`Found questions directory at: ${QUESTIONS_DIR}`);
       const folders = fs.readdirSync(QUESTIONS_DIR);
 
       for (const folderName of folders) {
         const folderPath = path.join(QUESTIONS_DIR, folderName);
         if (!fs.statSync(folderPath).isDirectory()) continue;
+
+        logs.push(`Processing folder: ${folderName}`);
 
         let subject = await subjectRepo.findOne({
           where: { name: folderName },
@@ -125,11 +143,16 @@ export const seedDatabase = async (req: Request, res: Response) => {
             name: folderName,
             description: `منهج ${folderName}`,
           });
+          logs.push(`Created new subject: ${folderName}`);
+        } else {
+          logs.push(`Using existing subject: ${folderName}`);
         }
 
         const files = fs
           .readdirSync(folderPath)
           .filter((f) => f.endsWith('.xlsx'));
+        logs.push(`Found ${files.length} Excel files in ${folderName}`);
+
         for (const fileName of files) {
           const filePath = path.join(folderPath, fileName);
           const examName = fileName.replace('.xlsx', '');
@@ -146,8 +169,10 @@ export const seedDatabase = async (req: Request, res: Response) => {
               duration_minutes: 30,
               is_active: true,
             });
+            logs.push(`Created new exam model: ${examName}`);
           } else {
-            // Clear existing
+            logs.push(`Updating existing exam: ${examName}`);
+            // Clear existing questions to avoid duplicates
             await AppDataSource.getRepository(Answer)
               .createQueryBuilder()
               .delete()
@@ -167,6 +192,7 @@ export const seedDatabase = async (req: Request, res: Response) => {
           const sheet = workbook.Sheets[workbook.SheetNames[0]];
           const data: any[] = XLSX.utils.sheet_to_json(sheet);
 
+          let questionCount = 0;
           for (const row of data) {
             const qText =
               row.question_text ||
@@ -236,10 +262,17 @@ export const seedDatabase = async (req: Request, res: Response) => {
               question: question,
             }));
             await AppDataSource.getRepository(Answer).save(answers);
+            questionCount++;
           }
-          logs.push(`Imported Exam: ${examName} for Subject: ${folderName}`);
+          logs.push(
+            `Successfully imported ${questionCount} questions for exam: ${examName}`,
+          );
         }
       }
+    } else {
+      logs.push(
+        '❌ Error: Could not find "questions" directory in any of the expected locations.',
+      );
     }
 
     res.json({ message: 'Seeding completed successfully', logs });

@@ -177,52 +177,130 @@ export class StudentService {
       ? await this.sectionRepository.findOne({ where: { id: sectionId } })
       : null;
 
+    console.log(
+      `[Import] Starting import from Excel. Rows found: ${data.length}`,
+    );
+
     for (const row of data) {
       try {
-        const { national_id, full_name, student_number } = row;
+        // Find values using flexible mapping (Normalize keys to lowercase for easier matching)
+        const rowKeys = Object.keys(row);
+        const findVal = (possibleNames: string[]) => {
+          const key = rowKeys.find((k) =>
+            possibleNames.some(
+              (p) => k.trim().toLowerCase() === p.toLowerCase(),
+            ),
+          );
+          return key ? row[key] : null;
+        };
+
+        const full_name = findVal([
+          'full_name',
+          'الاسم',
+          'الاسم بالكامل',
+          'اسم الطالب',
+          'اسم الطالبة',
+          'Full Name',
+          'Name',
+        ]);
+        const national_id = findVal([
+          'national_id',
+          'الرقم القومي',
+          'الرقم القومى',
+          'رقم البطاقة',
+          'رقم الطالبة',
+          'National ID',
+          'ID Number',
+        ]);
+        const student_number = findVal([
+          'student_number',
+          'كود الطالب',
+          'رقم الجلوس',
+          'رقم الطالب',
+          'رقم الطالبة',
+          'Student Number',
+          'Student Code',
+        ]);
 
         if (!national_id || !full_name) {
-          errors.push(`بيانات ناقصة في الصف: ${JSON.stringify(row)}`);
+          console.log(`[Import] Missing data in row: ${JSON.stringify(row)}`);
+          errors.push(
+            `بيانات ناقصة في الصف: ${JSON.stringify(row)}. تأكد من وجود أعمدة (الاسم، الرقم القومي)`,
+          );
           continue;
         }
 
-        // Check if user already exists
+        const cleanNationalId = String(national_id).trim();
+        const cleanFullName = String(full_name).trim();
+        const cleanStudentNumber = student_number
+          ? String(student_number).trim()
+          : cleanNationalId;
+
+        console.log(
+          `[Import] Processing student: ${cleanFullName} (ID: ${cleanNationalId})`,
+        );
+
+        // Check if user already exists (by national_id)
         const existingUser = await this.userRepository.findOne({
-          where: [{ national_id: String(national_id) }],
+          where: { national_id: cleanNationalId },
         });
 
         if (existingUser) {
-          errors.push(`الرقم القومي ${national_id} مسجل مسبقاً.`);
+          console.log(
+            `[Import] National ID ${cleanNationalId} already exists.`,
+          );
+          errors.push(
+            `الرقم القومي ${cleanNationalId} مسجل مسبقاً (طالب: ${cleanFullName})`,
+          );
+          continue;
+        }
+
+        // Check if student number exists
+        const existingStudent = await this.studentRepository.findOne({
+          where: { student_number: cleanStudentNumber },
+        });
+
+        if (existingStudent) {
+          console.log(
+            `[Import] Student number ${cleanStudentNumber} already exists.`,
+          );
+          errors.push(
+            `كود الطالب ${cleanStudentNumber} مسجل مسبقاً (طالب: ${existingStudent.full_name})`,
+          );
           continue;
         }
 
         await AppDataSource.transaction(async (manager) => {
           const user = new User();
-          user.national_id = String(national_id);
-          user.username = String(student_number || national_id);
-          user.email = `${national_id}@sems.local`;
+          user.national_id = cleanNationalId;
+          user.username = cleanStudentNumber;
+          user.email = `${cleanNationalId}@sems.local`;
           const salt = await bcrypt.genSalt(10);
-          user.password_hash = await bcrypt.hash(
-            String(student_number || national_id),
-            salt,
-          );
+          user.password_hash = await bcrypt.hash(cleanStudentNumber, salt);
           user.role = studentRole;
           const savedUser = await manager.save(User, user);
 
           const student = new Student();
-          student.full_name = String(full_name);
-          student.student_number = String(student_number || national_id);
+          student.full_name = cleanFullName;
+          student.student_number = cleanStudentNumber;
           student.user = savedUser;
           if (section) student.section = section;
           await manager.save(Student, student);
 
+          console.log(`[Import] Successfully saved student: ${cleanFullName}`);
           successCount++;
         });
       } catch (err: any) {
-        errors.push(`خطأ في استيراد ${row.full_name}: ${err.message}`);
+        console.error(`[Import] Error processing row:`, err);
+        errors.push(
+          `خطأ في استيراد ${row.full_name || row['الاسم'] || 'طالب غير محدد'}: ${err.message}`,
+        );
       }
     }
 
+    console.log(
+      `[Import] Finished. Success: ${successCount}, Errors: ${errors.length}`,
+    );
     return { success: successCount, errors };
   }
 }
