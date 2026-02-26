@@ -9,7 +9,8 @@ const isProduction = process.env.NODE_ENV === 'production';
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
-  // Support both standard variables and Neon/Vercel specific ones
+  // Use connection URL if available for better compatibility with Neon/Vercel
+  url: process.env.POSTGRES_URL || process.env.DATABASE_URL,
   host: process.env.POSTGRES_HOST || process.env.PGHOST || process.env.DB_HOST,
   port: parseInt(process.env.DB_PORT || '5432'),
   username:
@@ -27,11 +28,9 @@ export const AppDataSource = new DataSource({
   entities: [path.join(__dirname, '/../entities/**/*.{ts,js}')],
   subscribers: [],
   migrations: [],
-  extra: isProduction
+  ssl: isProduction
     ? {
-        ssl: {
-          rejectUnauthorized: false,
-        },
+        rejectUnauthorized: false,
       }
-    : {},
+    : false,
 });
