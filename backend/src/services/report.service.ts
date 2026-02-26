@@ -149,17 +149,40 @@ export class ReportService {
   }
 
   async generatePdfBuffer(data: any[]): Promise<Buffer> {
-    const templatePath = path.join(__dirname, '../templates/report.ejs');
+    const isProduction = process.env.NODE_ENV === 'production';
 
-    // Check if fonts exist before reading
+    // Find base path for assets/templates
+    const possibleBases = [
+      path.join(process.cwd(), 'backend/src'),
+      path.join(process.cwd(), 'src'),
+      path.join(__dirname, '..'),
+      path.join(__dirname, '../..'),
+    ];
+
+    let basePath = '';
+    for (const b of possibleBases) {
+      if (fs.existsSync(path.join(b, 'templates/report.ejs'))) {
+        basePath = b;
+        console.log(`[PDF] Found resources at: ${basePath}`);
+        break;
+      }
+    }
+
+    if (!basePath) {
+      console.error(
+        `[PDF] Error: Could not find templates directory. Checked: ${possibleBases.join(', ')}`,
+      );
+      throw new Error(
+        'تعذر العثور على ملفات التقارير (Template files not found)',
+      );
+    }
+
+    const templatePath = path.join(basePath, 'templates/report.ejs');
     const regularFontPath = path.join(
-      __dirname,
-      '../assets/fonts/Tajawal-Regular.ttf',
+      basePath,
+      'assets/fonts/Tajawal-Regular.ttf',
     );
-    const boldFontPath = path.join(
-      __dirname,
-      '../assets/fonts/Tajawal-Bold.ttf',
-    );
+    const boldFontPath = path.join(basePath, 'assets/fonts/Tajawal-Bold.ttf');
 
     let regularFont = '';
     let boldFont = '';
@@ -178,8 +201,6 @@ export class ReportService {
     });
 
     let browser;
-    const isProduction = process.env.NODE_ENV === 'production';
-
     try {
       if (isProduction) {
         // Vercel / Serverless Configuration
