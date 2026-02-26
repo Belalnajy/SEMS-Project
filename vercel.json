@@ -5,7 +5,10 @@
       "src": "backend/api/index.ts",
       "use": "@vercel/node",
       "config": {
-        "includeFiles": ["../src/templates/**", "../src/assets/**"]
+        "includeFiles": [
+          "backend/src/templates/report.ejs",
+          "backend/src/assets/fonts/**"
+        ]
       }
     },
     {

@@ -150,31 +150,33 @@ export class ReportService {
 
   async generatePdfBuffer(data: any[]): Promise<Buffer> {
     const isProduction = process.env.NODE_ENV === 'production';
+    console.log(
+      `[PDF] Current Info - CWD: ${process.cwd()}, Dirname: ${__dirname}`,
+    );
 
     // Find base path for assets/templates
     const possibleBases = [
-      path.join(__dirname, '../src'), // Typical for Vercel/Serverless
-      path.join(process.cwd(), 'backend/src'), // Local
-      path.join(process.cwd(), 'src'), // Local variant
+      path.join(process.cwd(), 'backend/src'), // Root in Vercel is /var/task
+      path.join(process.cwd(), 'src'),
+      path.join(__dirname, '../src'),
       path.join(__dirname, '..'),
       path.join(__dirname, '../..'),
-      path.join('/var/task/backend/src'), // Specific Vercel path
-      path.join('/var/task/src'), // Another Vercel variant
+      '/var/task/backend/src',
     ];
 
     let basePath = '';
     for (const b of possibleBases) {
       const checkPath = path.join(b, 'templates/report.ejs');
-      console.log(`[PDF] Checking: ${checkPath}`);
+      console.log(`[PDF] Checking exists: ${checkPath}`);
       if (fs.existsSync(checkPath)) {
         basePath = b;
-        console.log(`[PDF] Found resources at: ${basePath}`);
+        console.log(`[PDF] ✅ Found resources at: ${basePath}`);
         break;
       }
     }
 
     if (!basePath) {
-      const errorMsg = `تعذر العثور على ملفات التقارير. تم فحص: ${possibleBases.map((b) => path.join(b, 'templates/report.ejs')).join(' | ')}`;
+      const errorMsg = `تعذر العثور على ملفات التقارير. تم فحص المجلدات، المرجو التأكد من رفعها. [${process.cwd()}]`;
       console.error(`[PDF] Error: ${errorMsg}`);
       throw new Error(errorMsg);
     }
