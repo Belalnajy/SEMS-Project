@@ -42,7 +42,8 @@ export const authenticate = async (
 
     req.user = user;
     next();
-  } catch (error) {
+  } catch (error: any) {
+    console.error('[Auth Middleware] Error:', error.message);
     next(new ApiError(401, 'رمز المصادقة غير صالح أو منتهي الصلاحية.'));
   }
 };

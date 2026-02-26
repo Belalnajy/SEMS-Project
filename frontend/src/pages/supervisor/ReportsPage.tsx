@@ -96,9 +96,15 @@ export default function ReportsPage() {
     const params = new URLSearchParams();
     if (sectionFilter) params.set('section_id', sectionFilter);
     if (subjectFilter) params.set('subject_id', subjectFilter);
+
     const token = localStorage.getItem('sems_token');
+    if (token) params.set('token', token);
+
+    // Use dynamic API URL
+    const API_BASE_URL =
+      import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
     window.open(
-      `http://localhost:5000/api/reports/export/excel?token=${token}&${params.toString()}`,
+      `${API_BASE_URL}/reports/export/excel?${params.toString()}`,
       '_blank',
     );
   };
@@ -107,9 +113,15 @@ export default function ReportsPage() {
     const params = new URLSearchParams();
     if (sectionFilter) params.set('section_id', sectionFilter);
     if (subjectFilter) params.set('subject_id', subjectFilter);
+
     const token = localStorage.getItem('sems_token');
+    if (token) params.set('token', token);
+
+    // Use dynamic API URL
+    const API_BASE_URL =
+      import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
     window.open(
-      `http://localhost:5000/api/reports/export/pdf?token=${token}&${params.toString()}`,
+      `${API_BASE_URL}/reports/export/pdf?${params.toString()}`,
       '_blank',
     );
   };

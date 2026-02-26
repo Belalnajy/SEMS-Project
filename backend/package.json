@@ -13,6 +13,7 @@
     "seed": "ts-node-dev scripts/seed.ts"
   },
   "dependencies": {
+    "@sparticuz/chromium-min": "^143.0.4",
     "@types/ejs": "^3.1.5",
     "@types/express": "^5.0.6",
     "@types/node": "^25.3.0",

@@ -150,6 +150,8 @@ export class ReportService {
 
   async generatePdfBuffer(data: any[]): Promise<Buffer> {
     const templatePath = path.join(__dirname, '../templates/report.ejs');
+
+    // Check if fonts exist before reading
     const regularFontPath = path.join(
       __dirname,
       '../assets/fonts/Tajawal-Regular.ttf',
@@ -159,8 +161,15 @@ export class ReportService {
       '../assets/fonts/Tajawal-Bold.ttf',
     );
 
-    const regularFont = fs.readFileSync(regularFontPath).toString('base64');
-    const boldFont = fs.readFileSync(boldFontPath).toString('base64');
+    let regularFont = '';
+    let boldFont = '';
+
+    if (fs.existsSync(regularFontPath)) {
+      regularFont = fs.readFileSync(regularFontPath).toString('base64');
+    }
+    if (fs.existsSync(boldFontPath)) {
+      boldFont = fs.readFileSync(boldFontPath).toString('base64');
+    }
 
     const html = await ejs.renderFile(templatePath, {
       data,
@@ -168,20 +177,44 @@ export class ReportService {
       boldFont,
     });
 
-    const browser = await puppeteer.launch({
-      executablePath: process.env.CHROME_PATH || '/usr/bin/google-chrome',
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    });
+    let browser;
+    const isProduction = process.env.NODE_ENV === 'production';
 
-    const page = await browser.newPage();
-    await page.setContent(html, { waitUntil: 'networkidle0' });
-    const pdf = await page.pdf({
-      format: 'A4',
-      printBackground: true,
-      margin: { top: '20px', bottom: '20px', left: '20px', right: '20px' },
-    });
+    try {
+      if (isProduction) {
+        // Vercel / Serverless Configuration
+        const chromium = require('@sparticuz/chromium-min');
+        browser = await puppeteer.launch({
+          args: [...chromium.args, '--no-sandbox', '--disable-setuid-sandbox'],
+          defaultViewport: chromium.defaultViewport,
+          executablePath: await chromium.executablePath(
+            'https://github.com/Sparticuz/chromium/releases/download/v131.0.1/chromium-v131.0.1-pack.tar',
+          ),
+          headless: true,
+        });
+      } else {
+        // Local Configuration
+        browser = await puppeteer.launch({
+          executablePath: process.env.CHROME_PATH || '/usr/bin/google-chrome',
+          args: ['--no-sandbox', '--disable-setuid-sandbox'],
+          headless: true,
+        });
+      }
 
-    await browser.close();
-    return Buffer.from(pdf);
+      const page = await browser.newPage();
+      await page.setContent(html, { waitUntil: 'networkidle0' });
+      const pdf = await page.pdf({
+        format: 'A4',
+        printBackground: true,
+        margin: { top: '20px', bottom: '20px', left: '20px', right: '20px' },
+      });
+
+      await browser.close();
+      return Buffer.from(pdf);
+    } catch (error) {
+      console.error('PDF Generation Error:', error);
+      if (browser) await browser.close();
+      throw error;
+    }
   }
 }
