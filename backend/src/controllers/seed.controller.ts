@@ -9,6 +9,9 @@ import { ExamModel } from '../entities/ExamModel';
 import { Question } from '../entities/Question';
 import { Answer } from '../entities/Answer';
 import bcrypt from 'bcryptjs';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as XLSX from 'xlsx';
 
 export const seedDatabase = async (req: Request, res: Response) => {
   try {
@@ -105,54 +108,138 @@ export const seedDatabase = async (req: Request, res: Response) => {
       logs.push('Student set: 1122334455 / 123456');
     }
 
-    // 7. Exam Models & Questions
-    const mathSubject = await subjectRepo.findOne({
-      where: { name: 'الرياضيات' },
-    });
-    if (mathSubject) {
-      // Clear existing demo exams to avoid duplicates
-      const existingExams = await examRepo.find({
-        where: { name: 'اختبار تجريبي - رياضيات' },
-      });
-      if (existingExams.length > 0) {
-        await examRepo.remove(existingExams);
+    // 7. Bulk Import from /questions directory
+    const QUESTIONS_DIR = path.join(process.cwd(), '../questions');
+    if (fs.existsSync(QUESTIONS_DIR)) {
+      const folders = fs.readdirSync(QUESTIONS_DIR);
+
+      for (const folderName of folders) {
+        const folderPath = path.join(QUESTIONS_DIR, folderName);
+        if (!fs.statSync(folderPath).isDirectory()) continue;
+
+        let subject = await subjectRepo.findOne({
+          where: { name: folderName },
+        });
+        if (!subject) {
+          subject = await subjectRepo.save({
+            name: folderName,
+            description: `منهج ${folderName}`,
+          });
+        }
+
+        const files = fs
+          .readdirSync(folderPath)
+          .filter((f) => f.endsWith('.xlsx'));
+        for (const fileName of files) {
+          const filePath = path.join(folderPath, fileName);
+          const examName = fileName.replace('.xlsx', '');
+
+          let exam = await examRepo.findOne({
+            where: { name: examName, subject: { id: subject.id } },
+            relations: ['subject'],
+          });
+
+          if (!exam) {
+            exam = await examRepo.save({
+              name: examName,
+              subject: subject,
+              duration_minutes: 30,
+              is_active: true,
+            });
+          } else {
+            // Clear existing
+            await AppDataSource.getRepository(Answer)
+              .createQueryBuilder()
+              .delete()
+              .where(
+                'question_id IN (SELECT id FROM questions WHERE exam_model_id = :examId)',
+                { examId: exam.id },
+              )
+              .execute();
+            await AppDataSource.getRepository(Question).delete({
+              exam: { id: exam.id },
+            });
+          }
+
+          const workbook = XLSX.read(fs.readFileSync(filePath), {
+            type: 'buffer',
+          });
+          const sheet = workbook.Sheets[workbook.SheetNames[0]];
+          const data: any[] = XLSX.utils.sheet_to_json(sheet);
+
+          for (const row of data) {
+            const qText =
+              row.question_text ||
+              row.question ||
+              row['قائمة الأسئلة'] ||
+              row['السؤال'] ||
+              row['السؤال '];
+            const a1 =
+              row.answer1 ||
+              row.it1 ||
+              row['الاختيار الأول'] ||
+              row['أ'] ||
+              row['A'];
+            const a2 =
+              row.answer2 ||
+              row.it2 ||
+              row['الاختيار الثاني'] ||
+              row['ب'] ||
+              row['B'];
+            const a3 =
+              row.answer3 ||
+              row.it3 ||
+              row['الاختيار الثالث'] ||
+              row['ج'] ||
+              row['C'];
+            const a4 =
+              row.answer4 ||
+              row.it4 ||
+              row['الاختيار الرابع'] ||
+              row['د'] ||
+              row['D'];
+            const correctStr = String(
+              row.correct_answer ||
+                row.correct ||
+                row['الإجابة الصحيحة'] ||
+                row['الإجابة'] ||
+                row['الإجابة الصحيحه'] ||
+                row['الاجابة الصحيحة'] ||
+                '',
+            )
+              .trim()
+              .toUpperCase();
+
+            if (!qText || !a1) continue;
+
+            let correctIndex = -1;
+            if (['1', 'أ', 'A'].includes(correctStr)) correctIndex = 0;
+            else if (['2', 'ب', 'B'].includes(correctStr)) correctIndex = 1;
+            else if (['3', 'ج', 'C'].includes(correctStr)) correctIndex = 2;
+            else if (['4', 'د', 'D'].includes(correctStr)) correctIndex = 3;
+            else {
+              const num = parseInt(correctStr);
+              if (!isNaN(num)) correctIndex = num - 1;
+            }
+
+            const choices = [a1, a2, a3, a4].filter(Boolean);
+            const question = await AppDataSource.getRepository(Question).save({
+              question_text: String(qText),
+              exam: exam!,
+              sort_order: 0,
+            });
+
+            const answers = choices.map((text, idx) => ({
+              answer_text: String(text),
+              is_correct: idx === correctIndex,
+              sort_order: idx,
+              question: question,
+            }));
+            await AppDataSource.getRepository(Answer).save(answers);
+          }
+          logs.push(`Imported Exam: ${examName} for Subject: ${folderName}`);
+        }
       }
-
-      const exam = new ExamModel();
-      exam.name = 'اختبار تجريبي - رياضيات';
-      exam.duration_minutes = 30;
-      exam.is_active = true;
-      exam.subject = mathSubject;
-
-      const q1 = new Question();
-      q1.question_text = 'ما هو ناتج 5 + 7؟';
-      const a1_1 = new Answer();
-      a1_1.answer_text = '10';
-      a1_1.is_correct = false;
-      const a1_2 = new Answer();
-      a1_2.answer_text = '12';
-      a1_2.is_correct = true;
-      const a1_3 = new Answer();
-      a1_3.answer_text = '15';
-      a1_3.is_correct = false;
-      q1.answers = [a1_1, a1_2, a1_3];
-
-      const q2 = new Question();
-      q2.question_text = 'ما هو جذر التربيعي للعدد 16؟';
-      const a2_1 = new Answer();
-      a2_1.answer_text = '2';
-      a2_1.is_correct = false;
-      const a2_2 = new Answer();
-      a2_2.answer_text = '4';
-      a2_2.is_correct = true;
-      const a2_3 = new Answer();
-      a2_3.answer_text = '8';
-      a2_3.is_correct = false;
-      q2.answers = [a2_1, a2_2, a2_3];
-
-      exam.questions = [q1, q2];
-      await examRepo.save(exam);
-      logs.push('Exam Model and Questions initialized for Mathematics');
     }
 
     res.json({ message: 'Seeding completed successfully', logs });
