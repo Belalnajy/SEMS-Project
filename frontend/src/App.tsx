@@ -7,6 +7,7 @@ import Sidebar from './components/Sidebar';
 
 // Auth
 import LoginPage from './pages/auth/LoginPage';
+import ProfilePage from './pages/auth/ProfilePage';
 
 // Supervisor
 import SupervisorDashboard from './pages/supervisor/Dashboard';
@@ -101,6 +102,16 @@ export default function App() {
             }
           />
           <Route
+            path="/supervisor/profile"
+            element={
+              <ProtectedRoute roles={['supervisor']}>
+                <DashboardLayout>
+                  <ProfilePage />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/supervisor/students"
             element={
               <ProtectedRoute roles={['supervisor']}>
@@ -163,6 +174,16 @@ export default function App() {
             }
           />
           <Route
+            path="/manager/profile"
+            element={
+              <ProtectedRoute roles={['manager']}>
+                <DashboardLayout>
+                  <ProfilePage />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/manager/reports"
             element={
               <ProtectedRoute roles={['manager']}>
@@ -180,6 +201,16 @@ export default function App() {
               <ProtectedRoute roles={['student']}>
                 <DashboardLayout>
                   <StudentDashboard />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/student/profile"
+            element={
+              <ProtectedRoute roles={['student']}>
+                <DashboardLayout>
+                  <ProfilePage />
                 </DashboardLayout>
               </ProtectedRoute>
             }

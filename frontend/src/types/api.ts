@@ -19,6 +19,7 @@ export interface StudentProfile {
 export interface User {
   id: number;
   username: string;
+  national_id: string;
   email: string;
   role: Role;
   student?: StudentProfile;

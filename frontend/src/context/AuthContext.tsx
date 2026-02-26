@@ -13,6 +13,7 @@ interface AuthContextType {
   loading: boolean;
   login: (nationalId: string, password: string) => Promise<User>;
   register: (data: any) => Promise<User>;
+  updateUser: (updatedUser: User) => void;
   logout: () => void;
 }
 
@@ -46,6 +47,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const updateUser = (updatedUser: User) => {
+    setUser(updatedUser);
+    localStorage.setItem('sems_user', JSON.stringify(updatedUser));
+  };
+
   const login = async (nationalId: string, password: string): Promise<User> => {
     const res = await api.post<AuthResponse>('/auth/login', {
       national_id: nationalId,
@@ -72,7 +78,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider
+      value={{ user, loading, login, register, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

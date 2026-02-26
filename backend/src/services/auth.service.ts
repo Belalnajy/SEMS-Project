@@ -99,6 +99,35 @@ export class AuthService {
     return { user: userWithoutPassword, token };
   }
 
+  async updateProfile(userId: number, data: any): Promise<Partial<User>> {
+    const { national_id, password } = data;
+
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['role'],
+    });
+
+    if (!user) throw new ApiError(404, 'المستخدم غير موجود.');
+
+    if (national_id && national_id !== user.national_id) {
+      const existing = await this.userRepository.findOne({
+        where: { national_id },
+      });
+      if (existing)
+        throw new ApiError(400, 'الرقم القومي مسجل مسبقاً لمستخدم آخر.');
+      user.national_id = national_id;
+    }
+
+    if (password && password.trim() !== '') {
+      const salt = await bcrypt.genSalt(10);
+      user.password_hash = await bcrypt.hash(password, salt);
+    }
+
+    const savedUser = await this.userRepository.save(user);
+    const { password_hash: _, ...userWithoutPassword } = savedUser;
+    return userWithoutPassword;
+  }
+
   private generateToken(id: number, role: string): string {
     return jwt.sign(
       { id, role },

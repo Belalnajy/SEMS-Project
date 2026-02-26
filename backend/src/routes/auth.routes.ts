@@ -1,5 +1,10 @@
 import { Router } from 'express';
-import { register, login, getMe } from '../controllers/auth.controller';
+import {
+  register,
+  login,
+  getMe,
+  updateProfile,
+} from '../controllers/auth.controller';
 import { seedDatabase } from '../controllers/seed.controller';
 import { authenticate } from '../middleware/auth';
 import { validate } from '../middleware/validate';
@@ -16,5 +21,6 @@ router.post(
 );
 router.post('/login', validate({ body: ['national_id', 'password'] }), login);
 router.get('/me', authenticate, getMe);
+router.put('/update-profile', authenticate, updateProfile);
 
 export default router;

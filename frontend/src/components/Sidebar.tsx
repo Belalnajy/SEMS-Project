@@ -9,6 +9,7 @@ import {
   HiOutlineLogout,
   HiOutlineClipboardList,
   HiOutlineBookOpen,
+  HiOutlineCog,
 } from 'react-icons/hi';
 
 const menuItems = {
@@ -31,15 +32,18 @@ const menuItems = {
       icon: HiOutlineAcademicCap,
     },
     { path: '/supervisor/reports', label: 'التقارير', icon: HiOutlineChartBar },
+    { path: '/supervisor/profile', label: 'الإعدادات', icon: HiOutlineCog },
   ],
   manager: [
     { path: '/manager', label: 'الرئيسية', icon: HiOutlineHome },
     { path: '/manager/reports', label: 'التقارير', icon: HiOutlineChartBar },
+    { path: '/manager/profile', label: 'الإعدادات', icon: HiOutlineCog },
   ],
   student: [
     { path: '/student', label: 'الرئيسية', icon: HiOutlineHome },
     { path: '/student/exams', label: 'الامتحانات', icon: HiOutlineAcademicCap },
     { path: '/student/results', label: 'نتائجي', icon: HiOutlineDocumentText },
+    { path: '/student/profile', label: 'الإعدادات', icon: HiOutlineCog },
   ],
   guest: [],
 };
