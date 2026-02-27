@@ -4,6 +4,7 @@ import { Student } from '../entities/Student';
 import { Section } from '../entities/Section';
 import { User } from '../entities/User';
 import { Role } from '../entities/Role';
+import { Result } from '../entities/Result';
 import { ApiError } from '../middleware/errorHandler';
 import bcrypt from 'bcryptjs';
 
@@ -149,13 +150,23 @@ export class StudentService {
   async delete(id: number) {
     const student = await this.getById(id);
 
-    // Deleting the user will cascade and delete the student because of the setup,
-    // but doing it explicitly guarantees both are wiped.
     return await AppDataSource.transaction(async (manager) => {
+      // Ensure dependent results are removed even if DB-level cascades differ per environment.
+      await manager
+        .createQueryBuilder()
+        .delete()
+        .from(Result)
+        .where('student_id = :studentId', { studentId: student.id })
+        .execute();
+
+      // Delete student first, then linked user to avoid FK issues in some schemas.
+      await manager.remove(Student, student);
+
       if (student.user) {
         await manager.remove(User, student.user);
       }
-      return await manager.remove(Student, student);
+
+      return { deleted: true };
     });
   }
 
