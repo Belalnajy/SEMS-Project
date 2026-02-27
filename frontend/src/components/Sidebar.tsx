@@ -10,6 +10,7 @@ import {
   HiOutlineClipboardList,
   HiOutlineBookOpen,
   HiOutlineCog,
+  HiOutlineX,
 } from 'react-icons/hi';
 
 const menuItems = {
@@ -54,7 +55,12 @@ const roleLabels: Record<string, string> = {
   student: 'طالب',
 };
 
-export default function Sidebar() {
+type SidebarProps = {
+  isOpen: boolean;
+  onClose: () => void;
+};
+
+export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -68,7 +74,26 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="w-64 bg-slate-800 border-l border-slate-700 h-screen flex flex-col fixed inset-y-0 right-0 z-50 transition-transform lg:translate-x-0 shadow-lg shrink-0 print:hidden">
+    <>
+      {isOpen && (
+        <button
+          type="button"
+          onClick={onClose}
+          className="fixed inset-0 bg-black/40 z-40 lg:hidden"
+          aria-label="إغلاق القائمة الجانبية"
+        />
+      )}
+      <aside
+        className={`w-64 bg-slate-800 border-l border-slate-700 h-screen flex flex-col fixed inset-y-0 right-0 z-50 transition-transform shadow-lg shrink-0 print:hidden ${
+          isOpen ? 'translate-x-0' : 'translate-x-full'
+        } lg:translate-x-0`}>
+      <button
+        type="button"
+        onClick={onClose}
+        className="lg:hidden absolute top-4 left-4 text-slate-300 hover:text-white"
+        aria-label="إغلاق القائمة">
+        <HiOutlineX className="h-6 w-6" />
+      </button>
       <div className="p-6 border-b border-slate-700">
         <div className="flex items-center gap-3 mb-3">
           <img
@@ -89,6 +114,7 @@ export default function Sidebar() {
           <NavLink
             key={item.path}
             to={item.path}
+            onClick={onClose}
             end={item.path === `/${roleName}`}
             className={({ isActive }) =>
               `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm font-medium ${
@@ -118,6 +144,7 @@ export default function Sidebar() {
           <p>إعداد أ. ابتسام السلمي</p>
         </div>
       </div>
-    </aside>
+      </aside>
+    </>
   );
 }

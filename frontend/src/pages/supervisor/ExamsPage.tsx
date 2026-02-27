@@ -15,7 +15,6 @@ import ConfirmModal from '../../components/ConfirmModal';
 export default function ExamsPage() {
   const [exams, setExams] = useState<ExamModel[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
-  const [subjectFilter, setSubjectFilter] = useState('');
 
   const [showExamModal, setShowExamModal] = useState(false);
   const [showQModal, setShowQModal] = useState(false);
@@ -52,8 +51,7 @@ export default function ExamsPage() {
 
   const fetchExams = async () => {
     try {
-      const params = subjectFilter ? { subject_id: subjectFilter } : {};
-      const res = await api.get<ExamModel[]>('/exams', { params });
+      const res = await api.get<ExamModel[]>('/exams');
       setExams(res.data);
     } catch {}
   };
@@ -215,6 +213,13 @@ export default function ExamsPage() {
     }
   };
 
+  const subjectCards = subjects
+    .map((subject) => ({
+      subject,
+      exams: exams.filter((exam) => exam.subject?.id === subject.id),
+    }))
+    .filter((item) => item.exams.length > 0);
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -263,88 +268,84 @@ export default function ExamsPage() {
         loading={isDeleting}
       />
 
-      {/* Filters */}
-      <div className="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow-sm flex items-center">
-        <select
-          className="w-full sm:w-64 px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
-          value={subjectFilter}
-          onChange={(e) => {
-            setSubjectFilter(e.target.value);
-            setTimeout(fetchExams, 100);
-          }}>
-          <option value="">كل المواد</option>
-          {subjects.map((s) => (
-            <option key={s.id} value={s.id}>
-              {s.name}
-            </option>
-          ))}
-        </select>
-      </div>
-
       <div className="flex flex-col lg:flex-row gap-6 items-start">
         {/* Exams list */}
         <div
           className={`${selectedExam ? 'w-full lg:w-1/3 xl:w-1/4' : 'w-full'}`}>
-          <div
-            className={`grid gap-4 ${!selectedExam ? 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1'}`}>
-            {exams.map((exam) => (
+          <div className="space-y-4">
+            {subjectCards.map(({ subject, exams: subjectExams }) => (
               <div
-                key={exam.id}
-                className={`bg-slate-800 rounded-xl p-5 border shadow-sm transition-all cursor-pointer ${
-                  selectedExam?.id === exam.id
-                    ? 'border-blue-500 ring-1 ring-blue-500 bg-slate-800/80'
-                    : 'border-slate-700 hover:border-slate-500'
-                }`}
-                onClick={() => openExam(exam)}>
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="text-lg font-bold text-white leading-tight">
-                    {exam.name}
-                  </h3>
-                  <span
-                    className={`text-xs font-medium px-2 py-1 rounded-full whitespace-nowrap ${
-                      exam.is_active
-                        ? 'bg-green-500/10 text-green-500 border border-green-500/20'
-                        : 'bg-slate-700 text-slate-400 border border-slate-600'
-                    }`}>
-                    {exam.is_active ? 'مفعل' : 'معطل'}
+                key={subject.id}
+                className="bg-slate-800 rounded-xl p-4 border border-slate-700 shadow-sm">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-base font-bold text-white">{subject.name}</h3>
+                  <span className="text-xs text-slate-400 bg-slate-900 border border-slate-700 rounded-full px-2 py-1">
+                    {subjectExams.length} نموذج
                   </span>
                 </div>
-                <p className="text-sm text-slate-400 mb-4 whitespace-nowrap overflow-hidden text-ellipsis flex items-center gap-1">
-                  {(exam as any).subject_name || exam.subject?.name} —{' '}
-                  {exam.duration_minutes} دقيقة
-                </p>
-                <div className="flex gap-2 mt-auto">
-                  <button
-                    className="flex-1 flex justify-center items-center gap-1 bg-slate-700 hover:bg-slate-600 text-white px-3 py-1.5 rounded-lg text-sm transition-colors"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setEditExam(exam);
-                      setExamForm({
-                        subject_id:
-                          (exam as any).subject_id?.toString() ||
-                          exam.subject?.id?.toString() ||
-                          '',
-                        name: exam.name,
-                        duration_minutes: exam.duration_minutes,
-                        allow_reattempt: exam.allow_reattempt,
-                        is_active: exam.is_active,
-                      });
-                      setShowExamModal(true);
-                    }}>
-                    <HiOutlinePencil className="h-4 w-4" /> تعديل
-                  </button>
-                  <button
-                    className="flex-none flex justify-center items-center bg-red-500/10 hover:bg-red-500/20 text-red-500 px-3 py-1.5 rounded-lg transition-colors"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowConfirmDelete({ type: 'exam', id: exam.id });
-                    }}>
-                    <HiOutlineTrash className="h-4 w-4" />
-                  </button>
+
+                <div className="space-y-3">
+                  {subjectExams.map((exam) => (
+                    <div
+                      key={exam.id}
+                      className={`bg-slate-900 rounded-lg p-4 border transition-all cursor-pointer ${
+                        selectedExam?.id === exam.id
+                          ? 'border-blue-500 ring-1 ring-blue-500'
+                          : 'border-slate-700 hover:border-slate-500'
+                      }`}
+                      onClick={() => openExam(exam)}>
+                      <div className="flex justify-between items-start mb-2 gap-2">
+                        <h4 className="text-sm font-bold text-white leading-tight">
+                          {exam.name}
+                        </h4>
+                        <span
+                          className={`text-[11px] font-medium px-2 py-1 rounded-full whitespace-nowrap ${
+                            exam.is_active
+                              ? 'bg-green-500/10 text-green-500 border border-green-500/20'
+                              : 'bg-slate-700 text-slate-400 border border-slate-600'
+                          }`}>
+                          {exam.is_active ? 'مفعل' : 'معطل'}
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-400 mb-3">
+                        {exam.duration_minutes} دقيقة
+                      </p>
+                      <div className="flex gap-2">
+                        <button
+                          className="flex-1 flex justify-center items-center gap-1 bg-slate-700 hover:bg-slate-600 text-white px-2 py-1.5 rounded-lg text-xs transition-colors"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setEditExam(exam);
+                            setExamForm({
+                              subject_id:
+                                (exam as any).subject_id?.toString() ||
+                                exam.subject?.id?.toString() ||
+                                '',
+                              name: exam.name,
+                              duration_minutes: exam.duration_minutes,
+                              allow_reattempt: exam.allow_reattempt,
+                              is_active: exam.is_active,
+                            });
+                            setShowExamModal(true);
+                          }}>
+                          <HiOutlinePencil className="h-3.5 w-3.5" /> تعديل
+                        </button>
+                        <button
+                          className="flex-none flex justify-center items-center bg-red-500/10 hover:bg-red-500/20 text-red-500 px-2.5 py-1.5 rounded-lg transition-colors"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setShowConfirmDelete({ type: 'exam', id: exam.id });
+                          }}>
+                          <HiOutlineTrash className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             ))}
-            {exams.length === 0 && (
+
+            {subjectCards.length === 0 && (
               <div className="col-span-full bg-slate-800/50 rounded-xl p-8 border border-slate-700/50 border-dashed text-center text-slate-400">
                 لا توجد امتحانات، يرجى إنشاء نموذج جديد للبدء
               </div>
