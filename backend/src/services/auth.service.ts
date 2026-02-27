@@ -109,6 +109,10 @@ export class AuthService {
 
     if (!user) throw new ApiError(404, 'المستخدم غير موجود.');
 
+    if (user.role?.name === 'student') {
+      throw new ApiError(403, 'لا يمكن للطالب تعديل بيانات الحساب.');
+    }
+
     if (national_id && national_id !== user.national_id) {
       const existing = await this.userRepository.findOne({
         where: { national_id },

@@ -120,6 +120,17 @@ export const submitExam = async (req: Request, res: Response) => {
   res.status(201).json({ result });
 };
 
+
+export const reportQuestion = async (req: Request, res: Response) => {
+  const result = await examService.reportQuestion(
+    Number(req.params.id),
+    Number(req.params.questionId),
+    req.user!.id,
+    req.body,
+  );
+  res.status(201).json(result);
+};
+
 export const importQuestions = async (req: Request, res: Response) => {
   const file = (req as any).file;
   if (!file) throw new Error('يرجى اختيار ملف Excel');

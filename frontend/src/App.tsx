@@ -218,16 +218,6 @@ export default function App() {
             }
           />
           <Route
-            path="/student/profile"
-            element={
-              <ProtectedRoute roles={['student']}>
-                <DashboardLayout>
-                  <ProfilePage />
-                </DashboardLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
             path="/student/exams"
             element={
               <ProtectedRoute roles={['student']}>
