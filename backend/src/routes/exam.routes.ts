@@ -12,6 +12,7 @@ import {
   getMyResults,
   startExam,
   submitExam,
+  reportQuestion,
   importQuestions,
 } from '../controllers/exam.controller';
 import { authenticate } from '../middleware/auth';
@@ -31,6 +32,7 @@ router.get('/:id', getExamById);
 router.get('/:id/questions', getExamQuestions);
 router.post('/:id/start', startExam);
 router.post('/:id/submit', submitExam);
+router.post('/:id/questions/:questionId/report', roleGuard(['student']), reportQuestion);
 
 // Only supervisor manages contents
 router.use(roleGuard(['supervisor']));

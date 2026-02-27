@@ -6,6 +6,7 @@ import { Question } from '../entities/Question';
 import { Answer } from '../entities/Answer';
 import { Result } from '../entities/Result';
 import { Student } from '../entities/Student';
+import { QuestionReport } from '../entities/QuestionReport';
 import { ApiError } from '../middleware/errorHandler';
 
 export class ExamService {
@@ -14,6 +15,7 @@ export class ExamService {
   private questionRepository = AppDataSource.getRepository(Question);
   private resultRepository = AppDataSource.getRepository(Result);
   private studentRepository = AppDataSource.getRepository(Student);
+  private reportRepository = AppDataSource.getRepository(QuestionReport);
 
   async getAll() {
     return await this.examRepository.find({
@@ -307,6 +309,35 @@ export class ExamService {
     }));
   }
 
+
+  async reportQuestion(
+    examId: number,
+    questionId: number,
+    userId: number,
+    data: { message?: string },
+  ) {
+    const exam = await this.getById(examId);
+    const question = exam.questions?.find((q) => q.id === questionId);
+
+    if (!question) {
+      throw new ApiError(404, 'السؤال غير موجود في هذا النموذج.');
+    }
+
+    const student = await this.studentRepository.findOne({
+      where: { user: { id: userId } },
+    });
+
+    const report = new QuestionReport();
+    report.exam = exam;
+    report.question = question;
+    report.student = student || null;
+    report.message = (data.message || '').trim() || 'تم الإبلاغ عن خطأ في السؤال.';
+    report.status = 'pending';
+
+    await this.reportRepository.save(report);
+    return { success: true };
+  }
+
   async importQuestionsFromExcel(examId: number, buffer: Buffer) {
     const workbook = XLSX.read(buffer, { type: 'buffer' });
     const sheetName = workbook.SheetNames[0];
@@ -322,12 +353,16 @@ export class ExamService {
         const questionText =
           row.question_text || row.question || row['السؤال'] || row['question'];
 
-        const choices = [
+        const rawChoices = [
           row.answer1 || row.it1 || row['A'] || row['a'],
           row.answer2 || row.it2 || row['B'] || row['b'],
           row.answer3 || row.it3 || row['C'] || row['c'],
           row.answer4 || row.it4 || row['D'] || row['d'],
-        ].filter(Boolean);
+        ];
+
+        const choices = rawChoices
+          .map((value) => (value === undefined || value === null ? '' : String(value).trim()))
+          .filter((value) => value !== '' && value !== '0');
 
         const correctRaw = String(
           row.correct_answer ||

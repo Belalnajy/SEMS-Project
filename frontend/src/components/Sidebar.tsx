@@ -44,7 +44,6 @@ const menuItems = {
     { path: '/student', label: 'الرئيسية', icon: HiOutlineHome },
     { path: '/student/exams', label: 'الامتحانات', icon: HiOutlineAcademicCap },
     { path: '/student/results', label: 'نتائجي', icon: HiOutlineDocumentText },
-    { path: '/student/profile', label: 'الإعدادات', icon: HiOutlineCog },
   ],
   guest: [],
 };

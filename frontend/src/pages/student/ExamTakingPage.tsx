@@ -7,6 +7,7 @@ import {
   HiOutlineClock,
   HiOutlineCheckCircle,
   HiOutlineBookOpen,
+  HiOutlineExclamationCircle,
 } from 'react-icons/hi';
 import { HiOutlineRocketLaunch } from 'react-icons/hi2';
 import { ExamModel, Question } from '../../types/api';
@@ -58,6 +59,18 @@ export default function ExamTakingPage() {
       setSubmitting(false);
     }
   }, [answers, id, startedAt, submitting]);
+
+
+  const handleReportQuestion = async (questionId: number) => {
+    try {
+      await api.post(`/exams/${id}/questions/${questionId}/report`, {
+        message: 'تم الإبلاغ عن خطأ في السؤال من شاشة الطالب.',
+      });
+      toast.success('تم إرسال البلاغ إلى المشرف');
+    } catch (err: any) {
+      toast.error(err.response?.data?.error || 'تعذر إرسال البلاغ');
+    }
+  };
 
   // Timer
   useEffect(() => {
@@ -248,9 +261,18 @@ export default function ExamTakingPage() {
                 }`}>
                 {i + 1}
               </span>
-              <p className="text-lg text-white font-medium leading-relaxed pt-0.5">
-                {q.question_text}
-              </p>
+              <div className="flex-1">
+                <p className="text-lg text-white font-medium leading-relaxed pt-0.5">
+                  {q.question_text}
+                </p>
+                <button
+                  type="button"
+                  className="mt-3 inline-flex items-center gap-1.5 text-xs text-amber-400 hover:text-amber-300"
+                  onClick={() => handleReportQuestion(q.id)}>
+                  <HiOutlineExclamationCircle className="h-4 w-4" />
+                  الإبلاغ عن خطأ في السؤال
+                </button>
+              </div>
             </div>
 
             <div className="space-y-3 pl-12 pr-2">
