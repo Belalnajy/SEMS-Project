@@ -9,6 +9,9 @@ export class Section {
   @Column({ unique: true })
   name: string;
 
+  @Column({ type: 'text', nullable: true })
+  description?: string | null;
+
   @OneToMany(() => Student, (student) => student.section)
   students: Student[];
 }

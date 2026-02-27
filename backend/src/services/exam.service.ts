@@ -351,18 +351,34 @@ export class ExamService {
         // Expected columns: question_text, answer1, answer2, answer3, answer4, correct_answer (1-4)
         // Supported New Format: السؤال, A, B, C, D, الإجابة الصحيحه
         const questionText =
-          row.question_text || row.question || row['السؤال'] || row['question'];
+          row.question_text ??
+          row.question ??
+          row['السؤال'] ??
+          row['question'];
+
+        const getCellValue = (...keys: (string | number)[]) => {
+          for (const key of keys) {
+            const value = row[key as any];
+            if (value !== undefined && value !== null && String(value).trim() !== '') {
+              return value;
+            }
+          }
+          return '';
+        };
 
         const rawChoices = [
-          row.answer1 || row.it1 || row['A'] || row['a'],
-          row.answer2 || row.it2 || row['B'] || row['b'],
-          row.answer3 || row.it3 || row['C'] || row['c'],
-          row.answer4 || row.it4 || row['D'] || row['d'],
+          getCellValue('answer1', 'it1', 'A', 'a'),
+          getCellValue('answer2', 'it2', 'B', 'b'),
+          getCellValue('answer3', 'it3', 'C', 'c'),
+          getCellValue('answer4', 'it4', 'D', 'd'),
         ];
 
         const choices = rawChoices
-          .map((value) => (value === undefined || value === null ? '' : String(value).trim()))
-          .filter((value) => value !== '' && value !== '0');
+          .map((value) =>
+            value === undefined || value === null ? '' : String(value).trim(),
+          )
+          // اسمح بالقيمة "0" كإجابة صحيحة أو خيار عادي، وتجاهل الفارغ فقط
+          .filter((value) => value !== '');
 
         const correctRaw = String(
           row.correct_answer ||

@@ -23,15 +23,25 @@ export class SectionService {
 
     const section = new Section();
     section.name = name;
+    section.description =
+      typeof description === 'string' && description.trim() !== ''
+        ? description.trim()
+        : null;
 
     return await this.sectionRepository.save(section);
   }
 
   async update(id: number, data: any) {
     const section = await this.getById(id);
-    const { name } = data;
+    const { name, description } = data;
 
     if (name) section.name = name;
+    if (description !== undefined) {
+      section.description =
+        typeof description === 'string' && description.trim() !== ''
+          ? description.trim()
+          : null;
+    }
 
     return await this.sectionRepository.save(section);
   }

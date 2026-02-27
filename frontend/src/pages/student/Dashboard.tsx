@@ -107,7 +107,17 @@ export default function StudentDashboard() {
               <div
                 className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
                 style={{ direction: 'rtl' }}>
-                {subjectExams.map((exam, i) => {
+                {subjectExams
+                  .slice()
+                  .sort((a, b) => {
+                    const matchA = a.name.match(/(\d+)\s*$/);
+                    const matchB = b.name.match(/(\d+)\s*$/);
+                    const numA = matchA ? parseInt(matchA[1], 10) : 0;
+                    const numB = matchB ? parseInt(matchB[1], 10) : 0;
+                    if (numA !== numB) return numA - numB;
+                    return a.id - b.id;
+                  })
+                  .map((exam, i) => {
                   const result = getResultForExam(exam.id);
                   return (
                     <motion.div

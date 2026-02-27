@@ -216,7 +216,17 @@ export default function ExamsPage() {
   const subjectCards = subjects
     .map((subject) => ({
       subject,
-      exams: exams.filter((exam) => exam.subject?.id === subject.id),
+      exams: exams
+        .filter((exam) => exam.subject?.id === subject.id)
+        .slice()
+        .sort((a, b) => {
+          const matchA = a.name.match(/(\d+)\s*$/);
+          const matchB = b.name.match(/(\d+)\s*$/);
+          const numA = matchA ? parseInt(matchA[1], 10) : 0;
+          const numB = matchB ? parseInt(matchB[1], 10) : 0;
+          if (numA !== numB) return numA - numB;
+          return a.id - b.id;
+        }),
     }))
     .filter((item) => item.exams.length > 0);
 

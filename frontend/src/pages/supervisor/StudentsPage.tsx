@@ -227,7 +227,6 @@ export default function StudentsPage() {
         </button>
       </div>
 
-<<<<<<< HEAD
       {/* Students list (cards + table) */}
       {students.length === 0 ? (
         <div className="bg-slate-800 rounded-xl border border-slate-700 p-8 text-center text-slate-400 shadow-sm">
@@ -249,7 +248,9 @@ export default function StudentsPage() {
                   </span>
                 </div>
                 <div>
-                  <p className="text-base font-semibold text-white">{s.full_name}</p>
+                  <p className="text-base font-semibold text-white">
+                    {s.full_name}
+                  </p>
                   <p className="text-xs text-slate-400 mt-1">
                     الرقم القومي: {(s as any).user?.national_id || '-'}
                   </p>
@@ -281,25 +282,45 @@ export default function StudentsPage() {
                 <thead className="text-xs text-slate-400 uppercase bg-slate-900/50 border-b border-slate-700">
                   <tr>
                     <th className="px-6 py-4 font-medium">#</th>
-                    <th className="px-6 py-4 font-medium text-right">الاسم الكامل</th>
-                    <th className="px-6 py-4 font-medium text-right">رقم الطالب</th>
-                    <th className="px-6 py-4 font-medium text-right">الرقم القومي</th>
+                    <th className="px-6 py-4 font-medium text-right">
+                      الاسم الكامل
+                    </th>
+                    <th className="px-6 py-4 font-medium text-right">
+                      رقم الطالب
+                    </th>
+                    <th className="px-6 py-4 font-medium text-right">
+                      الرقم القومي
+                    </th>
                     <th className="px-6 py-4 font-medium text-right">الفصل</th>
-                    <th className="px-6 py-4 font-medium text-center">إجراءات</th>
+                    <th className="px-6 py-4 font-medium text-center">
+                      إجراءات
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-700/50">
                   {students.map((s, i) => (
-                    <tr key={s.id} className="hover:bg-slate-700/20 transition-colors">
-                      <td className="px-6 py-4 whitespace-nowrap">{(pagination.page - 1) * 20 + i + 1}</td>
-                      <td className="px-6 py-4 whitespace-nowrap font-medium text-white">{s.full_name}</td>
+                    <tr
+                      key={s.id}
+                      className="hover:bg-slate-700/20 transition-colors">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {(pagination.page - 1) * 20 + i + 1}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap font-medium text-white">
+                        {s.full_name}
+                      </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-500/10 text-blue-500 border border-blue-500/20">
                           {s.student_number}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-slate-300">{(s as any).user?.national_id || '-'}</td>
-                      <td className="px-6 py-4 whitespace-nowrap">{s.section?.name || <span className="text-slate-500">-</span>}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-slate-300">
+                        {(s as any).user?.national_id || '-'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {s.section?.name || (
+                          <span className="text-slate-500">-</span>
+                        )}
+                      </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex justify-center gap-2">
                           <button
