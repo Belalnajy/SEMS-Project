@@ -7,6 +7,7 @@ import { Role } from '../entities/Role';
 import { Result } from '../entities/Result';
 import { ApiError } from '../middleware/errorHandler';
 import bcrypt from 'bcryptjs';
+import { IsNull } from 'typeorm';
 
 export class StudentService {
   private studentRepository = AppDataSource.getRepository(Student);
@@ -24,15 +25,19 @@ export class StudentService {
       .leftJoinAndSelect('student.user', 'user')
       .orderBy('student.id', 'DESC');
 
-    if (search) {
+    if (search && String(search).trim() !== '') {
+      const term = `%${String(search).trim()}%`;
       qb.andWhere(
-        '(student.full_name ILIKE :search OR student.student_number ILIKE :search OR user.national_id ILIKE :search)',
-        { search: `%${search}%` }
+        '(student.full_name ILIKE :search OR student.student_number ILIKE :search OR user.national_id ILIKE :search OR section.name ILIKE :search)',
+        { search: term }
       );
     }
 
-    if (section_id) {
-      qb.andWhere('student.sectionId = :section_id', { section_id }); // Or section_id, depends on DB schema but usually TypeORM maps section to sectionId.
+    if (section_id !== undefined && section_id !== null && String(section_id).trim() !== '') {
+      const sectionIdNum = Number(section_id);
+      if (!isNaN(sectionIdNum)) {
+        qb.andWhere('student.section_id = :section_id', { section_id: sectionIdNum });
+      }
     }
 
     const [students, total] = await qb
@@ -167,6 +172,39 @@ export class StudentService {
       }
 
       return { deleted: true };
+    });
+  }
+
+  async deleteWithoutSection() {
+    const students = await this.studentRepository.find({
+      where: { section: IsNull() },
+      relations: ['user'],
+    });
+
+    if (!students.length) {
+      return { deleted: 0 };
+    }
+
+    const ids = students.map((s) => s.id);
+    const users = students
+      .map((s) => s.user)
+      .filter((u): u is User => !!u);
+
+    return await AppDataSource.transaction(async (manager) => {
+      await manager
+        .createQueryBuilder()
+        .delete()
+        .from(Result)
+        .where('student_id IN (:...ids)', { ids })
+        .execute();
+
+      await manager.remove(Student, students);
+
+      if (users.length) {
+        await manager.remove(User, users);
+      }
+
+      return { deleted: students.length };
     });
   }
 

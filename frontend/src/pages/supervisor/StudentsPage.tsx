@@ -57,7 +57,7 @@ export default function StudentsPage() {
     try {
       const params: any = { page, limit: 20 };
       if (search) params.search = search;
-      if (sectionFilter) params.section_id = sectionFilter;
+      if (sectionFilter) params.section_id = Number(sectionFilter);
       const res = await api.get<PaginatedStudents>('/students', { params });
       setStudents(res.data.students);
       setPagination(res.data.pagination);
@@ -77,6 +77,15 @@ export default function StudentsPage() {
     fetchStudents();
     fetchSections();
   }, []);
+
+  // Auto-refetch when search text or section filter changes (debounced)
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      fetchStudents(1);
+    }, 300);
+    return () => clearTimeout(timeout);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search, sectionFilter]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -113,6 +122,24 @@ export default function StudentsPage() {
       setShowConfirmDelete(null);
     } catch (err: any) {
       toast.error(err.response?.data?.error || 'حدث خطأ');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const deleteStudentsWithoutSection = async () => {
+    const confirmed = window.confirm(
+      'هل أنت متأكد من حذف جميع الطلاب الذين ليس لهم فصل؟ سيتم حذف بياناتهم ونتائجهم نهائياً.'
+    );
+    if (!confirmed) return;
+
+    setIsDeleting(true);
+    try {
+      await api.delete('/students/without-section/all');
+      toast.success('تم حذف جميع الطلاب بدون فصل بنجاح');
+      fetchStudents();
+    } catch (err: any) {
+      toast.error(err.response?.data?.error || 'فشل في حذف الطلاب بدون فصل');
     } finally {
       setIsDeleting(false);
     }
@@ -203,7 +230,6 @@ export default function StudentsPage() {
             placeholder="بحث بالاسم أو الرقم..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && fetchStudents()}
           />
         </div>
         <select
@@ -211,7 +237,6 @@ export default function StudentsPage() {
           value={sectionFilter}
           onChange={(e) => {
             setSectionFilter(e.target.value);
-            setTimeout(() => fetchStudents(), 100);
           }}>
           <option value="">كل الفصول</option>
           {sections.map((s) => (
@@ -220,11 +245,19 @@ export default function StudentsPage() {
             </option>
           ))}
         </select>
-        <button
-          className="bg-slate-700 hover:bg-slate-600 text-white px-6 py-2.5 rounded-lg font-medium transition-colors whitespace-nowrap"
-          onClick={() => fetchStudents()}>
-          بحث
-        </button>
+        <div className="flex gap-3">
+          <button
+            className="bg-slate-700 hover:bg-slate-600 text-white px-6 py-2.5 rounded-lg font-medium transition-colors whitespace-nowrap"
+            onClick={() => fetchStudents()}>
+            بحث
+          </button>
+          <button
+            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-lg font-medium transition-colors whitespace-nowrap"
+            onClick={deleteStudentsWithoutSection}
+            disabled={isDeleting}>
+            حذف الطلاب بدون فصل
+          </button>
+        </div>
       </div>
 
       {/* Students list (cards + table) */}
@@ -252,7 +285,7 @@ export default function StudentsPage() {
                     {s.full_name}
                   </p>
                   <p className="text-xs text-slate-400 mt-1">
-                    الرقم القومي: {(s as any).user?.national_id || '-'}
+                    الرقم الهوية: {(s as any).user?.national_id || '-'}
                   </p>
                   <p className="text-xs text-slate-400 mt-1">
                     الفصل: {s.section?.name || '-'}
@@ -289,7 +322,7 @@ export default function StudentsPage() {
                       رقم الطالب
                     </th>
                     <th className="px-6 py-4 font-medium text-right">
-                      الرقم القومي
+                      الرقم الهوية
                     </th>
                     <th className="px-6 py-4 font-medium text-right">الفصل</th>
                     <th className="px-6 py-4 font-medium text-center">

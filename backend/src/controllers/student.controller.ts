@@ -37,3 +37,14 @@ export const importStudents = async (req: Request, res: Response) => {
   const result = await studentService.importFromExcel(file.buffer, sectionId);
   res.json(result);
 };
+
+export const deleteStudentsWithoutSection = async (
+  req: Request,
+  res: Response,
+) => {
+  const result = await studentService.deleteWithoutSection();
+  res.json({
+    message: 'تم حذف جميع الطلاب بدون فصل.',
+    ...result,
+  });
+};
