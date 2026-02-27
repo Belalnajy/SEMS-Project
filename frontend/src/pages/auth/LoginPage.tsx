@@ -21,7 +21,7 @@ export default function LoginPage() {
       const routes: Record<string, string> = {
         supervisor: '/supervisor',
         manager: '/manager',
-        student: '/student',
+        student: '/student'
       };
       navigate(routes[user.role.name] || '/login');
     } catch (err: any) {
@@ -50,11 +50,13 @@ export default function LoginPage() {
             className="flex justify-center mb-6">
             <div className="relative">
               <div className="absolute inset-0 bg-blue-500/20 blur-2xl rounded-full" />
-              <img
-                src="/logo.png"
-                alt="Logo"
-                className="w-24 h-24 rounded-2xl shadow-2xl relative z-10 border border-white/10"
-              />
+              <Link to="/">
+                <img
+                  src="/logo.png"
+                  alt="Logo"
+                  className="w-24 h-24 rounded-2xl shadow-2xl relative z-10 border border-white/10"
+                />
+              </Link>
             </div>
           </motion.div>
 
@@ -81,7 +83,7 @@ export default function LoginPage() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
             <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mr-1">
-              رقم الهوية / الرقم القومي
+              رقم الهوية
             </label>
             <input
               type="text"

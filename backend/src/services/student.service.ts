@@ -27,7 +27,7 @@ export class StudentService {
     if (search) {
       qb.andWhere(
         '(student.full_name ILIKE :search OR student.student_number ILIKE :search OR user.national_id ILIKE :search)',
-        { search: `%${search}%` },
+        { search: `%${search}%` }
       );
     }
 
@@ -46,15 +46,15 @@ export class StudentService {
         total,
         page: Number(page),
         limit: Number(limit),
-        pages: Math.ceil(total / Number(limit)),
-      },
+        pages: Math.ceil(total / Number(limit))
+      }
     };
   }
 
   async getById(id: number) {
     const student = await this.studentRepository.findOne({
       where: { id },
-      relations: ['section', 'user'],
+      relations: ['section', 'user']
     });
     if (!student) throw new ApiError(404, 'الطالب غير موجود.');
     return student;
@@ -67,19 +67,19 @@ export class StudentService {
       student_number,
       section_id,
       email,
-      password,
+      password
     } = data;
 
     let section = null;
     if (section_id) {
       section = await this.sectionRepository.findOne({
-        where: { id: section_id },
+        where: { id: section_id }
       });
       if (!section) throw new ApiError(400, 'الشعبة غير موجودة.');
     }
 
     const studentRole = await this.roleRepository.findOne({
-      where: { name: 'student' },
+      where: { name: 'student' }
     });
     if (!studentRole)
       throw new ApiError(500, 'صلاحية الطالب غير معرفة في النظام.');
@@ -116,7 +116,7 @@ export class StudentService {
       section_id,
       national_id,
       email,
-      password,
+      password
     } = data;
 
     return await AppDataSource.transaction(async (manager) => {
@@ -134,7 +134,7 @@ export class StudentService {
       // 2. Update Student
       if (section_id) {
         const section = await this.sectionRepository.findOne({
-          where: { id: section_id },
+          where: { id: section_id }
         });
         if (!section) throw new ApiError(400, 'الفصل غير موجود.');
         student.section = section;
@@ -180,7 +180,7 @@ export class StudentService {
     const errors: string[] = [];
 
     const studentRole = await this.roleRepository.findOne({
-      where: { name: 'student' },
+      where: { name: 'student' }
     });
     if (!studentRole) throw new ApiError(500, 'صلاحية الطالب غير معرفة.');
 
@@ -189,7 +189,7 @@ export class StudentService {
       : null;
 
     console.log(
-      `[Import] Starting import from Excel. Rows found: ${data.length}`,
+      `[Import] Starting import from Excel. Rows found: ${data.length}`
     );
 
     for (const row of data) {
@@ -199,8 +199,8 @@ export class StudentService {
         const findVal = (possibleNames: string[]) => {
           const key = rowKeys.find((k) =>
             possibleNames.some(
-              (p) => k.trim().toLowerCase() === p.toLowerCase(),
-            ),
+              (p) => k.trim().toLowerCase() === p.toLowerCase()
+            )
           );
           return key ? row[key] : null;
         };
@@ -212,16 +212,15 @@ export class StudentService {
           'اسم الطالب',
           'اسم الطالبة',
           'Full Name',
-          'Name',
+          'Name'
         ]);
         const national_id = findVal([
           'national_id',
-          'الرقم القومي',
-          'الرقم القومى',
+          'الرقم الهوية',
           'رقم البطاقة',
           'رقم الطالبة',
           'National ID',
-          'ID Number',
+          'ID Number'
         ]);
         const student_number = findVal([
           'student_number',
@@ -230,13 +229,13 @@ export class StudentService {
           'رقم الطالب',
           'رقم الطالبة',
           'Student Number',
-          'Student Code',
+          'Student Code'
         ]);
 
         if (!national_id || !full_name) {
           console.log(`[Import] Missing data in row: ${JSON.stringify(row)}`);
           errors.push(
-            `بيانات ناقصة في الصف: ${JSON.stringify(row)}. تأكد من وجود أعمدة (الاسم، الرقم القومي)`,
+            `بيانات ناقصة في الصف: ${JSON.stringify(row)}. تأكد من وجود أعمدة (الاسم، الرقم الهوية)`
           );
           continue;
         }
@@ -248,35 +247,35 @@ export class StudentService {
           : cleanNationalId;
 
         console.log(
-          `[Import] Processing student: ${cleanFullName} (ID: ${cleanNationalId})`,
+          `[Import] Processing student: ${cleanFullName} (ID: ${cleanNationalId})`
         );
 
         // Check if user already exists (by national_id)
         const existingUser = await this.userRepository.findOne({
-          where: { national_id: cleanNationalId },
+          where: { national_id: cleanNationalId }
         });
 
         if (existingUser) {
           console.log(
-            `[Import] National ID ${cleanNationalId} already exists.`,
+            `[Import] National ID ${cleanNationalId} already exists.`
           );
           errors.push(
-            `الرقم القومي ${cleanNationalId} مسجل مسبقاً (طالب: ${cleanFullName})`,
+            `الرقم الهوية ${cleanNationalId} مسجل مسبقاً (طالب: ${cleanFullName})`
           );
           continue;
         }
 
         // Check if student number exists
         const existingStudent = await this.studentRepository.findOne({
-          where: { student_number: cleanStudentNumber },
+          where: { student_number: cleanStudentNumber }
         });
 
         if (existingStudent) {
           console.log(
-            `[Import] Student number ${cleanStudentNumber} already exists.`,
+            `[Import] Student number ${cleanStudentNumber} already exists.`
           );
           errors.push(
-            `كود الطالب ${cleanStudentNumber} مسجل مسبقاً (طالب: ${existingStudent.full_name})`,
+            `كود الطالب ${cleanStudentNumber} مسجل مسبقاً (طالب: ${existingStudent.full_name})`
           );
           continue;
         }
@@ -304,13 +303,13 @@ export class StudentService {
       } catch (err: any) {
         console.error(`[Import] Error processing row:`, err);
         errors.push(
-          `خطأ في استيراد ${row.full_name || row['الاسم'] || 'طالب غير محدد'}: ${err.message}`,
+          `خطأ في استيراد ${row.full_name || row['الاسم'] || 'طالب غير محدد'}: ${err.message}`
         );
       }
     }
 
     console.log(
-      `[Import] Finished. Success: ${successCount}, Errors: ${errors.length}`,
+      `[Import] Finished. Success: ${successCount}, Errors: ${errors.length}`
     );
     return { success: successCount, errors };
   }

@@ -19,23 +19,23 @@ export class AuthService {
       password,
       role_name,
       full_name,
-      student_number,
+      student_number
     } = data;
 
     // Check existing
     const existing = await this.userRepository.findOne({
-      where: [{ national_id }, { email }, { username }],
+      where: [{ national_id }, { email }, { username }]
     });
     if (existing) {
       throw new ApiError(
         400,
-        'البيانات (الرقم القومي أو البريد أو اسم المستخدم) مسجلة مسبقاً.',
+        'البيانات (الرقم الهوية أو البريد أو اسم المستخدم) مسجلة مسبقاً.'
       );
     }
 
     // Force role to 'student' for public registration
     const role = await this.roleRepository.findOne({
-      where: { name: 'student' },
+      where: { name: 'student' }
     });
     if (!role) {
       throw new ApiError(400, 'الصلاحية المطلوبة غير صحيحة.');
@@ -76,11 +76,11 @@ export class AuthService {
 
     const user = await this.userRepository.findOne({
       where: { national_id: String(national_id) },
-      relations: ['role', 'student', 'student.section'],
+      relations: ['role', 'student', 'student.section']
     });
 
     console.log(
-      `[Login] Attempting with ID: ${national_id}, User Found: ${!!user}`,
+      `[Login] Attempting with ID: ${national_id}, User Found: ${!!user}`
     );
 
     if (!user || !user.password_hash) {
@@ -104,7 +104,7 @@ export class AuthService {
 
     const user = await this.userRepository.findOne({
       where: { id: userId },
-      relations: ['role'],
+      relations: ['role']
     });
 
     if (!user) throw new ApiError(404, 'المستخدم غير موجود.');
@@ -115,10 +115,10 @@ export class AuthService {
 
     if (national_id && national_id !== user.national_id) {
       const existing = await this.userRepository.findOne({
-        where: { national_id },
+        where: { national_id }
       });
       if (existing)
-        throw new ApiError(400, 'الرقم القومي مسجل مسبقاً لمستخدم آخر.');
+        throw new ApiError(400, 'الرقم الهوية مسجل مسبقاً لمستخدم آخر.');
       user.national_id = national_id;
     }
 
@@ -136,7 +136,7 @@ export class AuthService {
     return jwt.sign(
       { id, role },
       process.env.JWT_SECRET || 'sems_super_secret_key_change_in_production',
-      { expiresIn: '7d' } as jwt.SignOptions,
+      { expiresIn: '7d' } as jwt.SignOptions
     );
   }
 }

@@ -96,13 +96,17 @@ export default function StudentDashboard() {
               key={subject.id}
               className="bg-slate-800/40 border border-slate-700 rounded-2xl p-4 sm:p-6 space-y-4">
               <div className="flex items-center justify-between flex-wrap gap-2">
-                <h3 className="text-lg sm:text-xl font-bold text-white">{subject.name}</h3>
+                <h3 className="text-lg sm:text-xl font-bold text-white">
+                  {subject.name}
+                </h3>
                 <span className="text-xs text-slate-400 bg-slate-900 border border-slate-700 rounded-full px-3 py-1">
                   {subjectExams.length} نماذج
                 </span>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+                style={{ direction: 'rtl' }}>
                 {subjectExams.map((exam, i) => {
                   const result = getResultForExam(exam.id);
                   return (
@@ -135,14 +139,18 @@ export default function StudentDashboard() {
                             <div className="flex-1">
                               <div className="flex justify-between items-center mb-1 text-xs">
                                 <span className="text-slate-400">آخر درجة:</span>
-                                <span className="font-bold text-green-400">{result.percentage}%</span>
+                                <span className="font-bold text-green-400">
+                                  {result.percentage}%
+                                </span>
                               </div>
                               <div className="w-full bg-slate-700 rounded-full h-2 overflow-hidden">
                                 <motion.div
                                   initial={{ width: 0 }}
                                   animate={{ width: `${result.percentage}%` }}
                                   className={`h-full ${
-                                    result.percentage >= 50 ? 'bg-green-500' : 'bg-red-500'
+                                    result.percentage >= 50
+                                      ? 'bg-green-500'
+                                      : 'bg-red-500'
                                   }`}
                                 />
                               </div>

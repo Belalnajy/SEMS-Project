@@ -6,7 +6,7 @@ import {
   HiOutlineTrash,
   HiOutlinePencil,
   HiOutlineUpload,
-  HiOutlineSearch,
+  HiOutlineSearch
 } from 'react-icons/hi';
 import { StudentProfile, Section } from '../../types/api';
 import Modal from '../../components/Modal';
@@ -40,7 +40,7 @@ export default function StudentsPage() {
     student_number: '',
     national_id: '',
     password: 'student123',
-    section_id: '',
+    section_id: ''
   });
 
   // Import State
@@ -49,7 +49,7 @@ export default function StudentsPage() {
 
   // Feedback Status
   const [showConfirmDelete, setShowConfirmDelete] = useState<number | null>(
-    null,
+    null
   );
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -95,7 +95,7 @@ export default function StudentsPage() {
         student_number: '',
         national_id: '',
         password: 'student123',
-        section_id: '',
+        section_id: ''
       });
       fetchStudents();
     } catch (err: any) {
@@ -125,7 +125,7 @@ export default function StudentsPage() {
       student_number: student.student_number,
       national_id: (student as any).user?.national_id || '',
       password: '',
-      section_id: student.section?.id?.toString() || '',
+      section_id: student.section?.id?.toString() || ''
     });
     setShowModal(true);
   };
@@ -138,10 +138,10 @@ export default function StudentsPage() {
     if (importSection) formData.append('section_id', importSection);
     try {
       const res = await api.post('/students/import', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+        headers: { 'Content-Type': 'multipart/form-data' }
       });
       toast.success(
-        `تم استيراد ${res.data.success} طالب بنجاح. ${res.data.errors?.length ? `أخطاء: ${res.data.errors.length}` : ''}`,
+        `تم استيراد ${res.data.success} طالب بنجاح. ${res.data.errors?.length ? `أخطاء: ${res.data.errors.length}` : ''}`
       );
       setShowImport(false);
       setImportFile(null);
@@ -174,7 +174,7 @@ export default function StudentsPage() {
                 student_number: '',
                 national_id: '',
                 password: 'student123',
-                section_id: '',
+                section_id: ''
               });
               setShowModal(true);
             }}>
@@ -227,7 +227,8 @@ export default function StudentsPage() {
         </button>
       </div>
 
-      {/* Students list */}
+<<<<<<< HEAD
+      {/* Students list (cards + table) */}
       {students.length === 0 ? (
         <div className="bg-slate-800 rounded-xl border border-slate-700 p-8 text-center text-slate-400 shadow-sm">
           لا يوجد طلاب
@@ -375,7 +376,7 @@ export default function StudentsPage() {
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-1">
-              الرقم القومي
+              الرقم الهوية
             </label>
             <input
               className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"

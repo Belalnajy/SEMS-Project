@@ -6,7 +6,7 @@ import {
   HiOutlineClipboardCheck,
   HiOutlineShieldCheck,
   HiOutlineUserGroup,
-  HiOutlineArrowNarrowLeft,
+  HiOutlineArrowNarrowLeft
 } from 'react-icons/hi';
 
 export default function LandingPage() {
@@ -14,8 +14,8 @@ export default function LandingPage() {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: { staggerChildren: 0.2 },
-    },
+      transition: { staggerChildren: 0.2 }
+    }
   };
 
   const itemVariants = {
@@ -23,8 +23,8 @@ export default function LandingPage() {
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.6, ease: 'easeOut' },
-    },
+      transition: { duration: 0.6, ease: 'easeOut' }
+    }
   };
 
   return (
@@ -93,14 +93,14 @@ export default function LandingPage() {
             variants={itemVariants}
             className="flex flex-col sm:flex-row items-center justify-center gap-5">
             <Link
-              to="/guest"
-              className="w-full sm:w-auto px-10 py-4 bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-2xl font-bold text-xl transition-all shadow-xl shadow-blue-600/25 hover:scale-105 active:scale-95">
-              ابدأ الاختبار كضيف
-            </Link>
-            <Link
               to="/login"
               className="w-full sm:w-auto px-10 py-4 bg-slate-800/50 backdrop-blur border border-slate-700 hover:bg-slate-700 text-white rounded-2xl font-bold text-xl transition-all hover:scale-105 active:scale-95">
               دخول الطلاب
+            </Link>
+            <Link
+              to="/guest"
+              className="w-full sm:w-auto px-10 py-4 bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-2xl font-bold text-xl transition-all shadow-xl shadow-blue-600/25 hover:scale-105 active:scale-95">
+              ابدأ الاختبار كضيف
             </Link>
           </motion.div>
         </motion.div>
@@ -173,7 +173,7 @@ export default function LandingPage() {
 function FeatureCard({
   icon,
   title,
-  description,
+  description
 }: {
   icon: any;
   title: string;

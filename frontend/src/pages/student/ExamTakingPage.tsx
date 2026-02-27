@@ -326,12 +326,12 @@ export default function ExamTakingPage() {
         </p>
         <button
           className={`flex items-center justify-center gap-3 w-full sm:w-auto mx-auto px-10 py-4 rounded-xl font-bold text-lg transition-all shadow-lg ${
-            submitting || Object.keys(answers).length === 0
+            submitting || Object.keys(answers).length < questions.length
               ? 'bg-slate-700 text-slate-400 cursor-not-allowed border border-slate-600'
               : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white border border-blue-500/50 hover:shadow-blue-500/25'
           }`}
           onClick={() => setShowSubmitConfirm(true)}
-          disabled={submitting}>
+          disabled={submitting || Object.keys(answers).length < questions.length}>
           {submitting ? (
             <>
               <div className="h-5 w-5 border-2 border-slate-400 border-t-white rounded-full animate-spin"></div>
