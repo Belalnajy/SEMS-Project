@@ -30,14 +30,26 @@ import StudentExamsPage from './pages/student/ExamsPage';
 // Guest
 import GuestPage from './pages/guest/GuestPage';
 
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
+import { HiOutlineMenu } from 'react-icons/hi';
 
 function DashboardLayout({ children }: { children: ReactNode }) {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-slate-900 flex">
-      <Sidebar />
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
       <main className="flex-1 lg:pl-64 pr-0 lg:pr-64 pb-10 transition-all duration-300 print:p-0 print:m-0 print:lg:pr-0">
-        <div className="p-4 md:p-8 space-y-6 max-w-7xl mx-auto">{children}</div>
+        <button
+          type="button"
+          onClick={() => setIsSidebarOpen(true)}
+          className="lg:hidden fixed top-4 right-4 z-30 p-2 rounded-lg border border-slate-700 bg-slate-800 text-slate-100 shadow-lg"
+          aria-label="فتح القائمة الجانبية">
+          <HiOutlineMenu className="h-6 w-6" />
+        </button>
+        <div className="p-4 pt-16 md:p-8 md:pt-8 space-y-6 max-w-7xl mx-auto">
+          {children}
+        </div>
       </main>
     </div>
   );
