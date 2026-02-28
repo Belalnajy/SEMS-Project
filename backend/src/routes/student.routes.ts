@@ -5,6 +5,7 @@ import {
   createStudent,
   updateStudent,
   deleteStudent,
+  deleteAllStudents,
   importStudents,
 } from '../controllers/student.controller';
 import { authenticate } from '../middleware/auth';
@@ -27,6 +28,7 @@ router.post(
 );
 router.post('/import', upload.single('file'), importStudents);
 router.put('/:id', updateStudent);
+router.delete('/', deleteAllStudents);
 router.delete('/:id', deleteStudent);
 
 export default router;

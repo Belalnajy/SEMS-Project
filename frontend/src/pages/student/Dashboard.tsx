@@ -1,14 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../api/client';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { HiOutlineAcademicCap, HiCheckCircle, HiClock } from 'react-icons/hi';
 import { ExamModel, Result, Subject } from '../../types/api';
 
 export default function StudentDashboard() {
   const [exams, setExams] = useState<ExamModel[]>([]);
   const [results, setResults] = useState<Result[]>([]);
-  const [activeSubjectId, setActiveSubjectId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -28,11 +27,6 @@ export default function StudentDashboard() {
           : (resultsRes.data as any).reports || [];
         setResults(resultsArray);
 
-        if (activeExams.length > 0) {
-          // Set initial tab to the first subject available
-          const firstSubjectId = activeExams[0].subject?.id;
-          setActiveSubjectId(firstSubjectId);
-        }
       } catch (err) {
         console.error('Failed to fetch dashboard data', err);
       } finally {
@@ -45,18 +39,19 @@ export default function StudentDashboard() {
 
   const navigate = useNavigate();
 
-  // Unique subjects that have exams
-  const subjectsMap = new Map<number, Subject>();
-  exams.forEach((exam) => {
-    if (exam.subject) {
-      subjectsMap.set(exam.subject.id, exam.subject);
+  // Group active exams by subject for organized display
+  const groupedExamsBySubject = exams.reduce<
+    Record<number, { subject: Subject; exams: ExamModel[] }>
+  >((acc, exam) => {
+    if (!exam.subject) return acc;
+    if (!acc[exam.subject.id]) {
+      acc[exam.subject.id] = { subject: exam.subject, exams: [] };
     }
-  });
-  const availableSubjects = Array.from(subjectsMap.values());
+    acc[exam.subject.id].exams.push(exam);
+    return acc;
+  }, {});
 
-  const filteredExams = activeSubjectId
-    ? exams.filter((e) => e.subject?.id === activeSubjectId)
-    : [];
+  const availableSubjects = Object.values(groupedExamsBySubject);
 
   const getResultForExam = (examId: number) => {
     return results.find((r) => r.exam_id === examId);
@@ -86,9 +81,9 @@ export default function StudentDashboard() {
         <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full -mr-32 -mt-32 blur-3xl"></div>
       </motion.div>
 
-      {/* Subjects Tabs */}
+      {/* Subjects & Models */}
       {availableSubjects.length > 0 ? (
-        <div className="space-y-6">
+        <div className="space-y-8">
           <div className="flex items-center justify-between border-b border-slate-700 pb-2">
             <h2 className="text-xl font-bold text-white flex items-center gap-2">
               <HiOutlineAcademicCap className="text-blue-500 h-6 w-6" />
@@ -96,103 +91,82 @@ export default function StudentDashboard() {
             </h2>
           </div>
 
-          <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide">
-            {availableSubjects.map((subject) => (
-              <button
-                key={subject.id}
-                onClick={() => setActiveSubjectId(subject.id)}
-                className={`px-6 py-2.5 rounded-full text-sm font-semibold transition-all whitespace-nowrap ${
-                  activeSubjectId === subject.id
-                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25 ring-2 ring-blue-500/50'
-                    : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white border border-slate-700'
-                }`}>
-                {subject.name}
-              </button>
-            ))}
-          </div>
+          {availableSubjects.map(({ subject, exams: subjectExams }) => (
+            <section
+              key={subject.id}
+              className="bg-slate-800/40 border border-slate-700 rounded-2xl p-4 sm:p-6 space-y-4">
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <h3 className="text-lg sm:text-xl font-bold text-white">{subject.name}</h3>
+                <span className="text-xs text-slate-400 bg-slate-900 border border-slate-700 rounded-full px-3 py-1">
+                  {subjectExams.length} نماذج
+                </span>
+              </div>
 
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeSubjectId}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.2 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredExams.map((exam, i) => {
-                const result = getResultForExam(exam.id);
-                return (
-                  <motion.div
-                    key={exam.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.05 }}
-                    onClick={() => navigate(`/student/exam/${exam.id}`)}
-                    className="bg-slate-800/80 backdrop-blur-sm rounded-2xl p-6 border border-slate-700 shadow-sm hover:border-blue-500/50 hover:shadow-xl hover:shadow-blue-500/5 transition-all cursor-pointer group relative overflow-hidden flex flex-col justify-between min-h-[220px]">
-                    <div>
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="p-3 rounded-xl bg-slate-900 border border-slate-700 text-blue-500 group-hover:scale-110 transition-transform">
-                          <HiOutlineAcademicCap className="h-6 w-6" />
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {subjectExams.map((exam, i) => {
+                  const result = getResultForExam(exam.id);
+                  return (
+                    <motion.div
+                      key={exam.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.04 }}
+                      onClick={() => navigate(`/student/exam/${exam.id}`)}
+                      className="bg-slate-800 rounded-xl p-5 border border-slate-700 hover:border-blue-500/50 hover:shadow-lg hover:shadow-blue-500/10 transition-all cursor-pointer group flex flex-col justify-between min-h-[190px]">
+                      <div>
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="p-2.5 rounded-lg bg-slate-900 border border-slate-700 text-blue-500 group-hover:scale-110 transition-transform">
+                            <HiOutlineAcademicCap className="h-5 w-5" />
+                          </div>
+                          <div className="flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-lg bg-slate-900 text-slate-400 border border-slate-700">
+                            <HiClock className="h-3.5 w-3.5" />
+                            {exam.duration_minutes} د
+                          </div>
                         </div>
-                        <div className="flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-lg bg-slate-900 text-slate-400 border border-slate-700">
-                          <HiClock className="h-3.5 w-3.5" />
-                          {exam.duration_minutes} دقيقة
-                        </div>
+
+                        <h4 className="text-base font-bold text-white group-hover:text-blue-400 transition-colors mb-1">
+                          {exam.name}
+                        </h4>
                       </div>
 
-                      <h3 className="text-xl font-bold text-white mb-2 group-hover:text-blue-400 transition-colors">
-                        {exam.name}
-                      </h3>
-                      <p className="text-sm text-slate-400 line-clamp-2">
-                        {exam.subject?.name}
-                      </p>
-                    </div>
-
-                    <div className="mt-6 flex items-center justify-between">
-                      {result ? (
-                        <div className="flex items-center gap-2 w-full">
-                          <div className="flex-1">
-                            <div className="flex justify-between items-center mb-1 text-xs">
-                              <span className="text-slate-400">آخر درجة:</span>
-                              <span className="font-bold text-green-400">
-                                {result.percentage}%
-                              </span>
+                      <div className="mt-4">
+                        {result ? (
+                          <div className="flex items-center gap-2 w-full">
+                            <div className="flex-1">
+                              <div className="flex justify-between items-center mb-1 text-xs">
+                                <span className="text-slate-400">آخر درجة:</span>
+                                <span className="font-bold text-green-400">{result.percentage}%</span>
+                              </div>
+                              <div className="w-full bg-slate-700 rounded-full h-2 overflow-hidden">
+                                <motion.div
+                                  initial={{ width: 0 }}
+                                  animate={{ width: `${result.percentage}%` }}
+                                  className={`h-full ${
+                                    result.percentage >= 50 ? 'bg-green-500' : 'bg-red-500'
+                                  }`}
+                                />
+                              </div>
                             </div>
-                            <div className="w-full bg-slate-700 rounded-full h-2 overflow-hidden">
-                              <motion.div
-                                initial={{ width: 0 }}
-                                animate={{ width: `${result.percentage}%` }}
-                                className={`h-full ${
-                                  result.percentage >= 50
-                                    ? 'bg-green-500'
-                                    : 'bg-red-500'
-                                }`}
-                              />
+                            <div className="text-green-500 ml-1">
+                              <HiCheckCircle className="h-5 w-5" />
                             </div>
                           </div>
-                          <div className="text-green-500 ml-2">
-                            <HiCheckCircle className="h-6 w-6" />
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="w-full">
-                          <div className="flex items-center justify-center py-2 px-4 rounded-xl bg-blue-600 font-bold text-white group-hover:bg-blue-500 transition-colors shadow-lg shadow-blue-600/20">
+                        ) : (
+                          <div className="flex items-center justify-center py-2 px-4 rounded-xl bg-blue-600 font-bold text-white group-hover:bg-blue-500 transition-colors shadow-lg shadow-blue-600/20 text-sm">
                             ابدأ الآن
                           </div>
-                        </div>
-                      )}
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </motion.div>
-          </AnimatePresence>
+                        )}
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </section>
+          ))}
         </div>
       ) : (
         <div className="bg-slate-800/50 rounded-2xl p-12 border border-slate-700/50 border-dashed text-center">
-          <p className="text-slate-400 text-lg">
-            لا توجد امتحانات متاحة حالياً.
-          </p>
+          <p className="text-slate-400 text-lg">لا توجد امتحانات متاحة حالياً.</p>
         </div>
       )}
 

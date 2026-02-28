@@ -4,6 +4,7 @@ import { Student } from '../entities/Student';
 import { Section } from '../entities/Section';
 import { User } from '../entities/User';
 import { Role } from '../entities/Role';
+import { Result } from '../entities/Result';
 import { ApiError } from '../middleware/errorHandler';
 import bcrypt from 'bcryptjs';
 
@@ -149,13 +150,60 @@ export class StudentService {
   async delete(id: number) {
     const student = await this.getById(id);
 
-    // Deleting the user will cascade and delete the student because of the setup,
-    // but doing it explicitly guarantees both are wiped.
     return await AppDataSource.transaction(async (manager) => {
+      // Ensure dependent results are removed even if DB-level cascades differ per environment.
+      await manager
+        .createQueryBuilder()
+        .delete()
+        .from(Result)
+        .where('student_id = :studentId', { studentId: student.id })
+        .execute();
+
+      // Delete student first, then linked user to avoid FK issues in some schemas.
+      await manager.remove(Student, student);
+
       if (student.user) {
         await manager.remove(User, student.user);
       }
-      return await manager.remove(Student, student);
+
+      return { deleted: true };
+    });
+  }
+
+  async deleteAll() {
+    return await AppDataSource.transaction(async (manager) => {
+      const students = await manager.find(Student, {
+        relations: ['user'],
+      });
+
+      if (students.length === 0) {
+        return { deleted: true, studentsDeleted: 0 };
+      }
+
+      const studentIds = students.map((student) => student.id);
+      const usersToDelete = students
+        .map((student) => student.user)
+        .filter((user): user is User => !!user);
+
+      await manager
+        .createQueryBuilder()
+        .delete()
+        .from(Result)
+        .where('student_id IN (:...studentIds)', { studentIds })
+        .execute();
+
+      await manager
+        .createQueryBuilder()
+        .delete()
+        .from(Student)
+        .where('id IN (:...studentIds)', { studentIds })
+        .execute();
+
+      if (usersToDelete.length > 0) {
+        await manager.remove(User, usersToDelete);
+      }
+
+      return { deleted: true, studentsDeleted: studentIds.length };
     });
   }
 

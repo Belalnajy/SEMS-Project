@@ -28,6 +28,14 @@ export const deleteStudent = async (req: Request, res: Response) => {
   res.json({ message: 'تم حذف الطالب بنجاح.' });
 };
 
+export const deleteAllStudents = async (_req: Request, res: Response) => {
+  const result = await studentService.deleteAll();
+  res.json({
+    message: `تم حذف جميع الطلاب بنجاح (${result.studentsDeleted}).`,
+    ...result,
+  });
+};
+
 export const importStudents = async (req: Request, res: Response) => {
   const file = (req as any).file;
   if (!file) throw new Error('يرجى اختيار ملف Excel');

@@ -51,6 +51,7 @@ export default function StudentsPage() {
   const [showConfirmDelete, setShowConfirmDelete] = useState<number | null>(
     null,
   );
+  const [showConfirmDeleteAll, setShowConfirmDeleteAll] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
   const fetchStudents = async (page = 1) => {
@@ -118,6 +119,20 @@ export default function StudentsPage() {
     }
   };
 
+  const confirmDeleteAll = async () => {
+    setIsDeleting(true);
+    try {
+      const res = await api.delete('/students');
+      toast.success(res.data?.message || 'تم حذف جميع الطلاب بنجاح');
+      fetchStudents();
+      setShowConfirmDeleteAll(false);
+    } catch (err: any) {
+      toast.error(err.response?.data?.error || 'حدث خطأ أثناء حذف جميع الطلاب');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   const handleEdit = (student: StudentProfile) => {
     setEditStudent(student);
     setForm({
@@ -159,14 +174,19 @@ export default function StudentsPage() {
           <h1 className="text-2xl font-bold text-white mb-1">إدارة الطلاب</h1>
           <p className="text-sm text-slate-400">إضافة وتعديل وحذف الطلاب</p>
         </div>
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap w-full md:w-auto gap-3">
           <button
-            className="flex items-center gap-2 bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+            className="flex-1 sm:flex-initial justify-center flex items-center gap-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 px-4 py-2 rounded-lg font-medium transition-colors"
+            onClick={() => setShowConfirmDeleteAll(true)}>
+            <HiOutlineTrash className="h-5 w-5" /> حذف الكل
+          </button>
+          <button
+            className="flex-1 sm:flex-initial justify-center flex items-center gap-2 bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg font-medium transition-colors"
             onClick={() => setShowImport(true)}>
             <HiOutlineUpload className="h-5 w-5" /> استيراد Excel
           </button>
           <button
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+            className="flex-1 sm:flex-initial justify-center flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
             onClick={() => {
               setEditStudent(null);
               setForm({
@@ -190,6 +210,16 @@ export default function StudentsPage() {
         onConfirm={confirmDelete}
         title="حذف طالب"
         message="هل أنت متأكد من حذف هذا الطالب؟ سيؤدي ذلك لحذف جميع بياناته ونتائجه."
+        isDanger={true}
+        loading={isDeleting}
+      />
+
+      <ConfirmModal
+        isOpen={showConfirmDeleteAll}
+        onClose={() => setShowConfirmDeleteAll(false)}
+        onConfirm={confirmDeleteAll}
+        title="حذف جميع الطلاب"
+        message="هل أنت متأكد من حذف جميع الطلاب؟ سيتم حذف كل البيانات والنتائج المرتبطة نهائياً."
         isDanger={true}
         loading={isDeleting}
       />
@@ -227,80 +257,102 @@ export default function StudentsPage() {
         </button>
       </div>
 
-      {/* Table */}
-      <div className="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow-sm">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm text-right text-slate-300 min-w-[800px]">
-            <thead className="text-xs text-slate-400 uppercase bg-slate-900/50 border-b border-slate-700">
-              <tr>
-                <th className="px-6 py-4 font-medium">#</th>
-                <th className="px-6 py-4 font-medium text-right">
-                  الاسم الكامل
-                </th>
-                <th className="px-6 py-4 font-medium text-right">رقم الطالب</th>
-                <th className="px-6 py-4 font-medium text-right">
-                  الرقم القومي
-                </th>
-                <th className="px-6 py-4 font-medium text-right">الفصل</th>
-                <th className="px-6 py-4 font-medium text-center">إجراءات</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-700/50">
-              {students.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={6}
-                    className="px-6 py-8 text-center text-slate-400">
-                    لا يوجد طلاب
-                  </td>
-                </tr>
-              ) : (
-                students.map((s, i) => (
-                  <tr
-                    key={s.id}
-                    className="hover:bg-slate-700/20 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {(pagination.page - 1) * 20 + i + 1}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap font-medium text-white">
-                      {s.full_name}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-500/10 text-blue-500 border border-blue-500/20">
-                        {s.student_number}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-slate-300">
-                      {(s as any).user?.national_id || '-'}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {s.section?.name || (
-                        <span className="text-slate-500">-</span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex justify-center gap-2">
-                        <button
-                          className="p-2 text-slate-400 hover:bg-slate-700 hover:text-white rounded-lg transition-all"
-                          title="تعديل"
-                          onClick={() => handleEdit(s)}>
-                          <HiOutlinePencil className="h-5 w-5" />
-                        </button>
-                        <button
-                          className="p-2 text-slate-400 hover:bg-red-500/10 hover:text-red-500 rounded-lg transition-all"
-                          title="حذف"
-                          onClick={() => setShowConfirmDelete(s.id)}>
-                          <HiOutlineTrash className="h-5 w-5" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+      {/* Students list */}
+      {students.length === 0 ? (
+        <div className="bg-slate-800 rounded-xl border border-slate-700 p-8 text-center text-slate-400 shadow-sm">
+          لا يوجد طلاب
         </div>
-      </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 gap-4 md:hidden">
+            {students.map((s, i) => (
+              <div
+                key={s.id}
+                className="bg-slate-800 rounded-xl border border-slate-700 p-4 shadow-sm space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-slate-400">
+                    #{(pagination.page - 1) * 20 + i + 1}
+                  </span>
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-500/10 text-blue-500 border border-blue-500/20">
+                    {s.student_number}
+                  </span>
+                </div>
+                <div>
+                  <p className="text-base font-semibold text-white">{s.full_name}</p>
+                  <p className="text-xs text-slate-400 mt-1">
+                    الرقم القومي: {(s as any).user?.national_id || '-'}
+                  </p>
+                  <p className="text-xs text-slate-400 mt-1">
+                    الفصل: {s.section?.name || '-'}
+                  </p>
+                </div>
+                <div className="flex gap-2 pt-2 border-t border-slate-700/60">
+                  <button
+                    className="flex-1 py-2 rounded-lg bg-slate-700/60 text-slate-200 hover:bg-slate-700 transition-colors text-sm font-medium flex items-center justify-center gap-1"
+                    title="تعديل"
+                    onClick={() => handleEdit(s)}>
+                    <HiOutlinePencil className="h-4 w-4" /> تعديل
+                  </button>
+                  <button
+                    className="flex-1 py-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors text-sm font-medium flex items-center justify-center gap-1"
+                    title="حذف"
+                    onClick={() => setShowConfirmDelete(s.id)}>
+                    <HiOutlineTrash className="h-4 w-4" /> حذف
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="hidden md:block bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow-sm">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-right text-slate-300 min-w-[800px]">
+                <thead className="text-xs text-slate-400 uppercase bg-slate-900/50 border-b border-slate-700">
+                  <tr>
+                    <th className="px-6 py-4 font-medium">#</th>
+                    <th className="px-6 py-4 font-medium text-right">الاسم الكامل</th>
+                    <th className="px-6 py-4 font-medium text-right">رقم الطالب</th>
+                    <th className="px-6 py-4 font-medium text-right">الرقم القومي</th>
+                    <th className="px-6 py-4 font-medium text-right">الفصل</th>
+                    <th className="px-6 py-4 font-medium text-center">إجراءات</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-700/50">
+                  {students.map((s, i) => (
+                    <tr key={s.id} className="hover:bg-slate-700/20 transition-colors">
+                      <td className="px-6 py-4 whitespace-nowrap">{(pagination.page - 1) * 20 + i + 1}</td>
+                      <td className="px-6 py-4 whitespace-nowrap font-medium text-white">{s.full_name}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-500/10 text-blue-500 border border-blue-500/20">
+                          {s.student_number}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-slate-300">{(s as any).user?.national_id || '-'}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">{s.section?.name || <span className="text-slate-500">-</span>}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex justify-center gap-2">
+                          <button
+                            className="p-2 text-slate-400 hover:bg-slate-700 hover:text-white rounded-lg transition-all"
+                            title="تعديل"
+                            onClick={() => handleEdit(s)}>
+                            <HiOutlinePencil className="h-5 w-5" />
+                          </button>
+                          <button
+                            className="p-2 text-slate-400 hover:bg-red-500/10 hover:text-red-500 rounded-lg transition-all"
+                            title="حذف"
+                            onClick={() => setShowConfirmDelete(s.id)}>
+                            <HiOutlineTrash className="h-5 w-5" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Pagination */}
       {pagination.pages > 1 && (
