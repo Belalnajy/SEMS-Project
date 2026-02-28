@@ -145,6 +145,25 @@ export default function StudentsPage() {
     }
   };
 
+
+  const deleteAllStudents = async () => {
+    const confirmed = window.confirm(
+      'هل أنت متأكد من حذف جميع الطلاب؟ سيتم حذف بياناتهم ونتائجهم نهائياً.'
+    );
+    if (!confirmed) return;
+
+    setIsDeleting(true);
+    try {
+      await api.delete('/students/all');
+      toast.success('تم حذف جميع الطلاب بنجاح');
+      fetchStudents(1);
+    } catch (err: any) {
+      toast.error(err.response?.data?.error || 'فشل في حذف جميع الطلاب');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   const handleEdit = (student: StudentProfile) => {
     setEditStudent(student);
     setForm({
@@ -256,6 +275,12 @@ export default function StudentsPage() {
             onClick={deleteStudentsWithoutSection}
             disabled={isDeleting}>
             حذف الطلاب بدون فصل
+          </button>
+          <button
+            className="bg-red-700 hover:bg-red-800 text-white px-4 py-2.5 rounded-lg font-medium transition-colors whitespace-nowrap"
+            onClick={deleteAllStudents}
+            disabled={isDeleting}>
+            حذف جميع الطلاب
           </button>
         </div>
       </div>
