@@ -334,6 +334,8 @@ export default function GuestPage() {
         <p className="text-slate-400 text-lg leading-relaxed">
           الثانوية الحادية والعشرون - إعداد أ. ابتسام السلمي
           <br />
+          مديرة المدرسة/ جميلة فهد المطيري
+          <br />
           يمكنك أداء الامتحان كزائر لتقييم مستواك.
           <br className="hidden sm:block" />
           ملاحظة: النتائج لن تُحفظ في التقارير الرسمية للنظام.
