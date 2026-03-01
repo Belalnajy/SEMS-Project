@@ -48,3 +48,12 @@ export const deleteStudentsWithoutSection = async (
     ...result,
   });
 };
+
+
+export const deleteAllStudents = async (req: Request, res: Response) => {
+  const result = await studentService.deleteAll();
+  res.json({
+    message: 'تم حذف جميع الطلاب بنجاح.',
+    ...result,
+  });
+};

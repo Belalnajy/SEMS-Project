@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { HiOutlineSparkles } from 'react-icons/hi';
+import { SCHOOL_LOGO_DATA_URI } from '../../constants/schoolLogo';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { motion } from 'framer-motion';
@@ -52,7 +53,7 @@ export default function LoginPage() {
               <div className="absolute inset-0 bg-blue-500/20 blur-2xl rounded-full" />
               <Link to="/">
                 <img
-                  src="/logo.png"
+                  src={SCHOOL_LOGO_DATA_URI}
                   alt="Logo"
                   className="w-24 h-24 rounded-2xl shadow-2xl relative z-10 border border-white/10"
                 />
@@ -68,6 +69,7 @@ export default function LoginPage() {
             الثانوية الحادية والعشرون
           </p>
           <p className="text-slate-400 text-xs mt-1">إشراف أ. ابتسام السلمي</p>
+          <p className="text-slate-500 text-[11px] mt-1">مديرة المدرسة/ جميلة فهد المطيري</p>
         </div>
 
         {error && (

@@ -7,6 +7,7 @@ import {
   deleteStudent,
   importStudents,
   deleteStudentsWithoutSection,
+  deleteAllStudents,
 } from '../controllers/student.controller';
 import { authenticate } from '../middleware/auth';
 import multer from 'multer';
@@ -27,6 +28,7 @@ router.post(
   createStudent,
 );
 router.post('/import', upload.single('file'), importStudents);
+router.delete('/all', deleteAllStudents);
 router.put('/:id', updateStudent);
 router.delete('/:id', deleteStudent);
 router.delete('/without-section/all', deleteStudentsWithoutSection);

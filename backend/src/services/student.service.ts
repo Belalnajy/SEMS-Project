@@ -208,6 +208,36 @@ export class StudentService {
     });
   }
 
+  async deleteAll() {
+    const students = await this.studentRepository.find({ relations: ['user'] });
+
+    if (!students.length) {
+      return { deleted: 0 };
+    }
+
+    const ids = students.map((s) => s.id);
+    const users = students
+      .map((s) => s.user)
+      .filter((u): u is User => !!u);
+
+    return await AppDataSource.transaction(async (manager) => {
+      await manager
+        .createQueryBuilder()
+        .delete()
+        .from(Result)
+        .where('student_id IN (:...ids)', { ids })
+        .execute();
+
+      await manager.remove(Student, students);
+
+      if (users.length) {
+        await manager.remove(User, users);
+      }
+
+      return { deleted: students.length };
+    });
+  }
+
   async importFromExcel(buffer: Buffer, sectionId?: number) {
     const workbook = XLSX.read(buffer, { type: 'buffer' });
     const sheetName = workbook.SheetNames[0];

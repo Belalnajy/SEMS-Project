@@ -1,5 +1,6 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { SCHOOL_LOGO_DATA_URI } from '../constants/schoolLogo';
 import {
   HiOutlineHome,
   HiOutlineUsers,
@@ -96,7 +97,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       <div className="p-6 border-b border-slate-700">
         <div className="flex items-center gap-3 mb-3">
           <img
-            src="/logo.png"
+            src={SCHOOL_LOGO_DATA_URI}
             alt="Logo"
             className="w-10 h-10 rounded-lg shadow-blue-500/20 shadow-lg"
           />
@@ -141,6 +142,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             الثانوية الحادية والعشرون
           </p>
           <p>إعداد أ. ابتسام السلمي</p>
+          <p>مديرة المدرسة/ جميلة فهد المطيري</p>
         </div>
       </div>
       </aside>

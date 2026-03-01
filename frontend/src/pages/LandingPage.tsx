@@ -84,9 +84,9 @@ export default function LandingPage() {
           <motion.p
             variants={itemVariants}
             className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed font-arabic">
-            منصة تعليمية متكاملة مصممة خصيصاً لطلاب الثانوية الحادية وعشرون
+            منصة تعليمية متكاملة مصممة خصيصاً لطلاب الثانوية الحادية والعشرون
             لتعزيز مهاراتهم في التحصيلي من خلال اختبارات ذكية وتقارير أداء دقيقة
-            بإشراف أ. ابتسام السلمي.
+            بإشراف أ. ابتسام السلمي، وبمتابعة مديرة المدرسة/ جميلة فهد المطيري.
           </motion.p>
 
           <motion.div
@@ -164,6 +164,7 @@ export default function LandingPage() {
             الثانوية الحادية والعشرون - جميع الحقوق محفوظة © 2026
           </p>
           <p className="text-slate-400 font-bold">إعداد أ. ابتسام السلمي</p>
+          <p className="text-slate-500 text-sm mt-1">مديرة المدرسة/ جميلة فهد المطيري</p>
         </div>
       </footer>
     </div>
