@@ -1,5 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import {
   HiOutlineAcademicCap,
@@ -7,58 +6,10 @@ import {
   HiOutlineClipboardCheck,
   HiOutlineShieldCheck,
   HiOutlineUserGroup,
-  HiOutlineArrowNarrowLeft,
-  HiOutlineEye,
-  HiOutlineLightBulb,
+  HiOutlineArrowNarrowLeft
 } from 'react-icons/hi';
-import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-
-function AnimatedCounter({ target, duration = 2000 }: { target: number; duration?: number }) {
-  const [count, setCount] = useState(0);
-  const ref = useRef<HTMLSpanElement>(null);
-  const isInView = useInView(ref, { once: true });
-
-  useEffect(() => {
-    if (!isInView || target === 0) return;
-    const steps = 60;
-    const increment = target / steps;
-    let current = 0;
-    const interval = setInterval(() => {
-      current += increment;
-      if (current >= target) {
-        setCount(target);
-        clearInterval(interval);
-      } else {
-        setCount(Math.floor(current));
-      }
-    }, duration / steps);
-    return () => clearInterval(interval);
-  }, [isInView, target, duration]);
-
-  return <span ref={ref}>{count.toLocaleString('ar-SA')}</span>;
-}
 
 export default function LandingPage() {
-  const [publicStats, setPublicStats] = useState({ students: 0, visitors: 0 });
-
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const res = await axios.get(`${API_URL}/public/stats`);
-        setPublicStats(res.data);
-      } catch { /* silent */ }
-    };
-    const trackVisit = async () => {
-      try {
-        await axios.post(`${API_URL}/public/track-visit`);
-      } catch { /* silent */ }
-    };
-    fetchStats();
-    trackVisit();
-  }, []);
-
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -153,74 +104,6 @@ export default function LandingPage() {
             </Link>
           </motion.div>
         </motion.div>
-      </section>
-
-      {/* Stats Counters */}
-      <section className="py-16 px-4">
-        <div className="max-w-5xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            {[
-              {
-                label: 'طالبة',
-                value: publicStats.students,
-                icon: HiOutlineUserGroup,
-                gradient: 'from-purple-500/20 to-purple-600/5',
-                iconBg: 'bg-purple-500/15',
-                iconColor: 'text-purple-400',
-                border: 'border-purple-500/20',
-              },
-              {
-                label: 'معلمة',
-                value: 60,
-                icon: HiOutlineAcademicCap,
-                gradient: 'from-amber-500/20 to-amber-600/5',
-                iconBg: 'bg-amber-500/15',
-                iconColor: 'text-amber-400',
-                border: 'border-amber-500/20',
-              },
-              {
-                label: 'مبادرة',
-                value: 27,
-                icon: HiOutlineLightBulb,
-                gradient: 'from-emerald-500/20 to-emerald-600/5',
-                iconBg: 'bg-emerald-500/15',
-                iconColor: 'text-emerald-400',
-                border: 'border-emerald-500/20',
-              },
-            ].map((stat, i) => (
-              <motion.div
-                key={stat.label}
-                className={`relative overflow-hidden bg-linear-to-br ${stat.gradient} backdrop-blur-sm border ${stat.border} rounded-2xl p-6 text-center`}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.15, duration: 0.5 }}
-              >
-                <div className={`${stat.iconBg} w-14 h-14 rounded-xl flex items-center justify-center mx-auto mb-4`}>
-                  <stat.icon className={`h-7 w-7 ${stat.iconColor}`} />
-                </div>
-                <h3 className="text-4xl font-extrabold text-white mb-1">
-                  <AnimatedCounter target={stat.value} />
-                </h3>
-                <p className="text-sm font-medium text-slate-400">{stat.label}</p>
-              </motion.div>
-            ))}
-          </div>
-
-          <motion.div
-            className="bg-slate-800/40 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-5 flex items-center justify-center gap-3"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.5, duration: 0.5 }}
-          >
-            <HiOutlineEye className="h-6 w-6 text-blue-400" />
-            <span className="text-slate-400 font-medium">عدد زوار الموقع:</span>
-            <span className="text-2xl font-bold text-white">
-              <AnimatedCounter target={publicStats.visitors} />
-            </span>
-          </motion.div>
-        </div>
       </section>
 
       {/* Features Grid */}

@@ -6,6 +6,9 @@ import {
   HiOutlineAcademicCap,
   HiOutlineBookOpen,
   HiOutlineClipboardList,
+  HiOutlineEye,
+  HiOutlineLightBulb,
+  HiOutlineUserGroup,
 } from 'react-icons/hi';
 
 interface Stats {
@@ -13,6 +16,7 @@ interface Stats {
   subjects: number;
   exams: number;
   sections: number;
+  visitors: number;
 }
 
 export default function SupervisorDashboard() {
@@ -21,6 +25,7 @@ export default function SupervisorDashboard() {
     subjects: 0,
     exams: 0,
     sections: 0,
+    visitors: 0,
   });
 
   useEffect(() => {
@@ -31,12 +36,14 @@ export default function SupervisorDashboard() {
       api.get('/subjects').catch(() => ({ data: [] })),
       api.get('/exams').catch(() => ({ data: [] })),
       api.get('/sections').catch(() => ({ data: [] })),
-    ]).then(([s, sub, ex, sec]) => {
+      api.get('/public/stats').catch(() => ({ data: { visitors: 0 } })),
+    ]).then(([s, sub, ex, sec, pub]) => {
       setStats({
         students: s.data.pagination?.total || 0,
         subjects: sub.data.length || 0,
         exams: ex.data.length || 0,
         sections: sec.data.length || 0,
+        visitors: pub.data.visitors || 0,
       });
     });
   }, []);
@@ -66,6 +73,18 @@ export default function SupervisorDashboard() {
       icon: HiOutlineClipboardList,
       colorClass: 'bg-amber-500/10 text-amber-500 border-amber-500/20',
     },
+    {
+      label: 'معلمة',
+      value: 60,
+      icon: HiOutlineUserGroup,
+      colorClass: 'bg-pink-500/10 text-pink-500 border-pink-500/20',
+    },
+    {
+      label: 'مبادرة',
+      value: 27,
+      icon: HiOutlineLightBulb,
+      colorClass: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20',
+    },
   ];
 
   return (
@@ -77,7 +96,7 @@ export default function SupervisorDashboard() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {cards.map((card, i) => (
           <motion.div
             key={card.label}
@@ -95,6 +114,17 @@ export default function SupervisorDashboard() {
           </motion.div>
         ))}
       </div>
+
+      <motion.div
+        className="bg-slate-800 rounded-xl p-5 border border-slate-700 shadow-sm flex items-center justify-center gap-3"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.7 }}
+      >
+        <HiOutlineEye className="h-6 w-6 text-blue-400" />
+        <span className="text-slate-400 font-medium">عدد زوار الموقع:</span>
+        <span className="text-2xl font-bold text-white">{stats.visitors}</span>
+      </motion.div>
     </div>
   );
 }
