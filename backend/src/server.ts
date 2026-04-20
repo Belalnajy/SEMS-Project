@@ -15,6 +15,7 @@ import subjectRoutes from './routes/subject.routes';
 import examRoutes from './routes/exam.routes';
 import reportRoutes from './routes/report.routes';
 import guestRoutes from './routes/guest.routes';
+import publicStatsRoutes from './routes/public-stats.routes';
 
 dotenv.config();
 
@@ -44,6 +45,7 @@ app.use('/api/subjects', subjectRoutes);
 app.use('/api/exams', examRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/guest', guestRoutes);
+app.use('/api/public', publicStatsRoutes);
 
 app.get('/api/health', (req: Request, res: Response) => {
   res.json({
@@ -65,6 +67,17 @@ export const initDB = async () => {
     await AppDataSource.initialize();
     console.log('📦 Connected to PostgreSQL via TypeORM');
   }
+
+  // Auto-create site_visitors table if it doesn't exist (safe for production)
+  try {
+    await AppDataSource.query(`
+      CREATE TABLE IF NOT EXISTS site_visitors (
+        id SERIAL PRIMARY KEY,
+        ip_address VARCHAR,
+        visited_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+  } catch { /* table may already exist */ }
 };
 
 // Start server only in non-Vercel environments
