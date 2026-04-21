@@ -2,10 +2,17 @@ import { Request, Response } from 'express';
 import { AppDataSource } from '../config/data-source';
 import { Student } from '../entities/Student';
 import { SiteVisitor } from '../entities/SiteVisitor';
+import { Subject } from '../entities/Subject';
+import { ExamModel } from '../entities/ExamModel';
+import { Section } from '../entities/Section';
 
 export const getPublicStats = async (req: Request, res: Response) => {
   try {
     const studentCount = await AppDataSource.getRepository(Student).count();
+
+    const subjectCount = await AppDataSource.getRepository(Subject).count();
+    const examCount = await AppDataSource.getRepository(ExamModel).count();
+    const sectionCount = await AppDataSource.getRepository(Section).count();
 
     let visitorCount = 0;
     try {
@@ -16,6 +23,9 @@ export const getPublicStats = async (req: Request, res: Response) => {
 
     res.json({
       students: studentCount,
+      subjects: subjectCount,
+      exams: examCount,
+      sections: sectionCount,
       visitors: visitorCount,
     });
   } catch (error) {

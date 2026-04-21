@@ -1,15 +1,6 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import api from '../../api/client';
-import {
-  HiOutlineUsers,
-  HiOutlineAcademicCap,
-  HiOutlineBookOpen,
-  HiOutlineClipboardList,
-  HiOutlineEye,
-  HiOutlineLightBulb,
-  HiOutlineUserGroup,
-} from 'react-icons/hi';
+import StatsOverview from '../../components/StatsOverview';
 
 interface Stats {
   students: number;
@@ -20,111 +11,25 @@ interface Stats {
 }
 
 export default function SupervisorDashboard() {
-  const [stats, setStats] = useState<Stats>({
-    students: 0,
-    subjects: 0,
-    exams: 0,
-    sections: 0,
-    visitors: 0,
-  });
+  const [stats, setStats] = useState<Stats | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([
-      api
-        .get('/students?limit=1')
-        .catch(() => ({ data: { pagination: { total: 0 } } })),
-      api.get('/subjects').catch(() => ({ data: [] })),
-      api.get('/exams').catch(() => ({ data: [] })),
-      api.get('/sections').catch(() => ({ data: [] })),
-      api.get('/public/stats').catch(() => ({ data: { visitors: 0 } })),
-    ]).then(([s, sub, ex, sec, pub]) => {
-      setStats({
-        students: s.data.pagination?.total || 0,
-        subjects: sub.data.length || 0,
-        exams: ex.data.length || 0,
-        sections: sec.data.length || 0,
-        visitors: pub.data.visitors || 0,
-      });
-    });
+    api.get('/public/stats')
+      .then((res) => {
+        setStats(res.data);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, []);
 
-  const cards = [
-    {
-      label: 'الطلاب',
-      value: stats.students,
-      icon: HiOutlineUsers,
-      colorClass: 'bg-purple-500/10 text-purple-500 border-purple-500/20',
-    },
-    {
-      label: 'المواد الدراسية',
-      value: stats.subjects,
-      icon: HiOutlineBookOpen,
-      colorClass: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
-    },
-    {
-      label: 'نماذج الامتحانات',
-      value: stats.exams,
-      icon: HiOutlineAcademicCap,
-      colorClass: 'bg-green-500/10 text-green-500 border-green-500/20',
-    },
-    {
-      label: 'الفصول',
-      value: stats.sections,
-      icon: HiOutlineClipboardList,
-      colorClass: 'bg-amber-500/10 text-amber-500 border-amber-500/20',
-    },
-    {
-      label: 'معلمة',
-      value: 60,
-      icon: HiOutlineUserGroup,
-      colorClass: 'bg-pink-500/10 text-pink-500 border-pink-500/20',
-    },
-    {
-      label: 'مبادرة',
-      value: 27,
-      icon: HiOutlineLightBulb,
-      colorClass: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20',
-    },
-  ];
-
-  return (
-    <div className="space-y-6">
-      <div className="bg-slate-800 rounded-xl p-6 border border-slate-700 shadow-sm">
-        <h1 className="text-2xl font-bold text-white mb-2">منصة التحصيلي</h1>
-        <p className="text-slate-400">
-          مرحباً بك في نظام إدارة الامتحانات المدرسية
-        </p>
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="h-12 w-12 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
       </div>
+    );
+  }
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {cards.map((card, i) => (
-          <motion.div
-            key={card.label}
-            className="bg-slate-800 rounded-xl p-6 border border-slate-700 shadow-sm flex items-center gap-4"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1 }}>
-            <div className={`p-4 rounded-xl border ${card.colorClass}`}>
-              <card.icon className="h-8 w-8" />
-            </div>
-            <div>
-              <h3 className="text-3xl font-bold text-white">{card.value}</h3>
-              <p className="text-sm font-medium text-slate-400">{card.label}</p>
-            </div>
-          </motion.div>
-        ))}
-      </div>
-
-      <motion.div
-        className="bg-slate-800 rounded-xl p-5 border border-slate-700 shadow-sm flex items-center justify-center gap-3"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.7 }}
-      >
-        <HiOutlineEye className="h-6 w-6 text-blue-400" />
-        <span className="text-slate-400 font-medium">عدد زوار الموقع:</span>
-        <span className="text-2xl font-bold text-white">{stats.visitors}</span>
-      </motion.div>
-    </div>
-  );
+  return <StatsOverview initialData={stats || undefined} />;
 }

@@ -8,6 +8,7 @@ import {
   HiOutlineUserGroup,
   HiOutlineArrowNarrowLeft
 } from 'react-icons/hi';
+import StatsOverview from '../components/StatsOverview';
 
 export default function LandingPage() {
   const containerVariants = {
@@ -104,6 +105,11 @@ export default function LandingPage() {
             </Link>
           </motion.div>
         </motion.div>
+      </section>
+
+      {/* Stats Section */}
+      <section className="py-20 px-4">
+        <StatsOverview />
       </section>
 
       {/* Features Grid */}
