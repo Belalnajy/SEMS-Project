@@ -35,27 +35,14 @@ export const getPublicStats = async (req: Request, res: Response) => {
 
 export const trackVisitor = async (req: Request, res: Response) => {
   try {
-    const ip =
+    const repo = AppDataSource.getRepository(SiteVisitor);
+
+    const visitor = new SiteVisitor();
+    visitor.ip_address =
       (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() ||
       req.socket.remoteAddress ||
       '';
-
-    const repo = AppDataSource.getRepository(SiteVisitor);
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const existing = await repo
-      .createQueryBuilder('v')
-      .where('v.ip_address = :ip', { ip })
-      .andWhere('v.visited_at >= :today', { today })
-      .getOne();
-
-    if (!existing) {
-      const visitor = new SiteVisitor();
-      visitor.ip_address = ip;
-      await repo.save(visitor);
-    }
+    await repo.save(visitor);
 
     res.json({ tracked: true });
   } catch {
