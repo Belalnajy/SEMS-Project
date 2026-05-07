@@ -16,6 +16,10 @@ export const startExam = async (req: Request, res: Response) => {
     return res.status(403).json({ error: 'هذا الامتحان غير متاح حالياً' });
   }
 
+  if (!exam.questions || exam.questions.length === 0) {
+    return res.status(400).json({ error: 'هذا النموذج لا يحتوي على أسئلة بعد. يرجى التواصل مع المشرف.' });
+  }
+
   // Hide correct answers for guests
   if (exam.questions) {
     exam.questions.forEach((q) => {

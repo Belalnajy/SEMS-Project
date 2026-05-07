@@ -342,7 +342,35 @@ export class ExamService {
     const workbook = XLSX.read(buffer, { type: 'buffer' });
     const sheetName = workbook.SheetNames[0];
     const sheet = workbook.Sheets[sheetName];
-    const data: any[] = XLSX.utils.sheet_to_json(sheet);
+
+    // Auto-detect header row: some Excel files have the header on a row other than the first
+    const rawRows: any[][] = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+    const knownHeaders = ['السؤال', 'question', 'question_text', 'قائمة الأسئلة'];
+    let headerRowIndex = 0;
+    for (let i = 0; i < Math.min(rawRows.length, 5); i++) {
+      const row = rawRows[i];
+      if (row && row.some((cell: any) => knownHeaders.includes(String(cell || '').trim()))) {
+        headerRowIndex = i;
+        break;
+      }
+    }
+
+    let data: any[];
+    if (headerRowIndex > 0) {
+      const headers = rawRows[headerRowIndex].map((h: any) => String(h || '').trim());
+      data = [];
+      for (let i = headerRowIndex + 1; i < rawRows.length; i++) {
+        const obj: any = {};
+        rawRows[i].forEach((cell: any, idx: number) => {
+          if (idx < headers.length && headers[idx]) {
+            obj[headers[idx]] = cell;
+          }
+        });
+        data.push(obj);
+      }
+    } else {
+      data = XLSX.utils.sheet_to_json(sheet);
+    }
 
     const exam = await this.getById(examId);
 

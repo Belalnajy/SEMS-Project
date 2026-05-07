@@ -190,7 +190,38 @@ export const seedDatabase = async (req: Request, res: Response) => {
             type: 'buffer',
           });
           const sheet = workbook.Sheets[workbook.SheetNames[0]];
-          const data: any[] = XLSX.utils.sheet_to_json(sheet);
+
+          // Auto-detect header row: some Excel files have the header on a row other than the first
+          const rawRows: any[][] = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+          const knownHeaders = ['السؤال', 'question', 'question_text', 'قائمة الأسئلة'];
+          let headerRowIndex = 0;
+          for (let i = 0; i < Math.min(rawRows.length, 5); i++) {
+            const row = rawRows[i];
+            if (row && row.some((cell: any) => knownHeaders.includes(String(cell || '').trim()))) {
+              headerRowIndex = i;
+              break;
+            }
+          }
+
+          // Re-parse with correct header row
+          let data: any[];
+          if (headerRowIndex > 0) {
+            // Build data using detected header row as column names
+            const headers = rawRows[headerRowIndex].map((h: any) => String(h || '').trim());
+            data = [];
+            for (let i = headerRowIndex + 1; i < rawRows.length; i++) {
+              const obj: any = {};
+              rawRows[i].forEach((cell: any, idx: number) => {
+                if (idx < headers.length && headers[idx]) {
+                  obj[headers[idx]] = cell;
+                }
+              });
+              data.push(obj);
+            }
+            logs.push(`  [${examName}] Header detected at row ${headerRowIndex + 1} (shifted)`);
+          } else {
+            data = XLSX.utils.sheet_to_json(sheet);
+          }
 
           let questionCount = 0;
           for (const row of data) {

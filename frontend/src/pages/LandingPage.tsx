@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import {
@@ -11,6 +12,11 @@ import {
 import StatsOverview from '../components/StatsOverview';
 
 export default function LandingPage() {
+  // Track visitor on page load
+  useEffect(() => {
+    const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+    fetch(`${baseURL}/public/track-visit`, { method: 'POST' }).catch(() => {});
+  }, []);
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {

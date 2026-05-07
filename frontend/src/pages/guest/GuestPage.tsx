@@ -27,6 +27,8 @@ export default function GuestPage() {
       .then(setExams)
       .catch(() => {});
     fetch(`${baseURL}/subjects`).catch(() => {});
+    // Track visitor
+    fetch(`${baseURL}/public/track-visit`, { method: 'POST' }).catch(() => {});
   }, []);
 
   const startExam = async () => {
