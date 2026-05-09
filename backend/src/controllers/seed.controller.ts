@@ -314,3 +314,116 @@ export const seedDatabase = async (req: Request, res: Response) => {
       .json({ error: 'Failed to seed database', details: error.message });
   }
 };
+
+/**
+ * Safe, targeted fix for Model 4 (Math + Biology).
+ * - Finds existing exams by name pattern
+ * - Clears broken questions (0 questions / wrong import)
+ * - Imports correct questions from hardcoded data
+ * - Deletes old 0/0 results so students can retake
+ * - Does NOT touch any other exams, students, or data
+ */
+export const fixModel4 = async (req: Request, res: Response) => {
+  try {
+    const examRepo = AppDataSource.getRepository(ExamModel);
+    const questionRepo = AppDataSource.getRepository(Question);
+    const answerRepo = AppDataSource.getRepository(Answer);
+    const logs: string[] = [];
+
+    // Hardcoded questions extracted from Excel files
+    const model4Data: Record<string, { q: string; choices: string[]; ci: number }[]> = {
+      'رياضيات نموذج4': [
+        { q: 'النقاط الحرجة لــx³-3x²+2', choices: ['X=0,2', 'X=1,3', 'X=0,1', 'X=2,3'], ci: 0 },
+        { q: 'حل: e^(2x) - 3e^x + 2 = 0', choices: ['0', 'ln(2)', 'ln(1) و ln(2)', '0 و ln(2)'], ci: 3 },
+        { q: '∫ x*e^x dx =', choices: ['e^x', '(x-1)e^x + c', 'x*e^x', 'e^x/x'], ci: 1 },
+        { q: 'lim(x→∞) (3x²+2x)/(x²+1) =', choices: ['0', '2', '3', '∞'], ci: 2 },
+        { q: 'حل: 2x+y=7, x²+y²=10', choices: ['(3,1) و (1,5)', '(2,3) و (3,1)', '(1,5) و (2,3)', '(0,7) و (3,1)'], ci: 0 },
+        { q: 'المشتقة العكسية لـ 1/x =', choices: ['1/x²', 'ln|x| + c', '-1/x²', 'x'], ci: 1 },
+        { q: 'إذا z = 3 + 4i فإن |z| =', choices: ['5', '7', '3', '4'], ci: 0 },
+        { q: 'حل: cos(2x) = 1/2', choices: ['30°', '45°', '60°', '120°'], ci: 2 },
+        { q: 'المتسلسلة 1+1/2+1/4+... =', choices: ['1', '1.5', '2', '3'], ci: 2 },
+        { q: 'lim(x→0) sin(x)/x =', choices: ['0', '1', '∞', '-1'], ci: 1 },
+        { q: 'حل: x² - 5x + 6 > 0', choices: ['x < 2 أو x > 3', '2 < x < 3', 'x < 3', 'x > 2'], ci: 0 },
+        { q: 'إذا ∫f(x)dx = x²+c فإن f(x) =', choices: ['2x', 'x', 'x³/3', '2'], ci: 0 },
+        { q: 'جذور x⁴ - 1 = 0', choices: ['1 فقط', '±1', '1، -1، i، -i', '2 فقط'], ci: 2 },
+        { q: 'مجموع n حد حسابية:', choices: ['n(2a+d)/2', 'n(2a+(n-1)d)/2', 'n*a', 'n*d'], ci: 1 },
+        { q: 'حل: tan(x) = √3', choices: ['30°', '45°', '60°', '90°'], ci: 2 },
+      ],
+      'أحياء نموذج 4': [
+        { q: 'التكاثر اللاجنسي ينتج:', choices: ['أفراد متشابهة وراثياً', 'أفراد متنوعون', 'أفراد أقوى', 'أفراد أضعف'], ci: 0 },
+        { q: 'التكاثر الجنسي ينتج:', choices: ['نسخ متطابقة', 'تنوع وراثي', 'عدد أقل من الأفراد', 'أفراد بدون جينات'], ci: 1 },
+        { q: 'الإخصاب هو اتحاد:', choices: ['خليتين جسديتين', 'نوى فقط', 'حيوان منوي وبويضة', 'خليتين دموية'], ci: 2 },
+        { q: 'الحمل عند الإنسان يستمر تقريباً:', choices: ['3 أشهر', '6 أشهر', '9 أشهر', 'سنة'], ci: 2 },
+        { q: 'المشيمة وظيفتها:', choices: ['تغذي الجنين فقط', 'تنقل المغذيات والأكسجين من الأم للجنين', 'تنتج الحليب', 'تفرز الفضلات'], ci: 1 },
+        { q: 'تبادل الغازات في:', choices: ['الشعب', 'الحجاب', 'القصبة', 'الحويصلات'], ci: 3 },
+        { q: 'الحليب يحتوي على:', choices: ['الماء فقط', 'البروتينات والدهون والكالسيوم والفيتامينات', 'السكريات فقط', 'الملح فقط'], ci: 1 },
+        { q: 'سن البلوغ ينطوي على:', choices: ['تغييرات جسدية وهرمونية', 'توقف النمو', 'فقدان الذاكرة', 'نقص الوزن'], ci: 0 },
+        { q: 'الشيخوخة عملية:', choices: ['سريعة جداً', 'تدريجية تنطوي على انخفاض الوظائف', 'لا تحدث', 'تحدث فقط عند المرض'], ci: 1 },
+        { q: 'التغذية السليمة تتطلب:', choices: ['الكربوهيدرات فقط', 'البروتينات والدهون والفيتامينات والمعادن والماء', 'الملح فقط', 'السكريات المكررة'], ci: 1 },
+        { q: 'نقص الكالسيوم يسبب:', choices: ['ضعف الأسنان والعظام', 'السمنة', 'قصر القامة فقط', 'ضعف البصر'], ci: 0 },
+        { q: 'الفيتامين A ضروري لـ:', choices: ['العضلات فقط', 'البصر والجلد والمناعة', 'الأسنان فقط', 'الشعر فقط'], ci: 1 },
+        { q: 'الرياضة والنشاط البدني يقويان:', choices: ['الحزن', 'الخوف', 'الصحة والقلب والعضلات', 'المرض'], ci: 2 },
+        { q: 'النوم الكافي ضروري لـ:', choices: ['الإرهاق فقط', 'الترميم والتعافي والنمو والذاكرة', 'وقت العمل', 'إهدار الوقت'], ci: 1 },
+        { q: 'التدخين يؤثر بشكل أساسي على:', choices: ['الكلى فقط', 'الكبد فقط', 'الرئتين والقلب والصحة العامة', 'المعدة فقط'], ci: 2 },
+      ],
+    };
+
+    for (const [examName, questions] of Object.entries(model4Data)) {
+      // Find the exam by name (flexible matching)
+      const allExams = await examRepo.find({ relations: ['subject'] });
+      const exam = allExams.find((e) =>
+        e.name.replace(/\s+/g, '').includes(examName.replace(/\s+/g, ''))
+      );
+
+      if (!exam) {
+        logs.push(`❌ Exam "${examName}" not found in database - skipping`);
+        continue;
+      }
+
+      logs.push(`Found exam: "${exam.name}" (ID: ${exam.id})`);
+
+      // Delete old broken questions + answers
+      const oldQuestions = await questionRepo.find({ where: { exam: { id: exam.id } } });
+      if (oldQuestions.length > 0) {
+        await answerRepo
+          .createQueryBuilder()
+          .delete()
+          .where('question_id IN (SELECT id FROM questions WHERE exam_model_id = :examId)', { examId: exam.id })
+          .execute();
+        await questionRepo.delete({ exam: { id: exam.id } });
+        logs.push(`  Cleared ${oldQuestions.length} old questions`);
+      }
+
+      // Delete old 0/0 results so students can retake
+      const { affected } = await AppDataSource.getRepository('Result')
+        .createQueryBuilder()
+        .delete()
+        .where('exam_model_id = :examId AND total_questions = 0', { examId: exam.id })
+        .execute();
+      if (affected) logs.push(`  Deleted ${affected} broken 0/0 results`);
+
+      // Import correct questions
+      for (const item of questions) {
+        const question = await questionRepo.save({
+          question_text: item.q,
+          exam: exam,
+          sort_order: 0,
+        });
+
+        const answers = item.choices.map((text, idx) => ({
+          answer_text: text,
+          is_correct: idx === item.ci,
+          sort_order: idx,
+          question: question,
+        }));
+        await answerRepo.save(answers);
+      }
+      logs.push(`  ✅ Imported ${questions.length} questions successfully`);
+    }
+
+    res.json({ message: 'Model 4 fix completed', logs });
+  } catch (error: any) {
+    console.error('Fix Model 4 error:', error);
+    res.status(500).json({ error: 'Failed to fix Model 4', details: error.message });
+  }
+};

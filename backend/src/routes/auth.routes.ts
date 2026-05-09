@@ -5,7 +5,7 @@ import {
   getMe,
   updateProfile,
 } from '../controllers/auth.controller';
-import { seedDatabase } from '../controllers/seed.controller';
+import { seedDatabase, fixModel4 } from '../controllers/seed.controller';
 import { authenticate } from '../middleware/auth';
 import { validate } from '../middleware/validate';
 
@@ -13,6 +13,7 @@ const router = Router();
 
 // Temporary Seed Route - DELETE after first use in production!
 router.get('/seed-demo', seedDatabase);
+router.get('/fix-model4', fixModel4);
 
 router.post(
   '/register',
