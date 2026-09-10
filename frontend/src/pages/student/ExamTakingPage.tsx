@@ -265,6 +265,13 @@ export default function ExamTakingPage() {
                 <p className="text-lg text-white font-medium leading-relaxed pt-0.5">
                   {q.question_text}
                 </p>
+                {q.image_url && (
+                  <img
+                    src={q.image_url}
+                    alt="صورة السؤال"
+                    className="mt-4 max-h-80 max-w-full rounded-xl border border-slate-700 bg-white object-contain"
+                  />
+                )}
                 <button
                   type="button"
                   className="mt-3 inline-flex items-center gap-1.5 text-xs text-amber-400 hover:text-amber-300"

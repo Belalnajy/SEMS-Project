@@ -55,6 +55,7 @@ export interface Answer {
 export interface Question {
   id: number;
   question_text: string;
+  image_url?: string | null; // External URL or base64 data URI
   sort_order: number;
   answers: Answer[];
 }

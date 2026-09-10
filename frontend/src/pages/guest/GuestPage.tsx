@@ -259,9 +259,18 @@ export default function GuestPage() {
                     }`}>
                     {i + 1}
                   </span>
-                  <p className="text-lg text-white font-medium leading-relaxed pt-0.5">
-                    {q.question_text}
-                  </p>
+                  <div className="flex-1">
+                    <p className="text-lg text-white font-medium leading-relaxed pt-0.5">
+                      {q.question_text}
+                    </p>
+                    {q.image_url && (
+                      <img
+                        src={q.image_url}
+                        alt="صورة السؤال"
+                        className="mt-4 max-h-80 max-w-full rounded-xl border border-slate-700 bg-white object-contain"
+                      />
+                    )}
+                  </div>
                 </div>
 
                 <div className="space-y-3 pl-12 pr-2">
