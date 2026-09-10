@@ -8,6 +8,7 @@ import { Result } from '../entities/Result';
 import { Student } from '../entities/Student';
 import { QuestionReport } from '../entities/QuestionReport';
 import { ApiError } from '../middleware/errorHandler';
+import { extractRowImages } from '../utils/xlsxImages';
 
 export class ExamService {
   private examRepository = AppDataSource.getRepository(ExamModel);
@@ -92,12 +93,13 @@ export class ExamService {
   // --- Questions Management ---
   async addQuestion(examId: number, data: any) {
     const exam = await this.getById(examId);
-    const { question_text, answers } = data; // answers[]: { answer_text, is_correct }
+    const { question_text, answers, image_url } = data; // answers[]: { answer_text, is_correct }
 
     return await AppDataSource.transaction(async (manager) => {
       const question = new Question();
       question.exam = exam;
       question.question_text = question_text;
+      question.image_url = image_url || null;
 
       const savedQuestion = await manager.save(Question, question);
 
@@ -248,7 +250,7 @@ export class ExamService {
   }
 
   async updateQuestion(examId: number, questionId: number, data: any) {
-    const { question_text, answers } = data;
+    const { question_text, answers, image_url } = data;
 
     const question = await this.questionRepository.findOne({
       where: { id: questionId, exam: { id: examId } },
@@ -258,8 +260,9 @@ export class ExamService {
     if (!question) throw new ApiError(404, 'السؤال غير موجود.');
 
     return await AppDataSource.transaction(async (manager) => {
-      // Update question text
+      // Update question text and image
       question.question_text = question_text;
+      if (image_url !== undefined) question.image_url = image_url || null;
       const updatedQuestion = await manager.save(Question, question);
 
       if (answers && Array.isArray(answers)) {
@@ -343,11 +346,16 @@ export class ExamService {
     const sheetName = workbook.SheetNames[0];
     const sheet = workbook.Sheets[sheetName];
 
+    // Pictures embedded in the workbook, keyed by the 0-based sheet row they are anchored to
+    const rowImages = extractRowImages(buffer);
+
     // Auto-detect header row: some Excel files have the header on a row other than the first
-    const rawRows: any[][] = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+    // (blankrows: true keeps indices aligned with real sheet rows, needed to match images)
+    const rawRows: any[][] = XLSX.utils.sheet_to_json(sheet, { header: 1, blankrows: true });
     const knownHeaders = ['السؤال', 'question', 'question_text', 'قائمة الأسئلة'];
     let headerRowIndex = 0;
-    for (let i = 0; i < Math.min(rawRows.length, 5); i++) {
+    // Scan 10 rows: with blankrows=true, leading empty rows now count too
+    for (let i = 0; i < Math.min(rawRows.length, 10); i++) {
       const row = rawRows[i];
       if (row && row.some((cell: any) => knownHeaders.includes(String(cell || '').trim()))) {
         headerRowIndex = i;
@@ -361,14 +369,16 @@ export class ExamService {
       data = [];
       for (let i = headerRowIndex + 1; i < rawRows.length; i++) {
         const obj: any = {};
-        rawRows[i].forEach((cell: any, idx: number) => {
+        (rawRows[i] || []).forEach((cell: any, idx: number) => {
           if (idx < headers.length && headers[idx]) {
             obj[headers[idx]] = cell;
           }
         });
+        Object.defineProperty(obj, '__rowNum__', { value: i, enumerable: false });
         data.push(obj);
       }
     } else {
+      // sheet_to_json attaches a hidden __rowNum__ (0-based sheet row) to every row
       data = XLSX.utils.sheet_to_json(sheet);
     }
 
@@ -431,9 +441,20 @@ export class ExamService {
 
         if (!questionText || choices.length < 2) continue;
 
+        // Question image: a URL/data-URI column, or a picture embedded at this row
+        const imageCell = getCellValue('image', 'image_url', 'الصورة', 'صورة', 'صوره');
+        let imageUrl: string | null = imageCell ? String(imageCell).trim() : null;
+        if (!imageUrl) {
+          const sheetRow = (row as any).__rowNum__;
+          if (typeof sheetRow === 'number' && rowImages.has(sheetRow)) {
+            imageUrl = rowImages.get(sheetRow)!;
+          }
+        }
+
         const question = new Question();
         question.exam = exam;
         question.question_text = String(questionText);
+        question.image_url = imageUrl;
         const savedQ = await manager.save(Question, question);
 
         const answerEntities = choices.map((text, idx) => {

@@ -25,8 +25,9 @@ const PORT = process.env.PORT || 5000;
 // Middlewares
 app.use(helmet());
 app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Large limit so question images (base64 data URIs) fit in JSON bodies
+app.use(express.json({ limit: '15mb' }));
+app.use(express.urlencoded({ extended: true, limit: '15mb' }));
 app.use(morgan('dev'));
 
 // Rate limiting
@@ -78,6 +79,13 @@ export const initDB = async () => {
       )
     `);
   } catch { /* table may already exist */ }
+
+  // Auto-add question image column (synchronize is off in production)
+  try {
+    await AppDataSource.query(
+      `ALTER TABLE questions ADD COLUMN IF NOT EXISTS image_url TEXT`,
+    );
+  } catch { /* column may already exist */ }
 };
 
 // Start server only in non-Vercel environments

@@ -7,6 +7,8 @@ import {
   HiOutlinePencil,
   HiOutlineDownload,
   HiOutlineLightBulb,
+  HiOutlinePhotograph,
+  HiOutlineX,
 } from 'react-icons/hi';
 import { ExamModel, Subject, Question } from '../../types/api';
 import Modal from '../../components/Modal';
@@ -34,6 +36,7 @@ export default function ExamsPage() {
 
   const [qForm, setQForm] = useState({
     question_text: '',
+    image_url: '',
     sort_order: 0,
     answers: [
       { answer_text: '', is_correct: false },
@@ -137,6 +140,7 @@ export default function ExamsPage() {
           `/exams/${selectedExam.id}/questions/${editQuestion.id}`,
           {
             question_text: qForm.question_text,
+            image_url: qForm.image_url || null,
             sort_order: qForm.sort_order,
             answers: filteredAnswers,
           },
@@ -145,6 +149,7 @@ export default function ExamsPage() {
       } else {
         await api.post(`/exams/${selectedExam.id}/questions`, {
           question_text: qForm.question_text,
+          image_url: qForm.image_url || null,
           sort_order: qForm.sort_order,
           answers: filteredAnswers,
         });
@@ -155,6 +160,7 @@ export default function ExamsPage() {
       setEditQuestion(null);
       setQForm({
         question_text: '',
+        image_url: '',
         sort_order: 0,
         answers: [
           { answer_text: '', is_correct: false },
@@ -194,6 +200,57 @@ export default function ExamsPage() {
   const openExam = (exam: ExamModel) => {
     setSelectedExam(exam);
     fetchQuestions(exam.id);
+  };
+
+  // Reads an image file as a data URI, downscaling large ones so the
+  // stored base64 stays small (no file storage on the server)
+  const readQuestionImage = (file: File): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = () => reject(new Error('read-failed'));
+      reader.onload = () => {
+        const dataUrl = reader.result as string;
+        if (file.size <= 300 * 1024) return resolve(dataUrl);
+        const img = new Image();
+        img.onload = () => {
+          const MAX_DIM = 1200;
+          const scale = Math.min(1, MAX_DIM / Math.max(img.width, img.height));
+          const canvas = document.createElement('canvas');
+          canvas.width = Math.round(img.width * scale) || 1;
+          canvas.height = Math.round(img.height * scale) || 1;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) return resolve(dataUrl);
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          resolve(canvas.toDataURL('image/jpeg', 0.85));
+        };
+        img.onerror = () => resolve(dataUrl);
+        img.src = dataUrl;
+      };
+      reader.readAsDataURL(file);
+    });
+
+  const handleQuestionImage = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      toast.error('يرجى اختيار ملف صورة صالح');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('حجم الصورة كبير جداً (الحد الأقصى 5 ميجابايت)');
+      return;
+    }
+    try {
+      const dataUrl = await readQuestionImage(file);
+      setQForm((prev) => ({ ...prev, image_url: dataUrl }));
+    } catch {
+      toast.error('فشل قراءة الصورة');
+    }
   };
 
   const handleImportExcel = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -403,9 +460,14 @@ export default function ExamsPage() {
                         حرف الخيار (A, B, C, D)
                       </li>
                     </ul>
+                    <p className="mt-2 text-[11px] text-blue-300">
+                      🖼️ الصور: أدرج الصورة داخل ملف Excel في نفس صف السؤال،
+                      أو أضف عمود <code className="text-white">صورة</code>{' '}
+                      يحتوي رابط الصورة — وستظهر للطالب تلقائياً.
+                    </p>
                     <p className="mt-2 text-[10px] text-slate-500 italic">
                       يدعم النظام أيضاً النسخ باللغة الإنجليزية (question,
-                      answer1-4, correct_answer)
+                      answer1-4, correct_answer, image)
                     </p>
                   </div>
                 </label>
@@ -415,6 +477,7 @@ export default function ExamsPage() {
                     setEditQuestion(null);
                     setQForm({
                       question_text: '',
+                      image_url: '',
                       sort_order: 0,
                       answers: [
                         { answer_text: '', is_correct: false },
@@ -448,9 +511,18 @@ export default function ExamsPage() {
                         <span className="flex-none bg-blue-600 text-white h-7 w-7 rounded-md flex items-center justify-center font-bold text-sm">
                           {i + 1}
                         </span>
-                        <p className="text-white font-medium text-base pt-0.5 leading-relaxed">
-                          {q.question_text}
-                        </p>
+                        <div>
+                          <p className="text-white font-medium text-base pt-0.5 leading-relaxed">
+                            {q.question_text}
+                          </p>
+                          {q.image_url && (
+                            <img
+                              src={q.image_url}
+                              alt="صورة السؤال"
+                              className="mt-3 max-h-48 max-w-full rounded-lg border border-slate-700 bg-white object-contain"
+                            />
+                          )}
+                        </div>
                       </div>
                       <div className="flex gap-2">
                         <button
@@ -460,6 +532,7 @@ export default function ExamsPage() {
                             setEditQuestion(q);
                             setQForm({
                               question_text: q.question_text,
+                              image_url: q.image_url || '',
                               sort_order: q.sort_order || 0,
                               answers:
                                 q.answers?.map((a) => ({
@@ -668,6 +741,41 @@ export default function ExamsPage() {
               }
               required
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-2">
+              صورة السؤال (اختياري)
+            </label>
+            {qForm.image_url ? (
+              <div className="relative inline-block">
+                <img
+                  src={qForm.image_url}
+                  alt="صورة السؤال"
+                  className="max-h-48 max-w-full rounded-lg border border-slate-700 bg-white object-contain"
+                />
+                <button
+                  type="button"
+                  title="إزالة الصورة"
+                  className="absolute -top-2 -left-2 bg-red-600 hover:bg-red-700 text-white rounded-full p-1 shadow-lg transition-colors"
+                  onClick={() => setQForm({ ...qForm, image_url: '' })}>
+                  <HiOutlineX className="h-4 w-4" />
+                </button>
+              </div>
+            ) : (
+              <label className="flex flex-col items-center justify-center gap-2 w-full py-6 bg-slate-900 border-2 border-dashed border-slate-700 hover:border-blue-500 rounded-lg cursor-pointer text-slate-400 hover:text-blue-400 transition-colors">
+                <HiOutlinePhotograph className="h-8 w-8" />
+                <span className="text-sm">
+                  اضغط لإرفاق صورة للسؤال (تظهر للطالب مع السؤال)
+                </span>
+                <input
+                  type="file"
+                  className="hidden"
+                  accept="image/*"
+                  onChange={handleQuestionImage}
+                />
+              </label>
+            )}
           </div>
 
           <div>

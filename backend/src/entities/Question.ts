@@ -19,6 +19,10 @@ export class Question {
   @Column({ type: 'text' })
   question_text: string;
 
+  // Optional question image: external URL or base64 data URI
+  @Column({ type: 'text', nullable: true })
+  image_url: string | null;
+
   @Column({ type: 'int', default: 0 })
   sort_order: number;
 
