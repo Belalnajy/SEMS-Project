@@ -22,6 +22,10 @@ dotenv.config();
 const app: Express = express();
 const PORT = process.env.PORT || 5000;
 
+// Vercel puts exactly one proxy in front of the app. Without this the rate
+// limiter keys on the proxy address instead of the visitor's IP.
+app.set('trust proxy', 1);
+
 // Middlewares
 app.use(helmet());
 app.use(cors());
@@ -30,13 +34,31 @@ app.use(express.json({ limit: '15mb' }));
 app.use(express.urlencoded({ extended: true, limit: '15mb' }));
 app.use(morgan('dev'));
 
-// Rate limiting
+// Rate limiting.
+// A whole school sits behind a single public IP, so limits here are shared by
+// every student at once. They are set high enough that a class taking an exam
+// together never trips them, while still stopping a runaway client.
+const isQuestionImage = (req: Request) =>
+  /^\/api\/exams\/questions\/\d+\/image$/.test(req.originalUrl.split('?')[0]);
+
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per `window`
+  max: 3000,
   message: 'تم تجاوز الحد المسموح به من الطلبات. يرجى المحاولة لاحقاً',
+  // Question images are one request per question; they would dominate the
+  // budget and their handler is a cheap cached read.
+  skip: isQuestionImage,
 });
 app.use('/api', limiter);
+
+// Login is the one endpoint worth guarding against guessing, but the cap still
+// has to clear a class of students signing in within the same few minutes.
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 200,
+  message: 'محاولات تسجيل دخول كثيرة. يرجى المحاولة بعد قليل',
+});
+app.use('/api/auth/login', loginLimiter);
 
 // Routes
 app.use('/api/auth', authRoutes);

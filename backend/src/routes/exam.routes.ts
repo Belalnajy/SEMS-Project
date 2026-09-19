@@ -34,13 +34,17 @@ router.use(authenticate);
 router.get('/', getAllExams);
 router.get('/my/results', getMyResults);
 router.get('/:id', getExamById);
-router.get('/:id/questions', getExamQuestions);
 router.post('/:id/start', startExam);
 router.post('/:id/submit', submitExam);
 router.post('/:id/questions/:questionId/report', roleGuard(['student']), reportQuestion);
 
 // Only supervisor manages contents
 router.use(roleGuard(['supervisor']));
+
+// Returns answers with is_correct intact — supervisor only.
+// Students get questions through /:id/start, which strips the correct answer.
+router.get('/:id/questions', getExamQuestions);
+
 router.post('/', validate({ body: ['subject_id', 'name'] }), createExam);
 router.put('/:id', updateExam);
 router.delete('/:id', deleteExam);
