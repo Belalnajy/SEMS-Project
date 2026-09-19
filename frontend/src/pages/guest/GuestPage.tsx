@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { HiOutlineClock, HiOutlineAcademicCap } from 'react-icons/hi';
 import ConfirmModal from '../../components/ConfirmModal';
+import { questionImageUrl } from '../../api/client';
 
 export default function GuestPage() {
   const [exams, setExams] = useState<any[]>([]);
@@ -263,10 +264,11 @@ export default function GuestPage() {
                     <p className="text-lg text-white font-medium leading-relaxed pt-0.5">
                       {q.question_text}
                     </p>
-                    {q.image_url && (
+                    {q.has_image && (
                       <img
-                        src={q.image_url}
+                        src={questionImageUrl(q.id)}
                         alt="صورة السؤال"
+                        loading="lazy"
                         className="mt-4 max-h-80 max-w-full rounded-xl border border-slate-700 bg-white object-contain"
                       />
                     )}

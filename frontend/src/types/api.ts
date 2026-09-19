@@ -55,7 +55,7 @@ export interface Answer {
 export interface Question {
   id: number;
   question_text: string;
-  image_url?: string | null; // External URL or base64 data URI
+  has_image?: boolean; // Image is loaded separately from the question payload
   sort_order: number;
   answers: Answer[];
 }

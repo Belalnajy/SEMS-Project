@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import api from '../../api/client';
+import api, { questionImageUrl } from '../../api/client';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
 import {
@@ -265,10 +265,11 @@ export default function ExamTakingPage() {
                 <p className="text-lg text-white font-medium leading-relaxed pt-0.5">
                   {q.question_text}
                 </p>
-                {q.image_url && (
+                {q.has_image && (
                   <img
-                    src={q.image_url}
+                    src={questionImageUrl(q.id)}
                     alt="صورة السؤال"
+                    loading="lazy"
                     className="mt-4 max-h-80 max-w-full rounded-xl border border-slate-700 bg-white object-contain"
                   />
                 )}

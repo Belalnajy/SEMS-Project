@@ -31,4 +31,9 @@ api.interceptors.response.use(
   },
 );
 
+// Question images are fetched by the browser directly (lazy, cached) instead of
+// being embedded in the exam payload.
+export const questionImageUrl = (questionId: number) =>
+  `${API_URL}/exams/questions/${questionId}/image`;
+
 export default api;

@@ -19,9 +19,14 @@ export class Question {
   @Column({ type: 'text' })
   question_text: string;
 
-  // Optional question image: external URL or base64 data URI
-  @Column({ type: 'text', nullable: true })
+  // Optional question image: external URL or base64 data URI.
+  // select: false keeps the (potentially large) image out of every exam query;
+  // it is served on demand by the question-image endpoint instead.
+  @Column({ type: 'text', nullable: true, select: false })
   image_url: string | null;
+
+  // Set by the service from a lightweight lookup — not a database column
+  has_image?: boolean;
 
   @Column({ type: 'int', default: 0 })
   sort_order: number;
