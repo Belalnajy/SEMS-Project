@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import api from '../../api/client';
+import api, { questionImageUrl } from '../../api/client';
 import {
   HiOutlinePlus,
   HiOutlineTrash,
@@ -34,9 +34,13 @@ export default function ExamsPage() {
     is_active: true,
   });
 
+  // image_url holds a newly picked image (data URI); has_image reflects the one
+  // already stored on the server; image_changed marks the image as edited.
   const [qForm, setQForm] = useState({
     question_text: '',
     image_url: '',
+    has_image: false,
+    image_changed: false,
     sort_order: 0,
     answers: [
       { answer_text: '', is_correct: false },
@@ -140,9 +144,12 @@ export default function ExamsPage() {
           `/exams/${selectedExam.id}/questions/${editQuestion.id}`,
           {
             question_text: qForm.question_text,
-            image_url: qForm.image_url || null,
             sort_order: qForm.sort_order,
             answers: filteredAnswers,
+            // Omitting image_url leaves the stored image untouched
+            ...(qForm.image_changed
+              ? { image_url: qForm.image_url || null }
+              : {}),
           },
         );
         toast.success('تم تحديث السؤال بنجاح');
@@ -161,6 +168,8 @@ export default function ExamsPage() {
       setQForm({
         question_text: '',
         image_url: '',
+        has_image: false,
+        image_changed: false,
         sort_order: 0,
         answers: [
           { answer_text: '', is_correct: false },
@@ -247,7 +256,12 @@ export default function ExamsPage() {
     }
     try {
       const dataUrl = await readQuestionImage(file);
-      setQForm((prev) => ({ ...prev, image_url: dataUrl }));
+      setQForm((prev) => ({
+        ...prev,
+        image_url: dataUrl,
+        has_image: true,
+        image_changed: true,
+      }));
     } catch {
       toast.error('فشل قراءة الصورة');
     }
@@ -478,6 +492,8 @@ export default function ExamsPage() {
                     setQForm({
                       question_text: '',
                       image_url: '',
+                      has_image: false,
+                      image_changed: false,
                       sort_order: 0,
                       answers: [
                         { answer_text: '', is_correct: false },
@@ -515,10 +531,11 @@ export default function ExamsPage() {
                           <p className="text-white font-medium text-base pt-0.5 leading-relaxed">
                             {q.question_text}
                           </p>
-                          {q.image_url && (
+                          {q.has_image && (
                             <img
-                              src={q.image_url}
+                              src={questionImageUrl(q.id)}
                               alt="صورة السؤال"
+                              loading="lazy"
                               className="mt-3 max-h-48 max-w-full rounded-lg border border-slate-700 bg-white object-contain"
                             />
                           )}
@@ -532,7 +549,9 @@ export default function ExamsPage() {
                             setEditQuestion(q);
                             setQForm({
                               question_text: q.question_text,
-                              image_url: q.image_url || '',
+                              image_url: '',
+                              has_image: !!q.has_image,
+                              image_changed: false,
                               sort_order: q.sort_order || 0,
                               answers:
                                 q.answers?.map((a) => ({
@@ -747,10 +766,12 @@ export default function ExamsPage() {
             <label className="block text-sm font-medium text-slate-300 mb-2">
               صورة السؤال (اختياري)
             </label>
-            {qForm.image_url ? (
+            {qForm.image_url || (qForm.has_image && editQuestion) ? (
               <div className="relative inline-block">
                 <img
-                  src={qForm.image_url}
+                  src={
+                    qForm.image_url || questionImageUrl(editQuestion!.id)
+                  }
                   alt="صورة السؤال"
                   className="max-h-48 max-w-full rounded-lg border border-slate-700 bg-white object-contain"
                 />
@@ -758,7 +779,14 @@ export default function ExamsPage() {
                   type="button"
                   title="إزالة الصورة"
                   className="absolute -top-2 -left-2 bg-red-600 hover:bg-red-700 text-white rounded-full p-1 shadow-lg transition-colors"
-                  onClick={() => setQForm({ ...qForm, image_url: '' })}>
+                  onClick={() =>
+                    setQForm({
+                      ...qForm,
+                      image_url: '',
+                      has_image: false,
+                      image_changed: true,
+                    })
+                  }>
                   <HiOutlineX className="h-4 w-4" />
                 </button>
               </div>

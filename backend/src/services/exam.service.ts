@@ -1,4 +1,5 @@
 import * as XLSX from 'xlsx';
+import { IsNull, Not } from 'typeorm';
 import { AppDataSource } from '../config/data-source';
 import { ExamModel } from '../entities/ExamModel';
 import { Subject } from '../entities/Subject';
@@ -39,9 +40,50 @@ export class ExamService {
       exam.questions.forEach((q) => {
         if (q.answers) q.answers.sort((a, b) => a.sort_order - b.sort_order);
       });
+
+      // Flag which questions have an image without loading the image itself
+      const withImages = await this.questionRepository.find({
+        where: { exam: { id }, image_url: Not(IsNull()) },
+        select: { id: true },
+      });
+
+      const imageIds = new Set(withImages.map((row) => row.id));
+      exam.questions.forEach((q) => {
+        q.has_image = imageIds.has(q.id);
+      });
     }
 
     return exam;
+  }
+
+  /**
+   * Loads a single question image on demand. Images are stored either as a
+   * base64 data URI or as a plain external URL.
+   */
+  async getQuestionImage(questionId: number): Promise<
+    | { kind: 'binary'; mime: string; buffer: Buffer }
+    | { kind: 'redirect'; url: string }
+  > {
+    const question = await this.questionRepository
+      .createQueryBuilder('q')
+      .select('q.id')
+      .addSelect('q.image_url')
+      .where('q.id = :id', { id: questionId })
+      .getOne();
+
+    const value = question?.image_url ? String(question.image_url) : '';
+    if (!value) throw new ApiError(404, 'لا توجد صورة لهذا السؤال.');
+
+    const dataUri = /^data:([\w.+-]+\/[\w.+-]+);base64,(.+)$/s.exec(value);
+    if (dataUri) {
+      return {
+        kind: 'binary',
+        mime: dataUri[1],
+        buffer: Buffer.from(dataUri[2], 'base64'),
+      };
+    }
+
+    return { kind: 'redirect', url: value };
   }
 
   async create(data: any) {
@@ -115,10 +157,12 @@ export class ExamService {
         await manager.save(Answer, answerEntities);
       }
 
-      return await manager.findOne(Question, {
+      const created = await manager.findOne(Question, {
         where: { id: savedQuestion.id },
         relations: ['answers'],
       });
+      if (created) created.has_image = !!question.image_url;
+      return created;
     });
   }
 
@@ -259,8 +303,13 @@ export class ExamService {
 
     if (!question) throw new ApiError(404, 'السؤال غير موجود.');
 
+    // image_url is not selected by default, so check for an existing image separately
+    const hadImageBefore = await this.questionRepository.count({
+      where: { id: questionId, image_url: Not(IsNull()) },
+    });
+
     return await AppDataSource.transaction(async (manager) => {
-      // Update question text and image
+      // Update question text; the image is only touched when the client sends it
       question.question_text = question_text;
       if (image_url !== undefined) question.image_url = image_url || null;
       const updatedQuestion = await manager.save(Question, question);
@@ -281,10 +330,15 @@ export class ExamService {
         await manager.save(Answer, answerEntities);
       }
 
-      return await manager.findOne(Question, {
+      const saved = await manager.findOne(Question, {
         where: { id: updatedQuestion.id },
         relations: ['answers'],
       });
+      if (saved) {
+        saved.has_image =
+          image_url !== undefined ? !!image_url : !!hadImageBefore;
+      }
+      return saved;
     });
   }
 

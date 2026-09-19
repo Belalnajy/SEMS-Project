@@ -131,6 +131,28 @@ export const reportQuestion = async (req: Request, res: Response) => {
   res.status(201).json(result);
 };
 
+export const getQuestionImage = async (req: Request, res: Response) => {
+  const image = await examService.getQuestionImage(
+    Number(req.params.questionId),
+  );
+
+  if (image.kind === 'redirect') {
+    return res.redirect(302, image.url);
+  }
+
+  // Images never change in place (a new image replaces the row), so let the
+  // browser cache them instead of re-downloading on every exam attempt.
+  res.setHeader('Content-Type', image.mime);
+  res.setHeader('Cache-Control', 'public, max-age=604800');
+  res.setHeader('ETag', `"q${req.params.questionId}-${image.buffer.length}"`);
+
+  if (req.headers['if-none-match'] === res.getHeader('ETag')) {
+    return res.status(304).end();
+  }
+
+  res.send(image.buffer);
+};
+
 export const importQuestions = async (req: Request, res: Response) => {
   const file = (req as any).file;
   if (!file) throw new Error('يرجى اختيار ملف Excel');

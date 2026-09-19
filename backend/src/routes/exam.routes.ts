@@ -14,6 +14,7 @@ import {
   submitExam,
   reportQuestion,
   importQuestions,
+  getQuestionImage,
 } from '../controllers/exam.controller';
 import { authenticate } from '../middleware/auth';
 import multer from 'multer';
@@ -22,6 +23,10 @@ import { validate } from '../middleware/validate';
 
 const router = Router();
 const upload = multer({ storage: multer.memoryStorage() });
+
+// Question images are served unauthenticated: <img> tags cannot send the
+// Bearer token, and exam questions are already public through guest mode.
+router.get('/questions/:questionId/image', getQuestionImage);
 
 router.use(authenticate);
 
