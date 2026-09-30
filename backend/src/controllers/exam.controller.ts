@@ -4,6 +4,12 @@ import { ExamService } from '../services/exam.service';
 const examService = new ExamService();
 
 export const getAllExams = async (req: Request, res: Response) => {
+  // Students only see exams their section is allowed to take
+  if (req.user?.role?.name === 'student') {
+    const exams = await examService.getAllForStudent(req.user.id);
+    return res.json(exams);
+  }
+
   const exams = await examService.getAll();
   res.json(exams);
 };
@@ -19,10 +25,15 @@ export const getMyResults = async (req: Request, res: Response) => {
 };
 
 export const getExamById = async (req: Request, res: Response) => {
-  const exam = await examService.getById(Number(req.params.id));
+  const isStudent = req.user?.role?.name === 'student';
+
+  // Reading an exam directly must respect the section restriction too
+  const exam = isStudent
+    ? await examService.assertStudentCanAccess(Number(req.params.id), req.user!.id)
+    : await examService.getById(Number(req.params.id));
 
   // Exclude correct_answer markers if user is a student
-  if (req.user?.role?.name === 'student') {
+  if (isStudent) {
     if (exam.questions) {
       exam.questions.forEach((q) => {
         if (q.answers) {

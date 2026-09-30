@@ -108,6 +108,24 @@ export const initDB = async () => {
       `ALTER TABLE questions ADD COLUMN IF NOT EXISTS image_url TEXT`,
     );
   } catch { /* column may already exist */ }
+
+  // Sections allowed per exam. No rows for an exam means "open to all sections".
+  // Mirrors the join table TypeORM generates, since synchronize is off here.
+  try {
+    await AppDataSource.query(`
+      CREATE TABLE IF NOT EXISTS exam_model_sections (
+        exam_model_id INTEGER NOT NULL
+          REFERENCES exam_models(id) ON UPDATE CASCADE ON DELETE CASCADE,
+        section_id INTEGER NOT NULL
+          REFERENCES sections(id) ON UPDATE CASCADE ON DELETE CASCADE,
+        PRIMARY KEY (exam_model_id, section_id)
+      )
+    `);
+    await AppDataSource.query(
+      `CREATE INDEX IF NOT EXISTS idx_exam_model_sections_section
+         ON exam_model_sections (section_id)`,
+    );
+  } catch { /* table may already exist */ }
 };
 
 // Start server only in non-Vercel environments

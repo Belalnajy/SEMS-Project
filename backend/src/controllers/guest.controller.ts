@@ -5,8 +5,10 @@ const examService = new ExamService();
 
 export const getAllExams = async (req: Request, res: Response) => {
   const exams = await examService.getAll();
-  // Guests only see active exams
-  res.json(exams.filter((e) => e.is_active));
+  // Guests only see active exams, and never ones restricted to specific sections
+  res.json(
+    exams.filter((e) => e.is_active && (e.sections?.length ?? 0) === 0),
+  );
 };
 
 export const startExam = async (req: Request, res: Response) => {
@@ -14,6 +16,13 @@ export const startExam = async (req: Request, res: Response) => {
 
   if (!exam.is_active) {
     return res.status(403).json({ error: 'هذا الامتحان غير متاح حالياً' });
+  }
+
+  // Exams limited to specific sections are for enrolled students only
+  if ((exam.sections?.length ?? 0) > 0) {
+    return res
+      .status(403)
+      .json({ error: 'هذا الاختبار متاح لطالبات الصفوف المحددة فقط.' });
   }
 
   if (!exam.questions || exam.questions.length === 0) {

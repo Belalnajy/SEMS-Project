@@ -3,6 +3,8 @@ import {
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
+  ManyToMany,
+  JoinTable,
   JoinColumn,
   OneToMany,
   CreateDateColumn,
@@ -11,6 +13,7 @@ import {
 import { Subject } from './Subject';
 import { Question } from './Question';
 import { Result } from './Result';
+import { Section } from './Section';
 
 @Entity('exam_models')
 export class ExamModel {
@@ -34,6 +37,16 @@ export class ExamModel {
   })
   @JoinColumn({ name: 'subject_id' })
   subject: Subject;
+
+  // Sections allowed to take this exam. Empty means every section is allowed,
+  // which keeps exams created before this feature open to everyone.
+  @ManyToMany(() => Section)
+  @JoinTable({
+    name: 'exam_model_sections',
+    joinColumn: { name: 'exam_model_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'section_id', referencedColumnName: 'id' },
+  })
+  sections: Section[];
 
   @OneToMany(() => Question, (question) => question.exam, { cascade: true })
   questions: Question[];

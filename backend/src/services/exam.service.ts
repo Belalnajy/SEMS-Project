@@ -7,6 +7,7 @@ import { Question } from '../entities/Question';
 import { Answer } from '../entities/Answer';
 import { Result } from '../entities/Result';
 import { Student } from '../entities/Student';
+import { Section } from '../entities/Section';
 import { QuestionReport } from '../entities/QuestionReport';
 import { ApiError } from '../middleware/errorHandler';
 import { extractRowImages } from '../utils/xlsxImages';
@@ -17,19 +18,73 @@ export class ExamService {
   private questionRepository = AppDataSource.getRepository(Question);
   private resultRepository = AppDataSource.getRepository(Result);
   private studentRepository = AppDataSource.getRepository(Student);
+  private sectionRepository = AppDataSource.getRepository(Section);
   private reportRepository = AppDataSource.getRepository(QuestionReport);
 
   async getAll() {
     return await this.examRepository.find({
-      relations: ['subject'],
+      relations: ['subject', 'sections'],
       order: { id: 'DESC' },
     });
+  }
+
+  /** True when the exam is open to every section, or to this student's one. */
+  private isSectionAllowed(exam: ExamModel, sectionId?: number | null) {
+    if (!exam.sections || exam.sections.length === 0) return true;
+    if (!sectionId) return false;
+    return exam.sections.some((s) => s.id === sectionId);
+  }
+
+  /** Exams a student is allowed to see: active, and open to their section. */
+  async getAllForStudent(userId: number) {
+    const student = await this.studentRepository.findOne({
+      where: { user: { id: userId } },
+      relations: ['section'],
+    });
+    const sectionId = student?.section?.id ?? null;
+
+    const exams = await this.examRepository.find({
+      relations: ['subject', 'sections'],
+      order: { id: 'DESC' },
+    });
+
+    return exams.filter(
+      (exam) => exam.is_active && this.isSectionAllowed(exam, sectionId),
+    );
+  }
+
+  /** Blocks a student from reaching an exam their section is not allowed. */
+  async assertStudentCanAccess(examId: number, userId: number) {
+    const exam = await this.getById(examId);
+
+    if (!exam.sections || exam.sections.length === 0) return exam;
+
+    const student = await this.studentRepository.findOne({
+      where: { user: { id: userId } },
+      relations: ['section'],
+    });
+
+    if (!this.isSectionAllowed(exam, student?.section?.id ?? null)) {
+      throw new ApiError(403, 'هذا الاختبار غير متاح لصفك.');
+    }
+
+    return exam;
+  }
+
+  /** Replaces the allowed sections. An empty list opens the exam to everyone. */
+  private async resolveSections(sectionIds: any): Promise<Section[]> {
+    if (!Array.isArray(sectionIds)) return [];
+    const ids = sectionIds
+      .map((value) => Number(value))
+      .filter((value) => Number.isInteger(value) && value > 0);
+    if (ids.length === 0) return [];
+    return await this.sectionRepository.findBy(ids.map((id) => ({ id })));
   }
 
   async getById(id: number) {
     const exam = await this.examRepository.findOne({
       where: { id },
-      relations: ['subject', 'questions', 'questions.answers'],
+      relations: ['subject', 'sections', 'questions', 'questions.answers'],
     });
 
     if (!exam) throw new ApiError(404, 'النموذج غير موجود.');
@@ -87,8 +142,14 @@ export class ExamService {
   }
 
   async create(data: any) {
-    const { subject_id, name, duration_minutes, allow_reattempt, is_active } =
-      data;
+    const {
+      subject_id,
+      name,
+      duration_minutes,
+      allow_reattempt,
+      is_active,
+      section_ids,
+    } = data;
 
     const subject = await this.subjectRepository.findOne({
       where: { id: subject_id },
@@ -101,14 +162,21 @@ export class ExamService {
     exam.duration_minutes = duration_minutes || 30;
     exam.allow_reattempt = allow_reattempt || false;
     exam.is_active = is_active !== undefined ? is_active : true;
+    exam.sections = await this.resolveSections(section_ids);
 
     return await this.examRepository.save(exam);
   }
 
   async update(id: number, data: any) {
     const exam = await this.getById(id);
-    const { subject_id, name, duration_minutes, allow_reattempt, is_active } =
-      data;
+    const {
+      subject_id,
+      name,
+      duration_minutes,
+      allow_reattempt,
+      is_active,
+      section_ids,
+    } = data;
 
     if (subject_id) {
       const subject = await this.subjectRepository.findOne({
@@ -123,6 +191,9 @@ export class ExamService {
       exam.duration_minutes = duration_minutes;
     if (allow_reattempt !== undefined) exam.allow_reattempt = allow_reattempt;
     if (is_active !== undefined) exam.is_active = is_active;
+    // Omitting section_ids leaves the current restriction untouched
+    if (section_ids !== undefined)
+      exam.sections = await this.resolveSections(section_ids);
 
     return await this.examRepository.save(exam);
   }
@@ -177,7 +248,7 @@ export class ExamService {
   }
 
   async checkAttemptEligibility(examId: number, userId: number) {
-    const exam = await this.getById(examId);
+    const exam = await this.assertStudentCanAccess(examId, userId);
     if (exam.allow_reattempt) return true;
 
     const student = await this.studentRepository.findOne({
@@ -203,7 +274,7 @@ export class ExamService {
     data: { answers: any[]; started_at?: string },
   ) {
     const { answers, started_at } = data;
-    const exam = await this.getById(examId);
+    const exam = await this.assertStudentCanAccess(examId, userId);
 
     const student = await this.studentRepository.findOne({
       where: { user: { id: userId } },

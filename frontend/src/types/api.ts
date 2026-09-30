@@ -41,6 +41,7 @@ export interface ExamModel {
   allow_reattempt: boolean;
   is_active: boolean;
   subject: Subject;
+  sections?: Section[]; // Empty/absent means every section may take the exam
   questions?: Question[];
   created_at: string;
 }

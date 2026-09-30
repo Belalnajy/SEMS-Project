@@ -9,14 +9,16 @@ import {
   HiOutlineLightBulb,
   HiOutlinePhotograph,
   HiOutlineX,
+  HiCheck,
 } from 'react-icons/hi';
-import { ExamModel, Subject, Question } from '../../types/api';
+import { ExamModel, Subject, Question, Section } from '../../types/api';
 import Modal from '../../components/Modal';
 import ConfirmModal from '../../components/ConfirmModal';
 
 export default function ExamsPage() {
   const [exams, setExams] = useState<ExamModel[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [sections, setSections] = useState<Section[]>([]);
 
   const [showExamModal, setShowExamModal] = useState(false);
   const [showQModal, setShowQModal] = useState(false);
@@ -26,12 +28,14 @@ export default function ExamsPage() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [editQuestion, setEditQuestion] = useState<Question | null>(null);
 
+  // section_ids empty = الاختبار متاح لكل الصفوف
   const [examForm, setExamForm] = useState({
     subject_id: '',
     name: '',
     duration_minutes: 30,
     allow_reattempt: false,
     is_active: true,
+    section_ids: [] as number[],
   });
 
   // image_url holds a newly picked image (data URI); has_image reflects the one
@@ -70,6 +74,13 @@ export default function ExamsPage() {
     } catch {}
   };
 
+  const fetchSections = async () => {
+    try {
+      const res = await api.get<Section[]>('/sections');
+      setSections(res.data);
+    } catch {}
+  };
+
   const fetchQuestions = async (examId: number) => {
     try {
       const res = await api.get<Question[]>(`/exams/${examId}/questions`);
@@ -80,7 +91,17 @@ export default function ExamsPage() {
   useEffect(() => {
     fetchExams();
     fetchSubjects();
+    fetchSections();
   }, []);
+
+  const toggleSection = (sectionId: number) => {
+    setExamForm((prev) => ({
+      ...prev,
+      section_ids: prev.section_ids.includes(sectionId)
+        ? prev.section_ids.filter((id) => id !== sectionId)
+        : [...prev.section_ids, sectionId],
+    }));
+  };
 
   const handleExamSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -323,6 +344,7 @@ export default function ExamsPage() {
               duration_minutes: 30,
               allow_reattempt: false,
               is_active: true,
+              section_ids: [],
             });
             setShowExamModal(true);
           }}>
@@ -388,9 +410,24 @@ export default function ExamsPage() {
                           {exam.is_active ? 'مفعل' : 'معطل'}
                         </span>
                       </div>
-                      <p className="text-xs text-slate-400 mb-3">
+                      <p className="text-xs text-slate-400 mb-2">
                         {exam.duration_minutes} دقيقة
                       </p>
+                      <div className="flex flex-wrap gap-1 mb-3">
+                        {exam.sections && exam.sections.length > 0 ? (
+                          exam.sections.map((s) => (
+                            <span
+                              key={s.id}
+                              className="text-[10px] bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded px-1.5 py-0.5">
+                              {s.name}
+                            </span>
+                          ))
+                        ) : (
+                          <span className="text-[10px] text-slate-500 border border-slate-700 rounded px-1.5 py-0.5">
+                            كل الصفوف
+                          </span>
+                        )}
+                      </div>
                       <div className="flex gap-2">
                         <button
                           className="flex-1 flex justify-center items-center gap-1 bg-slate-700 hover:bg-slate-600 text-white px-2 py-1.5 rounded-lg text-xs transition-colors"
@@ -406,6 +443,9 @@ export default function ExamsPage() {
                               duration_minutes: exam.duration_minutes,
                               allow_reattempt: exam.allow_reattempt,
                               is_active: exam.is_active,
+                              section_ids: (exam.sections || []).map(
+                                (s) => s.id,
+                              ),
                             });
                             setShowExamModal(true);
                           }}>
@@ -678,6 +718,61 @@ export default function ExamsPage() {
               }
               required
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-1">
+              الصفوف المسموح لها بدخول الاختبار
+            </label>
+            <p className="text-xs text-slate-500 mb-2">
+              اتركها فارغة ليكون الاختبار متاحاً لكل الصفوف
+            </p>
+
+            {sections.length === 0 ? (
+              <p className="text-xs text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-lg p-3">
+                لا توجد صفوف مضافة بعد. أضف الصفوف أولاً من صفحة الصفوف.
+              </p>
+            ) : (
+              <div className="grid grid-cols-2 gap-2">
+                {sections.map((s) => {
+                  const selected = examForm.section_ids.includes(s.id);
+                  return (
+                    <button
+                      key={s.id}
+                      type="button"
+                      onClick={() => toggleSection(s.id)}
+                      className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm text-right transition-colors ${
+                        selected
+                          ? 'bg-blue-500/10 border-blue-500/50 text-blue-300'
+                          : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-slate-500'
+                      }`}>
+                      <span
+                        className={`h-4 w-4 flex-none rounded border flex items-center justify-center ${
+                          selected
+                            ? 'bg-blue-600 border-blue-600'
+                            : 'border-slate-500'
+                        }`}>
+                        {selected && (
+                          <HiCheck className="h-3 w-3 text-white" />
+                        )}
+                      </span>
+                      <span className="truncate">{s.name}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+            {examForm.section_ids.length > 0 && (
+              <button
+                type="button"
+                className="mt-2 text-xs text-slate-400 hover:text-white transition-colors"
+                onClick={() =>
+                  setExamForm({ ...examForm, section_ids: [] })
+                }>
+                إلغاء التحديد (إتاحة الاختبار لكل الصفوف)
+              </button>
+            )}
           </div>
 
           <div className="pt-2 flex flex-col gap-3">
