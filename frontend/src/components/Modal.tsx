@@ -30,14 +30,15 @@ export default function Modal({
             className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-9998"
           />
 
-          {/* Content */}
+          {/* Content. The card is height-capped and its body scrolls on its
+              own, so a long form never pushes the submit button off screen. */}
           <div className="fixed inset-0 flex items-center justify-center p-4 z-9999 pointer-events-none">
             <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className={`w-full ${maxWidth} bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden pointer-events-auto`}>
-              <div className="flex items-center justify-between p-5 border-b border-slate-700 bg-slate-800/50">
+              className={`w-full ${maxWidth} max-h-[90vh] flex flex-col bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden pointer-events-auto`}>
+              <div className="flex-none flex items-center justify-between p-5 border-b border-slate-700 bg-slate-800/50">
                 <h3 className="text-xl font-bold text-white">{title}</h3>
                 <button
                   onClick={onClose}
@@ -46,7 +47,7 @@ export default function Modal({
                 </button>
               </div>
 
-              <div className="p-6">{children}</div>
+              <div className="flex-1 min-h-0 overflow-y-auto p-6">{children}</div>
             </motion.div>
           </div>
         </>

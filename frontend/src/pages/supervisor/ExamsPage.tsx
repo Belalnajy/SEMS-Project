@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import toast from 'react-hot-toast';
 import api, { questionImageUrl } from '../../api/client';
 import {
@@ -101,6 +101,58 @@ export default function ExamsPage() {
         ? prev.section_ids.filter((id) => id !== sectionId)
         : [...prev.section_ids, sectionId],
     }));
+  };
+
+  // أسماء الشعب على شكل "اولى 3" أو "ثاني7"، فنجمعها تحت اسم الصف
+  const sectionNumber = (name: string) => {
+    const match = name.match(/(\d+)\s*$/);
+    return match ? parseInt(match[1], 10) : 0;
+  };
+
+  // ترتيب الصفوف: أولى ثم ثاني ثم ثالث، وأي اسم غير معروف يروح للآخر
+  const gradeRank = (grade: string) => {
+    const order = ['اول', 'أول', 'ثان', 'ثالث', 'رابع', 'خامس', 'سادس'];
+    const index = order.findIndex((prefix) => grade.startsWith(prefix));
+    return index === -1 ? 99 : index;
+  };
+
+  const sectionGroups = useMemo(() => {
+    const groups = new Map<string, Section[]>();
+    sections.forEach((s) => {
+      const grade = s.name.replace(/[\s\d]+$/, '').trim() || 'أخرى';
+      if (!groups.has(grade)) groups.set(grade, []);
+      groups.get(grade)!.push(s);
+    });
+
+    return Array.from(groups.entries())
+      .map(([grade, items]) => ({
+        grade,
+        items: items
+          .slice()
+          .sort((a, b) => sectionNumber(a.name) - sectionNumber(b.name)),
+      }))
+      .sort((a, b) => {
+        const byRank = gradeRank(a.grade) - gradeRank(b.grade);
+        if (byRank !== 0) return byRank;
+        // أسماء غير متوقعة: رتّبها بترتيب إضافتها
+        return (
+          Math.min(...a.items.map((s) => s.id)) -
+          Math.min(...b.items.map((s) => s.id))
+        );
+      });
+  }, [sections]);
+
+  const toggleGrade = (items: Section[]) => {
+    const ids = items.map((s) => s.id);
+    setExamForm((prev) => {
+      const allSelected = ids.every((id) => prev.section_ids.includes(id));
+      return {
+        ...prev,
+        section_ids: allSelected
+          ? prev.section_ids.filter((id) => !ids.includes(id))
+          : Array.from(new Set([...prev.section_ids, ...ids])),
+      };
+    });
   };
 
   const handleExamSubmit = async (e: React.FormEvent) => {
@@ -664,8 +716,8 @@ export default function ExamsPage() {
         isOpen={showExamModal}
         onClose={() => setShowExamModal(false)}
         title={editExam ? 'تعديل النموذج' : 'نموذج امتحان جديد'}
-        maxWidth="max-w-md">
-        <form onSubmit={handleExamSubmit} className="space-y-4">
+        maxWidth="max-w-lg">
+        <form onSubmit={handleExamSubmit} className="space-y-3">
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-1">
               المادة
@@ -721,11 +773,23 @@ export default function ExamsPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1">
-              الصفوف المسموح لها بدخول الاختبار
-            </label>
+            <div className="flex items-center justify-between mb-1 gap-2">
+              <label className="block text-sm font-medium text-slate-300">
+                الصفوف المسموح لها بدخول الاختبار
+              </label>
+              {examForm.section_ids.length > 0 && (
+                <button
+                  type="button"
+                  className="text-xs text-slate-400 hover:text-white transition-colors whitespace-nowrap"
+                  onClick={() => setExamForm({ ...examForm, section_ids: [] })}>
+                  إلغاء الكل
+                </button>
+              )}
+            </div>
             <p className="text-xs text-slate-500 mb-2">
-              اتركها فارغة ليكون الاختبار متاحاً لكل الصفوف
+              {examForm.section_ids.length === 0
+                ? 'لم تحدد أي صف — الاختبار متاح لكل الصفوف'
+                : `تم تحديد ${examForm.section_ids.length} شعبة`}
             </p>
 
             {sections.length === 0 ? (
@@ -733,45 +797,52 @@ export default function ExamsPage() {
                 لا توجد صفوف مضافة بعد. أضف الصفوف أولاً من صفحة الصفوف.
               </p>
             ) : (
-              <div className="grid grid-cols-2 gap-2">
-                {sections.map((s) => {
-                  const selected = examForm.section_ids.includes(s.id);
+              <div className="max-h-44 overflow-y-auto rounded-lg border border-slate-700 bg-slate-900/50 p-2 space-y-2">
+                {sectionGroups.map(({ grade, items }) => {
+                  const allSelected = items.every((s) =>
+                    examForm.section_ids.includes(s.id),
+                  );
                   return (
-                    <button
-                      key={s.id}
-                      type="button"
-                      onClick={() => toggleSection(s.id)}
-                      className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm text-right transition-colors ${
-                        selected
-                          ? 'bg-blue-500/10 border-blue-500/50 text-blue-300'
-                          : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-slate-500'
-                      }`}>
-                      <span
-                        className={`h-4 w-4 flex-none rounded border flex items-center justify-center ${
-                          selected
-                            ? 'bg-blue-600 border-blue-600'
-                            : 'border-slate-500'
-                        }`}>
-                        {selected && (
-                          <HiCheck className="h-3 w-3 text-white" />
-                        )}
-                      </span>
-                      <span className="truncate">{s.name}</span>
-                    </button>
+                    <div key={grade}>
+                      <div className="flex items-center justify-between mb-1.5 px-1">
+                        <span className="text-xs font-bold text-slate-300">
+                          {grade}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => toggleGrade(items)}
+                          className="text-[11px] text-blue-400 hover:text-blue-300 transition-colors">
+                          {allSelected ? 'إلغاء الكل' : 'تحديد الكل'}
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-6 gap-1.5">
+                        {items.map((s) => {
+                          const selected = examForm.section_ids.includes(s.id);
+                          const label =
+                            sectionNumber(s.name) || s.name.trim();
+                          return (
+                            <button
+                              key={s.id}
+                              type="button"
+                              title={s.name}
+                              onClick={() => toggleSection(s.id)}
+                              className={`flex items-center justify-center gap-1 px-2 py-1.5 rounded-md border text-xs transition-colors ${
+                                selected
+                                  ? 'bg-blue-600 border-blue-600 text-white font-medium'
+                                  : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-slate-500'
+                              }`}>
+                              {selected && (
+                                <HiCheck className="h-3 w-3 flex-none" />
+                              )}
+                              <span className="truncate">{label}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
                   );
                 })}
               </div>
-            )}
-
-            {examForm.section_ids.length > 0 && (
-              <button
-                type="button"
-                className="mt-2 text-xs text-slate-400 hover:text-white transition-colors"
-                onClick={() =>
-                  setExamForm({ ...examForm, section_ids: [] })
-                }>
-                إلغاء التحديد (إتاحة الاختبار لكل الصفوف)
-              </button>
             )}
           </div>
 
@@ -825,7 +896,8 @@ export default function ExamsPage() {
             </label>
           </div>
 
-          <div className="pt-4">
+          {/* مثبّت أسفل النافذة ليظل ظاهراً حتى على الشاشات القصيرة */}
+          <div className="sticky -bottom-6 -mx-6 -mb-6 px-6 pt-4 pb-6 bg-slate-800 border-t border-slate-700">
             <button
               type="submit"
               className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg transition-colors">
