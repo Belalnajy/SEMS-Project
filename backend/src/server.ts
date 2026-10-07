@@ -87,7 +87,23 @@ app.use('/api/*', (req: Request, res: Response) => {
 app.use(errorHandler);
 
 // Database connection helper
-export const initDB = async () => {
+// Every serverless request awaits initDB(). Running the body once per instance
+// (and making concurrent cold-start requests share that one run) keeps a request
+// from reading a table while another request is still creating or seeding it,
+// and spares every later request a dozen schema queries.
+let initPromise: Promise<void> | null = null;
+
+export const initDB = (): Promise<void> => {
+  if (!initPromise) {
+    initPromise = runInitDB().catch((err) => {
+      initPromise = null; // let the next request retry a failed start
+      throw err;
+    });
+  }
+  return initPromise;
+};
+
+const runInitDB = async () => {
   if (!AppDataSource.isInitialized) {
     await AppDataSource.initialize();
     console.log('📦 Connected to PostgreSQL via TypeORM');

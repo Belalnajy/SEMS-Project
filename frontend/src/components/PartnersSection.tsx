@@ -54,11 +54,22 @@ export default function PartnersSection() {
       .catch(() => {})
       .finally(() => setLoadingPosts(false));
 
+    loadCategories();
+  }, []);
+
+  // The form is useless without its types, so a failed or empty answer is
+  // retried a couple of times instead of leaving the list silently empty.
+  const loadCategories = (attempt = 0) => {
     api
       .get<PartnerCategory[]>('/partners/categories')
-      .then((res) => setCategories(res.data))
-      .catch(() => {});
-  }, []);
+      .then((res) => {
+        if (res.data.length > 0) setCategories(res.data);
+        else if (attempt < 2) setTimeout(() => loadCategories(attempt + 1), 1500 * (attempt + 1));
+      })
+      .catch(() => {
+        if (attempt < 2) setTimeout(() => loadCategories(attempt + 1), 1500 * (attempt + 1));
+      });
+  };
 
   const loadMore = async () => {
     setLoadingMore(true);
@@ -274,6 +285,9 @@ export default function PartnersSection() {
                   </label>
                   <select
                     className={selectClass}
+                    onFocus={() => {
+                      if (categories.length === 0) loadCategories();
+                    }}
                     value={form.category}
                     onChange={(e) => setForm({ ...form, category: e.target.value })}
                     required>
