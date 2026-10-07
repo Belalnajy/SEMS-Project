@@ -156,11 +156,27 @@ export const initDB = async () => {
       `CREATE INDEX IF NOT EXISTS idx_partner_posts_status
          ON partner_posts (status, approved_at)`,
     );
-    // Starter types from the school's reference design; editable in the dashboard
+    // Starter types requested by the school; editable in the dashboard
     await AppDataSource.query(`
       INSERT INTO partner_categories (name, sort_order)
       SELECT name, sort_order FROM (VALUES
-        ('نشاط', 1), ('ثقافي', 2), ('معلمتي', 3)
+        ('تعليق', 1), ('شكر', 2), ('استفسار', 3)
+      ) AS defaults(name, sort_order)
+      WHERE NOT EXISTS (SELECT 1 FROM partner_categories)
+    `);
+    // One-time switch from the first starter set (نشاط، ثقافي، معلمتي) to the
+    // school's chosen types. Runs only while the table still holds exactly that
+    // untouched set, so it never overrides types the school edited itself.
+    await AppDataSource.query(`
+      DELETE FROM partner_categories
+      WHERE (SELECT COUNT(*) FROM partner_categories) = 3
+        AND (SELECT COUNT(*) FROM partner_categories
+              WHERE name IN ('نشاط', 'ثقافي', 'معلمتي')) = 3
+    `);
+    await AppDataSource.query(`
+      INSERT INTO partner_categories (name, sort_order)
+      SELECT name, sort_order FROM (VALUES
+        ('تعليق', 1), ('شكر', 2), ('استفسار', 3)
       ) AS defaults(name, sort_order)
       WHERE NOT EXISTS (SELECT 1 FROM partner_categories)
     `);

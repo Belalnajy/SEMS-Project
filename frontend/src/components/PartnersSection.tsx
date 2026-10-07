@@ -19,7 +19,6 @@ const LONG_MESSAGE = 220;
 const TICKER = [
   'ولي الأمر شريك النجاح',
   'معاً نصنع فرقاً وأثراً لا يُنسى',
-  'شاركونا قصصكم ومواقفكم مع بناتكم',
   'كلمة شكر صغيرة تصنع يوماً جميلاً لمعلمة',
 ];
 
@@ -101,6 +100,10 @@ export default function PartnersSection() {
   const remaining = Math.max(total - posts.length, 0);
   const inputClass =
     'w-full px-4 py-3 bg-slate-900/70 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all';
+  // القائمة المنسدلة تحتاج خلفية معتمة و color-scheme داكن: مع خلفية شفافة يرسم
+  // Chrome/Edge على ويندوز الخيارات بيضاء على نص أبيض فتختفي
+  const selectClass =
+    'w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all [color-scheme:dark]';
 
   return (
     <section id="partners" className="py-20 px-4 scroll-mt-24">
@@ -270,15 +273,15 @@ export default function PartnersSection() {
                     نوع المشاركة <span className="text-red-400">*</span>
                   </label>
                   <select
-                    className={inputClass}
+                    className={selectClass}
                     value={form.category}
                     onChange={(e) => setForm({ ...form, category: e.target.value })}
                     required>
-                    <option value="" disabled>
+                    <option value="" disabled className="bg-slate-900 text-slate-400">
                       اختر نوع المشاركة
                     </option>
                     {categories.map((c) => (
-                      <option key={c.id} value={c.name}>
+                      <option key={c.id} value={c.name} className="bg-slate-900 text-white">
                         {c.name}
                       </option>
                     ))}
