@@ -2,12 +2,14 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { HiOutlineClock, HiOutlineAcademicCap } from 'react-icons/hi';
+import { HiOutlineClock } from 'react-icons/hi';
 import ConfirmModal from '../../components/ConfirmModal';
 import { questionImageUrl } from '../../api/client';
 
 export default function GuestPage() {
   const [exams, setExams] = useState<any[]>([]);
+  // loading → done | failed: يفرّق بين «جاري التحميل» و«لا توجد امتحانات» و«تعذّر التحميل»
+  const [examsState, setExamsState] = useState<'loading' | 'done' | 'failed'>('loading');
   const [selectedExam, setSelectedExam] = useState<any>(null);
   const [guestName, setGuestName] = useState('');
 
@@ -24,9 +26,15 @@ export default function GuestPage() {
   useEffect(() => {
     const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
     fetch(`${baseURL}/guest/exams`)
-      .then((r) => r.json())
-      .then(setExams)
-      .catch(() => {});
+      .then((r) => {
+        if (!r.ok) throw new Error(String(r.status));
+        return r.json();
+      })
+      .then((data) => {
+        setExams(Array.isArray(data) ? data : []);
+        setExamsState('done');
+      })
+      .catch(() => setExamsState('failed'));
     fetch(`${baseURL}/subjects`).catch(() => {});
     // Track visitor
     fetch(`${baseURL}/public/track-visit`, { method: 'POST' }).catch(() => {});
@@ -335,23 +343,32 @@ export default function GuestPage() {
 
   // Select phase
   return (
-    <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-4">
+    <div className="relative isolate min-h-screen bg-ink-950 flex flex-col items-center justify-center px-4 py-12 overflow-hidden">
+      <div className="absolute inset-0 -z-10 bg-grid-fade" />
+      <div className="absolute -z-10 top-[-10rem] left-1/2 -translate-x-1/2 h-[30rem] w-[min(56rem,140vw)] rounded-full bg-[radial-gradient(closest-side,rgb(37_99_235/0.22),transparent)]" />
+
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-center mb-10 w-full max-w-2xl">
-        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-blue-500/10 text-blue-500 mb-6 border border-blue-500/20">
-          <HiOutlineAcademicCap className="w-10 h-10" />
-        </div>
-        <h1 className="text-4xl font-bold text-white mb-4">منصة التحصيلي</h1>
-        <p className="text-slate-400 text-lg leading-relaxed">
-          الثانوية الحادية والعشرون - إعداد أ. ابتسام السلمي
-          <br />
-          مديرة المدرسة/ جميلة فهد المطيري
-          <br />
-          يمكنك أداء الامتحان كزائر لتقييم مستواك.
-          <br className="hidden sm:block" />
-          ملاحظة: النتائج لن تُحفظ في التقارير الرسمية للنظام.
+        className="text-center mb-8 sm:mb-10 w-full max-w-2xl">
+        <Link to="/" className="inline-block mb-6">
+          <img
+            src="/logo.jpeg"
+            alt="شعار الثانوية الحادية والعشرون"
+            className="h-20 w-20 rounded-2xl object-cover ring-1 ring-gold-400/40 shadow-xl shadow-gold-500/10"
+          />
+        </Link>
+        <h1 className="font-display text-3xl sm:text-4xl font-bold text-white mb-3">
+          الاختبار كضيف
+        </h1>
+        <p className="text-slate-300 text-base sm:text-lg leading-relaxed">
+          أدّي أحد الاختبارات المتاحة لتقييم مستواك قبل اختبار التحصيلي.
+        </p>
+        <p className="mt-2 text-sm text-slate-400">
+          الثانوية الحادية والعشرون · إعداد أ. ابتسام السلمي · مديرة المدرسة / جميلة فهد المطيري
+        </p>
+        <p className="mt-5 inline-flex items-center gap-2 rounded-full border border-gold-400/25 bg-gold-400/5 px-4 py-1.5 text-xs sm:text-sm text-gold-200">
+          نتائج الضيف لا تُحفظ في التقارير الرسمية للنظام
         </p>
       </motion.div>
 
@@ -359,8 +376,7 @@ export default function GuestPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="bg-slate-800 rounded-3xl p-8 max-w-lg w-full shadow-2xl border border-slate-700 relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-blue-500 to-indigo-500" />
+        className="border-gradient rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl shadow-black/40 relative overflow-hidden">
 
         <div className="space-y-6">
           <div>
@@ -368,7 +384,7 @@ export default function GuestPage() {
               الاسم <span className="text-red-400">*</span>
             </label>
             <input
-              className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
+              className="w-full px-4 py-3 bg-ink-950 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:border-gold-400/50 focus:ring-2 focus:ring-gold-400/20 focus:outline-none transition-all"
               placeholder="الاسم الثلاثي للاختبار..."
               value={guestName}
               onChange={(e) => setGuestName(e.target.value)}
@@ -381,9 +397,13 @@ export default function GuestPage() {
             </label>
 
             {exams.length === 0 ? (
-              <div className="bg-slate-900/50 rounded-xl p-6 text-center border border-slate-700 border-dashed">
+              <div className="bg-ink-950/60 rounded-xl p-6 text-center border border-white/10 border-dashed">
                 <p className="text-slate-400 text-sm">
-                  جاري تحميل الامتحانات المتاحة...
+                  {examsState === 'loading'
+                    ? 'جاري تحميل الامتحانات المتاحة...'
+                    : examsState === 'failed'
+                      ? 'تعذّر تحميل الامتحانات، يرجى تحديث الصفحة والمحاولة مرة أخرى.'
+                      : 'لا توجد امتحانات متاحة للضيوف حالياً.'}
                 </p>
               </div>
             ) : (
@@ -394,7 +414,7 @@ export default function GuestPage() {
                     className={`relative flex items-center p-4 rounded-xl border cursor-pointer transition-all group overflow-hidden ${
                       selectedExam?.id === exam.id
                         ? 'bg-blue-500/10 border-blue-500'
-                        : 'bg-slate-900 border-slate-700 hover:border-slate-500 hover:bg-slate-800'
+                        : 'bg-ink-950 border-white/10 hover:border-white/25 hover:bg-white/[0.03]'
                     }`}
                     onClick={() => setSelectedExam(exam)}>
                     {selectedExam?.id === exam.id && (
@@ -448,7 +468,7 @@ export default function GuestPage() {
           </div>
         </div>
 
-        <div className="mt-8 text-center pt-6 border-t border-slate-700/50">
+        <div className="mt-8 text-center pt-6 border-t border-white/10">
           <Link
             to="/login"
             className="text-slate-400 hover:text-white transition-colors text-sm font-medium">

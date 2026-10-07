@@ -33,13 +33,14 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-ink-950 flex items-center justify-center p-4 relative isolate overflow-hidden">
       {/* Decorative Background Elements */}
+      <div className="absolute inset-0 -z-10 bg-grid-fade pointer-events-none" />
       <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/10 blur-[120px] rounded-full pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-600/10 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-gold-500/10 blur-[120px] rounded-full pointer-events-none" />
 
       <motion.div
-        className="w-full max-w-[440px] bg-slate-800/50 backdrop-blur-xl rounded-3xl p-10 shadow-2xl border border-slate-700/50 relative z-10"
+        className="w-full max-w-[440px] border-gradient rounded-3xl p-7 sm:p-10 shadow-2xl shadow-black/40 relative z-10"
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: 'easeOut' }}>
@@ -50,7 +51,7 @@ export default function LoginPage() {
             transition={{ delay: 0.2 }}
             className="flex justify-center mb-6">
             <div className="relative">
-              <div className="absolute inset-0 bg-blue-500/20 blur-2xl rounded-full" />
+              <div className="absolute inset-0 bg-gold-400/15 blur-2xl rounded-full" />
               <Link to="/">
                 <img
                   src={SCHOOL_LOGO_DATA_URI}
@@ -61,11 +62,11 @@ export default function LoginPage() {
             </div>
           </motion.div>
 
-          <h1 className="text-2xl font-bold font-arabic text-white mb-3 tracking-tight">
+          <h1 className="font-display text-2xl font-bold text-white mb-3 tracking-tight">
             منصة التحصيلي
           </h1>
-          <div className="h-1 w-16 bg-blue-500 mx-auto rounded-full mb-4" />
-          <p className="text-blue-400 font-semibold text-sm">
+          <div className="h-px w-20 mx-auto mb-4 bg-linear-to-l from-transparent via-gold-400 to-transparent" />
+          <p className="text-gold-200 font-semibold text-sm">
             الثانوية الحادية والعشرون
           </p>
           <p className="text-slate-400 text-xs mt-1">إشراف أ. ابتسام السلمي</p>
@@ -90,7 +91,7 @@ export default function LoginPage() {
             <input
               type="text"
               dir="rtl"
-              className="w-full px-5 py-3.5 bg-slate-900/50 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all placeholder:text-slate-600"
+              className="w-full px-5 py-3.5 bg-ink-950/70 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-gold-400/20 focus:border-gold-400/50 transition-all placeholder:text-slate-600"
               placeholder="أدخل الرقم هنا..."
               value={nationalId}
               onChange={(e) => setNationalId(e.target.value)}
@@ -105,7 +106,7 @@ export default function LoginPage() {
             <input
               type="password"
               dir="rtl"
-              className="w-full px-5 py-3.5 bg-slate-900/50 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all placeholder:text-slate-600"
+              className="w-full px-5 py-3.5 bg-ink-950/70 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-gold-400/20 focus:border-gold-400/50 transition-all placeholder:text-slate-600"
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -148,12 +149,12 @@ export default function LoginPage() {
           <Link
             to="/guest"
             className="text-slate-400 hover:text-white transition-colors text-sm font-medium flex items-center gap-2 group">
-            <HiOutlineSparkles className="opacity-0 group-hover:opacity-100 transition-opacity h-4 w-4 text-blue-400" />
+            <HiOutlineSparkles className="opacity-0 group-hover:opacity-100 transition-opacity h-4 w-4 text-gold-300" />
             الدخول كضيف للمنصة
-            <HiOutlineSparkles className="opacity-0 group-hover:opacity-100 transition-opacity h-4 w-4 text-blue-400" />
+            <HiOutlineSparkles className="opacity-0 group-hover:opacity-100 transition-opacity h-4 w-4 text-gold-300" />
           </Link>
 
-          <div className="w-12 h-px bg-slate-700/50" />
+          <div className="w-12 h-px bg-white/10" />
 
           <p className="text-[10px] text-slate-500 text-center leading-relaxed">
             جميع الحقوق محفوظة &copy; {new Date().getFullYear()} <br />

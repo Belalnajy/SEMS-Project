@@ -1,7 +1,17 @@
 @import 'tailwindcss';
 
 @theme {
-  --font-sans: 'Inter', 'Tajawal', system-ui, sans-serif;
+  /* الخطوط تُحمَّل من Google Fonts في index.html — بدونها كان كل جهاز يعرض خطه */
+  --font-sans: 'IBM Plex Sans Arabic', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Noto Kufi Arabic', 'IBM Plex Sans Arabic', system-ui, sans-serif;
+  /* الذهبي: لون التوقيع في الواجهة العامة */
+  --color-gold-200: #f7e3b0;
+  --color-gold-300: #f0d08a;
+  --color-gold-400: #e3b85f;
+  --color-gold-500: #c99a3c;
+  --color-ink-950: #060b18;
+  --color-ink-900: #0a1224;
+  --color-ink-800: #111b33;
   --color-primary-50: #eff6ff;
   --color-primary-100: #dbeafe;
   --color-primary-500: #3b82f6;
@@ -44,6 +54,31 @@
   .partners-marquee {
     animation: none;
   }
+}
+
+/* نص بتدرّج ذهبي هادئ */
+.text-gold-gradient {
+  background: linear-gradient(120deg, #f7e3b0 0%, #e3b85f 45%, #f0d08a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* شبكة خطوط خفيفة تتلاشى نحو الأطراف — خلفية الواجهة الرئيسية */
+.bg-grid-fade {
+  background-image:
+    linear-gradient(to right, rgb(148 163 184 / 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(148 163 184 / 0.06) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, #000 40%, transparent 100%);
+}
+
+/* حدّ متدرّج رفيع للبطاقات الفاخرة */
+.border-gradient {
+  border: 1px solid transparent;
+  background:
+    linear-gradient(var(--color-ink-900), var(--color-ink-900)) padding-box,
+    linear-gradient(140deg, rgb(227 184 95 / 0.45), rgb(51 65 85 / 0.4) 40%, rgb(59 130 246 / 0.35)) border-box;
 }
 
 @media print {
