@@ -10,6 +10,7 @@ import {
   HiOutlineArrowNarrowLeft
 } from 'react-icons/hi';
 import StatsOverview from '../components/StatsOverview';
+import PartnersSection from '../components/PartnersSection';
 
 export default function LandingPage() {
   // Track visitor on page load
@@ -48,12 +49,19 @@ export default function LandingPage() {
             </span>
           </div>
 
-          <Link
-            to="/login"
-            className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white px-6 py-2.5 rounded-xl font-bold transition-all border border-slate-700 hover:border-blue-500/50">
-            تسجيل الدخول
-            <HiOutlineArrowNarrowLeft className="h-4 w-4" />
-          </Link>
+          <div className="flex items-center gap-2 sm:gap-4">
+            <a
+              href="#partners"
+              className="hidden sm:inline-block text-slate-300 hover:text-white font-bold px-3 py-2 transition-colors">
+              شركاؤنا في النجاح
+            </a>
+            <Link
+              to="/login"
+              className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white px-6 py-2.5 rounded-xl font-bold transition-all border border-slate-700 hover:border-blue-500/50">
+              تسجيل الدخول
+              <HiOutlineArrowNarrowLeft className="h-4 w-4" />
+            </Link>
+          </div>
         </div>
       </nav>
 
@@ -117,6 +125,9 @@ export default function LandingPage() {
       <section className="py-20 px-4">
         <StatsOverview />
       </section>
+
+      {/* شركاؤنا في النجاح */}
+      <PartnersSection />
 
       {/* Features Grid */}
       <section className="py-20 px-4 bg-slate-900/30">

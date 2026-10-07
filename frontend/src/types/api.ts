@@ -84,3 +84,22 @@ export interface AuthResponse {
   user: User;
   token: string;
 }
+
+// قسم "شركاؤنا في النجاح"
+export interface PartnerCategory {
+  id: number;
+  name: string;
+  sort_order: number;
+}
+
+export interface PartnerPost {
+  id: number;
+  parent_name: string;
+  student_name: string | null;
+  category: string;
+  message: string;
+  status?: 'pending' | 'approved'; // Admin responses only
+  source?: 'public' | 'admin'; // Admin responses only
+  approved_at: string | null;
+  created_at?: string; // Admin responses only
+}

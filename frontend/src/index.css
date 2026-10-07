@@ -21,6 +21,31 @@
   }
 }
 
+/* شريط "شركاؤنا في النجاح" المتحرك. المحتوى مكرر مرتين، فالتحريك بمقدار
+   نصف العرض يرجّع النسخة التانية مكان الأولى بالظبط ويبان كأنه مستمر */
+@keyframes partners-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(50%);
+  }
+}
+
+.partners-marquee {
+  animation: partners-marquee 35s linear infinite;
+}
+
+.partners-marquee:hover {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .partners-marquee {
+    animation: none;
+  }
+}
+
 @media print {
   body {
     background-color: white !important;

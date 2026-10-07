@@ -16,6 +16,7 @@ import examRoutes from './routes/exam.routes';
 import reportRoutes from './routes/report.routes';
 import guestRoutes from './routes/guest.routes';
 import publicStatsRoutes from './routes/public-stats.routes';
+import partnerRoutes from './routes/partner.routes';
 
 dotenv.config();
 
@@ -69,6 +70,7 @@ app.use('/api/exams', examRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/guest', guestRoutes);
 app.use('/api/public', publicStatsRoutes);
+app.use('/api/partners', partnerRoutes);
 
 app.get('/api/health', (req: Request, res: Response) => {
   res.json({
@@ -126,6 +128,43 @@ export const initDB = async () => {
          ON exam_model_sections (section_id)`,
     );
   } catch { /* table may already exist */ }
+
+  // "شركاؤنا في النجاح": parent posts awaiting/after moderation, plus the
+  // editable list of post types. Mirrors the PartnerPost/PartnerCategory entities.
+  try {
+    await AppDataSource.query(`
+      CREATE TABLE IF NOT EXISTS partner_categories (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(50) NOT NULL UNIQUE,
+        sort_order INTEGER NOT NULL DEFAULT 0
+      )
+    `);
+    await AppDataSource.query(`
+      CREATE TABLE IF NOT EXISTS partner_posts (
+        id SERIAL PRIMARY KEY,
+        parent_name VARCHAR(100) NOT NULL,
+        student_name VARCHAR(100),
+        category VARCHAR(50) NOT NULL,
+        message TEXT NOT NULL,
+        status VARCHAR(20) NOT NULL DEFAULT 'pending',
+        source VARCHAR(20) NOT NULL DEFAULT 'public',
+        approved_at TIMESTAMP,
+        created_at TIMESTAMP NOT NULL DEFAULT now()
+      )
+    `);
+    await AppDataSource.query(
+      `CREATE INDEX IF NOT EXISTS idx_partner_posts_status
+         ON partner_posts (status, approved_at)`,
+    );
+    // Starter types from the school's reference design; editable in the dashboard
+    await AppDataSource.query(`
+      INSERT INTO partner_categories (name, sort_order)
+      SELECT name, sort_order FROM (VALUES
+        ('نشاط', 1), ('ثقافي', 2), ('معلمتي', 3)
+      ) AS defaults(name, sort_order)
+      WHERE NOT EXISTS (SELECT 1 FROM partner_categories)
+    `);
+  } catch { /* tables may already exist */ }
 };
 
 // Start server only in non-Vercel environments

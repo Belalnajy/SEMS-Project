@@ -12,6 +12,7 @@ import {
   HiOutlineBookOpen,
   HiOutlineCog,
   HiOutlineX,
+  HiOutlineHeart,
 } from 'react-icons/hi';
 
 const menuItems = {
@@ -34,11 +35,21 @@ const menuItems = {
       icon: HiOutlineAcademicCap,
     },
     { path: '/supervisor/reports', label: 'التقارير', icon: HiOutlineChartBar },
+    {
+      path: '/supervisor/partners',
+      label: 'شركاؤنا في النجاح',
+      icon: HiOutlineHeart,
+    },
     { path: '/supervisor/profile', label: 'الإعدادات', icon: HiOutlineCog },
   ],
   manager: [
     { path: '/manager', label: 'الرئيسية', icon: HiOutlineHome },
     { path: '/manager/reports', label: 'التقارير', icon: HiOutlineChartBar },
+    {
+      path: '/manager/partners',
+      label: 'شركاؤنا في النجاح',
+      icon: HiOutlineHeart,
+    },
     { path: '/manager/profile', label: 'الإعدادات', icon: HiOutlineCog },
   ],
   student: [

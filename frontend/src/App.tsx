@@ -16,6 +16,7 @@ import SectionsPage from './pages/supervisor/SectionsPage';
 import SubjectsPage from './pages/supervisor/SubjectsPage';
 import ExamsPage from './pages/supervisor/ExamsPage';
 import SupervisorReportsPage from './pages/supervisor/ReportsPage';
+import PartnersPage from './pages/supervisor/PartnersPage';
 
 // Manager
 import ManagerDashboard from './pages/manager/Dashboard';
@@ -173,6 +174,16 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/supervisor/partners"
+            element={
+              <ProtectedRoute roles={['supervisor']}>
+                <DashboardLayout>
+                  <PartnersPage />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
 
           {/* Manager */}
           <Route
@@ -201,6 +212,16 @@ export default function App() {
               <ProtectedRoute roles={['manager']}>
                 <DashboardLayout>
                   <ManagerReportsPage />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/manager/partners"
+            element={
+              <ProtectedRoute roles={['manager']}>
+                <DashboardLayout>
+                  <PartnersPage />
                 </DashboardLayout>
               </ProtectedRoute>
             }
