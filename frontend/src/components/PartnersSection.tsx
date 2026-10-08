@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
+import { inView, reveal, revealSoft, stagger } from './landing/motion';
 import {
   HiOutlineChatAlt2,
   HiOutlineHeart,
@@ -121,24 +123,38 @@ export default function PartnersSection() {
       <div className="absolute -z-10 top-0 left-1/2 -translate-x-1/2 h-[30rem] w-[min(60rem,140vw)] rounded-full bg-[radial-gradient(closest-side,rgb(227_184_95/0.08),transparent)]" />
       <div className="max-w-6xl mx-auto space-y-6 sm:space-y-8">
         {/* Hero */}
-        <div className="text-center pb-2">
-          <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl border border-gold-400/25 bg-gold-400/5">
+        <motion.div
+          variants={stagger(0, 0.12)}
+          initial="hidden"
+          whileInView="visible"
+          viewport={inView}
+          className="text-center pb-2">
+          <motion.div
+            variants={{ hidden: { opacity: 0, scale: 0.6, rotate: -12 }, visible: { opacity: 1, scale: 1, rotate: 0, transition: { type: 'spring', stiffness: 220, damping: 16 } } }}
+            className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl border border-gold-400/25 bg-gold-400/5">
             <HiOutlineChatAlt2 className="h-7 w-7 text-gold-300" />
-          </div>
-          <span className="inline-flex items-center gap-2 rounded-full border border-gold-400/25 bg-gold-400/5 px-4 py-1.5 text-sm font-semibold text-gold-200 mb-4">
+          </motion.div>
+          <motion.span
+            variants={revealSoft}
+            className="inline-flex items-center gap-2 rounded-full border border-gold-400/25 bg-gold-400/5 px-4 py-1.5 text-sm font-semibold text-gold-200 mb-4">
             <HiOutlineSparkles className="h-4 w-4" />
             شركاؤنا في النجاح
-          </span>
-          <h2 className="font-display text-3xl sm:text-5xl font-bold text-white mb-3 sm:mb-4">
+          </motion.span>
+          <motion.h2 variants={revealSoft} className="font-display text-3xl sm:text-5xl font-bold text-white mb-3 sm:mb-4">
             معاً نُعلّم ونُلهم
-          </h2>
-          <p className="text-base sm:text-lg text-slate-400">
+          </motion.h2>
+          <motion.p variants={revealSoft} className="text-base sm:text-lg text-slate-400">
             ولي الأمر .. شريك النجاح وصانع الأثر
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
 
         {/* Ticker */}
-        <div className="flex items-stretch overflow-hidden rounded-2xl border border-gold-400/15 bg-ink-900/80">
+        <motion.div
+          variants={reveal}
+          initial="hidden"
+          whileInView="visible"
+          viewport={inView}
+          className="flex items-stretch overflow-hidden rounded-2xl border border-gold-400/15 bg-ink-900/80">
           <div className="flex-none flex items-center px-4 sm:px-5 bg-linear-to-b from-gold-400 to-gold-500">
             <HiOutlineSpeakerphone className="h-5 w-5 sm:h-6 sm:w-6 text-ink-950" />
           </div>
@@ -156,10 +172,15 @@ export default function PartnersSection() {
               ))}
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Posts */}
-        <div className="p-5 sm:p-8 rounded-3xl border border-white/8 bg-white/[0.02]">
+        <motion.div
+          variants={reveal}
+          initial="hidden"
+          whileInView="visible"
+          viewport={inView}
+          className="p-5 sm:p-8 rounded-3xl border border-white/8 bg-white/[0.02]">
           <div className="mb-6 sm:mb-8 border-r-2 border-gold-400 pr-4">
             <h3 className="font-display text-xl sm:text-2xl font-bold text-white">
               مشاركات أولياء الأمور
@@ -180,13 +201,21 @@ export default function PartnersSection() {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+              <motion.div
+                variants={stagger(0, 0.08)}
+                initial="hidden"
+                whileInView="visible"
+                viewport={inView}
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
                 {posts.map((post) => {
                   const long = post.message.length > LONG_MESSAGE;
                   const open = expanded[post.id];
                   return (
-                    <article
+                    <motion.article
                       key={post.id}
+                      variants={reveal}
+                      whileHover={{ y: -4 }}
+                      transition={{ type: 'spring', stiffness: 260, damping: 22 }}
                       className="flex flex-col p-5 sm:p-6 rounded-2xl border border-white/8 bg-ink-900/80 transition-colors hover:border-gold-400/30">
                       <div className="flex items-start gap-3 mb-4">
                         <div className="flex-none h-10 w-10 rounded-xl bg-gold-400/10 border border-gold-400/20 flex items-center justify-center">
@@ -225,10 +254,10 @@ export default function PartnersSection() {
                           {open ? 'عرض أقل' : 'اقرأ المزيد'}
                         </button>
                       )}
-                    </article>
+                    </motion.article>
                   );
                 })}
-              </div>
+              </motion.div>
 
               {remaining > 0 && (
                 <div className="text-center mt-8">
@@ -243,10 +272,15 @@ export default function PartnersSection() {
               )}
             </>
           )}
-        </div>
+        </motion.div>
 
         {/* Submission form */}
-        <div className="p-5 sm:p-8 rounded-3xl border-gradient">
+        <motion.div
+          variants={reveal}
+          initial="hidden"
+          whileInView="visible"
+          viewport={inView}
+          className="p-5 sm:p-8 rounded-3xl border-gradient">
           <div className="mb-6 sm:mb-8 border-r-2 border-gold-400 pr-4">
             <h3 className="font-display text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
               مشاركاتكم محل تقديرنا
@@ -364,7 +398,7 @@ export default function PartnersSection() {
               </button>
             </form>
           )}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

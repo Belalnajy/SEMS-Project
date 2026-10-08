@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import { motion, useMotionValueEvent, useReducedMotion, useScroll, useTransform } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import {
   HiOutlineAcademicCap,
@@ -10,14 +10,16 @@ import {
   HiOutlineDocumentDownload,
   HiOutlineArrowNarrowLeft,
   HiOutlinePlay,
+  HiOutlineChevronDown,
 } from 'react-icons/hi';
 import StatsStrip from '../components/landing/StatsStrip';
 import PartnersSection from '../components/PartnersSection';
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 24 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] } },
-};
+import HeroBackground from '../components/landing/HeroBackground';
+import RevealText from '../components/landing/RevealText';
+import SpotlightCard from '../components/landing/SpotlightCard';
+import MagneticButton from '../components/landing/MagneticButton';
+import ScrollProgress from '../components/landing/ScrollProgress';
+import { EASE_OUT, inView, reveal, revealSoft, stagger } from '../components/landing/motion';
 
 const FEATURES = [
   {
@@ -52,7 +54,21 @@ const FEATURES = [
   },
 ];
 
+const NAV_LINKS = [
+  { href: '#features', label: 'مميزات المنصة' },
+  { href: '#partners', label: 'شركاؤنا في النجاح' },
+];
+
 export default function LandingPage() {
+  const reduce = useReducedMotion();
+  const { scrollY } = useScroll();
+  const [scrolled, setScrolled] = useState(false);
+  useMotionValueEvent(scrollY, 'change', (v) => setScrolled(v > 24));
+
+  // المحتوى يتراجع ويخفت قليلاً مع التمرير — عمق بسيط بلا إزعاج
+  const heroY = useTransform(scrollY, [0, 600], [0, reduce ? 0 : 90]);
+  const heroOpacity = useTransform(scrollY, [0, 500], [1, reduce ? 1 : 0.35]);
+
   // Track visitor on page load
   useEffect(() => {
     const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
@@ -61,138 +77,170 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-ink-950 text-slate-200 overflow-x-hidden selection:bg-gold-400/30">
+      <ScrollProgress />
+
       {/* ── Navbar ─────────────────────────────────────────────────────── */}
-      <nav className="fixed top-0 inset-x-0 z-50 border-b border-white/5 bg-ink-950/70 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-3">
-          <Link to="/" className="flex items-center gap-3 min-w-0">
+      <motion.nav
+        initial={reduce ? false : { y: -24, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.7, ease: EASE_OUT }}
+        className={`fixed top-0 inset-x-0 z-50 transition-[background-color,border-color,box-shadow] duration-500 ${
+          scrolled
+            ? 'bg-ink-950/80 backdrop-blur-xl border-b border-white/8 shadow-[0_8px_40px_rgb(0_0_0/0.35)]'
+            : 'bg-transparent border-b border-transparent'
+        }`}>
+        <div
+          className={`max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between gap-3 transition-[height] duration-500 ${
+            scrolled ? 'h-14 sm:h-16' : 'h-16 sm:h-20'
+          }`}>
+          <Link to="/" className="flex items-center gap-3 min-w-0 group">
             <img
               src="/logo.jpeg"
               alt="شعار الثانوية الحادية والعشرون"
-              className="h-10 w-10 sm:h-11 sm:w-11 flex-none rounded-xl object-cover ring-1 ring-gold-400/40 shadow-lg shadow-gold-500/10"
+              className="h-10 w-10 sm:h-11 sm:w-11 flex-none rounded-xl object-cover ring-1 ring-gold-400/40 shadow-lg shadow-gold-500/10 transition-transform duration-500 group-hover:rotate-[-4deg] group-hover:scale-105"
             />
             <div className="min-w-0 leading-tight">
-              <p className="font-display font-bold text-white text-base sm:text-lg truncate">
-                منصة التحصيلي
-              </p>
-              <p className="text-[11px] sm:text-xs text-slate-400 truncate">
-                الثانوية الحادية والعشرون
-              </p>
+              <p className="font-display font-bold text-white text-base sm:text-lg truncate">منصة التحصيلي</p>
+              <p className="text-[11px] sm:text-xs text-slate-400 truncate">الثانوية الحادية والعشرون</p>
             </div>
           </Link>
 
           <div className="flex items-center gap-1 sm:gap-2 flex-none">
-            <a
-              href="#features"
-              className="hidden md:inline-flex px-4 py-2 text-sm font-medium text-slate-300 hover:text-white transition-colors">
-              مميزات المنصة
-            </a>
-            <a
-              href="#partners"
-              className="hidden md:inline-flex px-4 py-2 text-sm font-medium text-slate-300 hover:text-white transition-colors">
-              شركاؤنا في النجاح
-            </a>
-            <Link
-              to="/login"
-              className="whitespace-nowrap inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-gold-400/40 px-3.5 sm:px-5 py-2 sm:py-2.5 text-sm font-semibold text-white transition-all">
-              تسجيل الدخول
-              <HiOutlineArrowNarrowLeft className="h-4 w-4" />
-            </Link>
+            {NAV_LINKS.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                className="relative hidden md:inline-flex px-4 py-2 text-sm font-medium text-slate-300 hover:text-white transition-colors after:absolute after:bottom-1 after:right-4 after:left-4 after:h-px after:origin-right after:scale-x-0 after:bg-gold-400 after:transition-transform after:duration-300 hover:after:scale-x-100">
+                {link.label}
+              </a>
+            ))}
+            <MagneticButton strength={0.15}>
+              <Link
+                to="/login"
+                className="whitespace-nowrap inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-gold-400/40 px-3.5 sm:px-5 py-2 sm:py-2.5 text-sm font-semibold text-white transition-colors">
+                تسجيل الدخول
+                <HiOutlineArrowNarrowLeft className="h-4 w-4" />
+              </Link>
+            </MagneticButton>
           </div>
         </div>
-      </nav>
+      </motion.nav>
 
       {/* ── Hero ───────────────────────────────────────────────────────── */}
-      <header className="relative isolate pt-32 sm:pt-44 pb-16 sm:pb-24 px-4 sm:px-6">
-        <div className="absolute inset-0 -z-10 bg-grid-fade" />
-        <div className="absolute -z-10 top-[-12rem] left-1/2 -translate-x-1/2 h-[36rem] w-[min(68rem,140vw)] rounded-full bg-[radial-gradient(closest-side,rgb(37_99_235/0.28),transparent)]" />
-        <div className="absolute -z-10 top-24 right-[-10rem] h-80 w-80 rounded-full bg-[radial-gradient(closest-side,rgb(227_184_95/0.14),transparent)]" />
+      <header className="relative isolate min-h-[100svh] flex flex-col justify-center pt-28 sm:pt-32 pb-24 px-4 sm:px-6">
+        <HeroBackground />
 
-        <motion.div
-          className="max-w-4xl mx-auto text-center"
-          initial="hidden"
-          animate="visible"
-          transition={{ staggerChildren: 0.12 }}>
+        <motion.div style={{ y: heroY, opacity: heroOpacity }} className="max-w-4xl mx-auto text-center w-full">
           <motion.div
-            variants={fadeUp}
-            className="inline-flex items-center gap-2 rounded-full border border-gold-400/25 bg-gold-400/5 px-4 py-1.5 mb-7 sm:mb-9">
-            <span className="h-1.5 w-1.5 rounded-full bg-gold-400" />
+            initial={reduce ? false : { opacity: 0, y: 12, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.7, ease: EASE_OUT, delay: 0.1 }}
+            className="inline-flex items-center gap-2 rounded-full border border-gold-400/25 bg-gold-400/5 px-4 py-1.5 mb-8 sm:mb-10 backdrop-blur">
+            <span className="relative h-1.5 w-1.5 rounded-full bg-gold-400 live-dot" />
             <span className="text-xs sm:text-sm font-medium text-gold-200">
               الثانوية الحادية والعشرون · الاستعداد لاختبار التحصيلي
             </span>
           </motion.div>
 
-          <motion.h1
-            variants={fadeUp}
-            className="font-display font-extrabold text-white text-[2.4rem] leading-[1.25] sm:text-6xl sm:leading-[1.2] lg:text-7xl tracking-tight mb-6 sm:mb-8">
-            مستقبلك يبدأ مع
-            <span className="block text-gold-gradient pb-2">منصة التحصيلي</span>
-          </motion.h1>
+          <h1 className="font-display font-extrabold text-white text-[2.5rem] leading-[1.22] sm:text-6xl sm:leading-[1.18] lg:text-[5.25rem] tracking-tight mb-6 sm:mb-8">
+            <RevealText text="مستقبلك يبدأ مع" delay={0.25} className="block" />
+            <RevealText text="منصة التحصيلي" delay={0.5} className="block pb-2" wordClassName="text-gold-gradient" />
+          </h1>
 
           <motion.p
-            variants={fadeUp}
-            className="text-base sm:text-lg md:text-xl text-slate-300/90 max-w-2xl mx-auto leading-relaxed sm:leading-loose mb-9 sm:mb-11">
-            منصة تعليمية متكاملة صُممت لطالبات الثانوية الحادية والعشرون، تعزّز
-            الاستعداد لاختبار التحصيلي باختبارات تحاكي الاختبار الفعلي وتقارير أداء
-            دقيقة بعد كل محاولة.
+            variants={revealSoft}
+            initial={reduce ? 'visible' : 'hidden'}
+            animate="visible"
+            transition={{ delay: 0.9 }}
+            className="text-base sm:text-lg md:text-xl text-slate-300/90 max-w-2xl mx-auto leading-relaxed sm:leading-loose mb-10 sm:mb-12">
+            منصة تعليمية متكاملة صُممت لطالبات الثانوية الحادية والعشرون، تعزّز الاستعداد
+            لاختبار التحصيلي باختبارات تحاكي الاختبار الفعلي وتقارير أداء دقيقة بعد كل محاولة.
           </motion.p>
 
           <motion.div
-            variants={fadeUp}
+            variants={reveal}
+            initial={reduce ? 'visible' : 'hidden'}
+            animate="visible"
+            transition={{ delay: 1.1 }}
             className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 max-w-sm sm:max-w-none mx-auto">
-            <Link
-              to="/guest"
-              className="group inline-flex items-center justify-center gap-2.5 rounded-2xl bg-linear-to-l from-blue-600 to-indigo-600 px-8 py-4 text-lg font-bold text-white shadow-xl shadow-blue-700/30 ring-1 ring-white/10 transition-all hover:shadow-blue-600/40 hover:-translate-y-0.5 active:translate-y-0">
-              <HiOutlinePlay className="h-5 w-5 transition-transform group-hover:scale-110" />
-              ابدأ الاختبار كضيف
-            </Link>
-            <Link
-              to="/login"
-              className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-8 py-4 text-lg font-bold text-white backdrop-blur transition-all hover:border-gold-400/40 hover:bg-white/10 hover:-translate-y-0.5 active:translate-y-0">
-              دخول الطالبات
-            </Link>
+            <MagneticButton className="w-full sm:w-auto">
+              <Link
+                to="/guest"
+                className="group relative w-full inline-flex items-center justify-center gap-2.5 overflow-hidden rounded-2xl bg-linear-to-l from-blue-600 via-indigo-600 to-violet-600 px-9 py-4 text-lg font-bold text-white shadow-xl shadow-indigo-700/30 ring-1 ring-white/10 transition-shadow hover:shadow-indigo-500/40">
+                <span className="absolute inset-0 -translate-x-full bg-linear-to-l from-transparent via-white/15 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+                <HiOutlinePlay className="relative h-5 w-5 transition-transform group-hover:scale-110" />
+                <span className="relative">ابدأ الاختبار كضيف</span>
+              </Link>
+            </MagneticButton>
+            <MagneticButton className="w-full sm:w-auto">
+              <Link
+                to="/login"
+                className="w-full inline-flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-9 py-4 text-lg font-bold text-white backdrop-blur transition-colors hover:border-gold-400/40 hover:bg-white/10">
+                دخول الطالبات
+              </Link>
+            </MagneticButton>
           </motion.div>
 
-          <motion.p variants={fadeUp} className="mt-10 sm:mt-12 text-sm text-slate-400">
+          <motion.p
+            initial={reduce ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.5, duration: 0.8 }}
+            className="mt-10 sm:mt-14 text-sm text-slate-400">
             إعداد أ. ابتسام السلمي
             <span className="mx-2 text-slate-600">·</span>
             مديرة المدرسة / جميلة فهد المطيري
           </motion.p>
         </motion.div>
+
+        {/* دعوة للتمرير */}
+        <motion.a
+          href="#stats"
+          aria-label="انتقل للأسفل"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 2, duration: 1 }}
+          className="absolute bottom-6 left-1/2 -translate-x-1/2 text-slate-500 hover:text-gold-300 transition-colors">
+          <motion.span
+            animate={reduce ? undefined : { y: [0, 8, 0] }}
+            transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+            className="block">
+            <HiOutlineChevronDown className="h-6 w-6" />
+          </motion.span>
+        </motion.a>
       </header>
 
       {/* ── Stats ──────────────────────────────────────────────────────── */}
-      <section className="px-4 sm:px-6 pb-20 sm:pb-28">
+      <section id="stats" className="scroll-mt-24 px-4 sm:px-6 pb-20 sm:pb-28 -mt-6">
         <StatsStrip />
       </section>
 
       {/* ── Features ───────────────────────────────────────────────────── */}
-      <section id="features" className="scroll-mt-24 px-4 sm:px-6 py-20 sm:py-28 border-y border-white/5 bg-ink-900/60">
+      <section id="features" className="relative scroll-mt-24 px-4 sm:px-6 py-20 sm:py-28 border-y border-white/5 bg-ink-900/60">
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(60%_50%_at_50%_0%,rgb(79_70_229/0.12),transparent)]" />
         <div className="max-w-7xl mx-auto">
           <SectionHeading eyebrow="لماذا منصة التحصيلي" title="كل ما تحتاجه الطالبة للاستعداد" />
 
-          <div className="mt-12 sm:mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {FEATURES.map((feature, index) => (
-              <motion.article
-                key={feature.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-60px' }}
-                transition={{ duration: 0.5, delay: (index % 3) * 0.08 }}
-                className="group relative flex gap-4 sm:block rounded-2xl sm:rounded-3xl border border-white/8 bg-white/[0.02] p-5 sm:p-8 transition-all duration-300 hover:border-gold-400/30 hover:bg-white/[0.04]">
-                <div className="flex-none flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-xl sm:rounded-2xl border border-gold-400/20 bg-gold-400/5 sm:mb-6 transition-colors group-hover:bg-gold-400/10">
+          <motion.div
+            variants={stagger(0.1, 0.09)}
+            initial="hidden"
+            whileInView="visible"
+            viewport={inView}
+            className="mt-12 sm:mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            {FEATURES.map((feature) => (
+              <SpotlightCard key={feature.title} className="group flex gap-4 sm:block p-5 sm:p-8">
+                <motion.div
+                  whileHover={reduce ? undefined : { rotate: -8, scale: 1.08 }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 15 }}
+                  className="flex-none flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-xl sm:rounded-2xl border border-gold-400/20 bg-gold-400/5 sm:mb-6 transition-colors group-hover:bg-gold-400/10 group-hover:border-gold-400/40">
                   <feature.icon className="h-6 w-6 sm:h-7 sm:w-7 text-gold-300" />
-                </div>
+                </motion.div>
                 <div>
-                  <h3 className="font-display text-lg sm:text-xl font-bold text-white mb-1.5 sm:mb-3">
-                    {feature.title}
-                  </h3>
-                  <p className="text-sm sm:text-base text-slate-400 leading-relaxed">
-                    {feature.description}
-                  </p>
+                  <h3 className="font-display text-lg sm:text-xl font-bold text-white mb-1.5 sm:mb-3">{feature.title}</h3>
+                  <p className="text-sm sm:text-base text-slate-400 leading-relaxed">{feature.description}</p>
                 </div>
-              </motion.article>
+              </SpotlightCard>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -200,14 +248,11 @@ export default function LandingPage() {
       <PartnersSection />
 
       {/* ── Footer ─────────────────────────────────────────────────────── */}
-      <footer className="border-t border-white/5 bg-ink-900/60">
+      <footer className="relative border-t border-white/5 bg-ink-900/60 overflow-hidden">
+        <div className="absolute inset-x-0 top-0 h-px bg-linear-to-l from-transparent via-gold-400/40 to-transparent" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-14 flex flex-col lg:flex-row items-center lg:items-start justify-between gap-8 text-center lg:text-start">
           <div className="flex flex-col lg:flex-row items-center gap-4">
-            <img
-              src="/logo.jpeg"
-              alt=""
-              className="h-14 w-14 rounded-2xl object-cover ring-1 ring-gold-400/30"
-            />
+            <img src="/logo.jpeg" alt="" className="h-14 w-14 rounded-2xl object-cover ring-1 ring-gold-400/30" />
             <div>
               <p className="font-display font-bold text-white text-lg">منصة التحصيلي</p>
               <p className="text-sm text-slate-400 mt-1">الثانوية الحادية والعشرون</p>
@@ -215,10 +260,10 @@ export default function LandingPage() {
           </div>
 
           <nav className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-slate-400">
-            <a href="#features" className="hover:text-white transition-colors">مميزات المنصة</a>
-            <a href="#partners" className="hover:text-white transition-colors">شركاؤنا في النجاح</a>
-            <Link to="/guest" className="hover:text-white transition-colors">الاختبار كضيف</Link>
-            <Link to="/login" className="hover:text-white transition-colors">تسجيل الدخول</Link>
+            <a href="#features" className="hover:text-gold-200 transition-colors">مميزات المنصة</a>
+            <a href="#partners" className="hover:text-gold-200 transition-colors">شركاؤنا في النجاح</a>
+            <Link to="/guest" className="hover:text-gold-200 transition-colors">الاختبار كضيف</Link>
+            <Link to="/login" className="hover:text-gold-200 transition-colors">تسجيل الدخول</Link>
           </nav>
 
           <div className="text-sm leading-relaxed">
@@ -237,14 +282,24 @@ export default function LandingPage() {
 function SectionHeading({ eyebrow, title }: { eyebrow: string; title: string }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.6 }}
+      variants={stagger(0, 0.12)}
+      initial="hidden"
+      whileInView="visible"
+      viewport={inView}
       className="text-center">
-      <p className="text-sm font-semibold tracking-wide text-gold-300 mb-3">{eyebrow}</p>
-      <h2 className="font-display text-[1.75rem] leading-snug sm:text-4xl font-bold text-white">{title}</h2>
-      <div className="mx-auto mt-5 h-px w-24 bg-linear-to-l from-transparent via-gold-400 to-transparent" />
+      <motion.p variants={revealSoft} className="text-sm font-semibold tracking-wide text-gold-300 mb-3">
+        {eyebrow}
+      </motion.p>
+      <motion.h2
+        variants={revealSoft}
+        className="font-display text-[1.75rem] leading-snug sm:text-4xl font-bold text-white">
+        {title}
+      </motion.h2>
+      {/* الخط الذهبي يُرسم من المنتصف للطرفين عند الظهور */}
+      <motion.div
+        variants={{ hidden: { scaleX: 0, opacity: 0 }, visible: { scaleX: 1, opacity: 1, transition: { duration: 0.8, ease: EASE_OUT } } }}
+        className="mx-auto mt-5 h-px w-28 bg-linear-to-l from-transparent via-gold-400 to-transparent"
+      />
     </motion.div>
   );
 }

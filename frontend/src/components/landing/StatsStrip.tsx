@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, useInView, useReducedMotion } from 'framer-motion';
+import { inView, reveal, stagger } from './motion';
 import {
   HiOutlineAcademicCap,
   HiOutlineBookOpen,
@@ -87,32 +88,33 @@ export default function StatsStrip() {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-60px' }}
-      transition={{ duration: 0.7 }}
-      className="relative max-w-6xl mx-auto rounded-3xl border-gradient shadow-2xl shadow-black/40">
+      variants={stagger(0.1, 0.07)}
+      initial="hidden"
+      whileInView="visible"
+      viewport={inView}
+      className="relative max-w-6xl mx-auto rounded-3xl border-gradient border-conic shadow-2xl shadow-black/40 overflow-hidden shimmer-sweep">
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
         {items.map((item, index) => (
-          <div
+          <motion.div
             key={item.label}
-            className={`flex flex-col items-center justify-center gap-2 px-3 py-7 sm:py-9 text-center border-white/5 ${dividers(index)}`}>
-            <item.icon className="h-6 w-6 text-gold-400/80" />
+            variants={reveal}
+            className={`group flex flex-col items-center justify-center gap-2 px-3 py-7 sm:py-9 text-center border-white/5 ${dividers(index)}`}>
+            <item.icon className="h-6 w-6 text-gold-400/80 transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:scale-110" />
             <span className="font-display text-3xl sm:text-4xl font-bold text-white tabular-nums">
               <CountUp value={item.value} />
             </span>
             <span className="text-sm text-slate-400">{item.label}</span>
-          </div>
+          </motion.div>
         ))}
       </div>
 
-      <div className="flex items-center justify-center gap-2.5 border-t border-white/5 px-4 py-4 text-sm text-slate-400">
+      <motion.div variants={reveal} className="flex items-center justify-center gap-2.5 border-t border-white/5 px-4 py-4 text-sm text-slate-400">
         <HiOutlineEye className="h-5 w-5 text-gold-400/80" />
         عدد زوار الموقع
         <span className="font-display text-lg font-bold text-gold-200 tabular-nums">
           <CountUp value={stats.visitors} />
         </span>
-      </div>
+      </motion.div>
     </motion.div>
   );
 }
