@@ -56,7 +56,7 @@ export default function LoginPage() {
                 <img
                   src={SCHOOL_LOGO_DATA_URI}
                   alt="Logo"
-                  className="w-24 h-24 rounded-2xl shadow-2xl relative z-10 border border-white/10"
+                  className="w-24 h-24 rounded-2xl shadow-2xl relative z-10 border border-slate-700"
                 />
               </Link>
             </div>
@@ -91,7 +91,7 @@ export default function LoginPage() {
             <input
               type="text"
               dir="rtl"
-              className="w-full px-5 py-3.5 bg-ink-950/70 border border-white/10 rounded-xl text-slate-50 focus:outline-none focus:ring-2 focus:ring-gold-400/20 focus:border-gold-400/50 transition-all placeholder:text-slate-600"
+              className="w-full px-5 py-3.5 bg-ink-950/70 border border-slate-700 rounded-xl text-slate-50 focus:outline-none focus:ring-2 focus:ring-gold-400/20 focus:border-gold-400/50 transition-all placeholder:text-slate-600"
               placeholder="أدخل الرقم هنا..."
               value={nationalId}
               onChange={(e) => setNationalId(e.target.value)}
@@ -106,7 +106,7 @@ export default function LoginPage() {
             <input
               type="password"
               dir="rtl"
-              className="w-full px-5 py-3.5 bg-ink-950/70 border border-white/10 rounded-xl text-slate-50 focus:outline-none focus:ring-2 focus:ring-gold-400/20 focus:border-gold-400/50 transition-all placeholder:text-slate-600"
+              className="w-full px-5 py-3.5 bg-ink-950/70 border border-slate-700 rounded-xl text-slate-50 focus:outline-none focus:ring-2 focus:ring-gold-400/20 focus:border-gold-400/50 transition-all placeholder:text-slate-600"
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}

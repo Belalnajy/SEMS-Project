@@ -112,11 +112,11 @@ export default function PartnersSection() {
 
   const remaining = Math.max(total - posts.length, 0);
   const inputClass =
-    'w-full px-4 py-3 bg-ink-950/70 border border-white/10 rounded-xl text-slate-50 placeholder-slate-500 focus:border-gold-400/50 focus:ring-2 focus:ring-gold-400/20 focus:outline-none transition-all';
+    'w-full px-4 py-3 bg-ink-950/70 border border-slate-700 rounded-xl text-slate-50 placeholder-slate-500 focus:border-gold-400/50 focus:ring-2 focus:ring-gold-400/20 focus:outline-none transition-all';
   // القائمة المنسدلة تحتاج خلفية معتمة و color-scheme داكن: مع خلفية شفافة يرسم
   // Chrome/Edge على ويندوز الخيارات بيضاء على نص أبيض فتختفي
   const selectClass =
-    'w-full px-4 py-3 bg-ink-950 border border-white/10 rounded-xl text-slate-50 focus:border-gold-400/50 focus:ring-2 focus:ring-gold-400/20 focus:outline-none transition-all [color-scheme:dark]';
+    'w-full px-4 py-3 bg-ink-950 border border-slate-700 rounded-xl text-slate-50 focus:border-gold-400/50 focus:ring-2 focus:ring-gold-400/20 focus:outline-none transition-all [color-scheme:dark]';
 
   return (
     <section id="partners" className="relative isolate py-20 sm:py-28 px-4 sm:px-6 scroll-mt-24 overflow-hidden">
@@ -180,7 +180,7 @@ export default function PartnersSection() {
           initial="hidden"
           whileInView="visible"
           viewport={inView}
-          className="p-5 sm:p-8 rounded-3xl border border-white/8 bg-white/[0.02]">
+          className="p-5 sm:p-8 rounded-3xl border border-slate-700 bg-white/[0.02]">
           <div className="mb-6 sm:mb-8 border-r-2 border-gold-400 pr-4">
             <h3 className="font-display text-xl sm:text-2xl font-bold text-slate-50">
               مشاركات أولياء الأمور
@@ -216,7 +216,7 @@ export default function PartnersSection() {
                       variants={reveal}
                       whileHover={{ y: -4 }}
                       transition={{ type: 'spring', stiffness: 260, damping: 22 }}
-                      className="flex flex-col p-5 sm:p-6 rounded-2xl border border-white/8 bg-ink-900/80 transition-colors hover:border-gold-400/30">
+                      className="flex flex-col p-5 sm:p-6 rounded-2xl border border-slate-700 bg-ink-900/80 transition-colors hover:border-gold-400/30">
                       <div className="flex items-start gap-3 mb-4">
                         <div className="flex-none h-10 w-10 rounded-xl bg-gold-400/10 border border-gold-400/20 flex items-center justify-center">
                           <HiOutlineHeart className="h-5 w-5 text-gold-300" />
@@ -233,7 +233,7 @@ export default function PartnersSection() {
                         </div>
                       </div>
 
-                      <span className="self-start text-xs bg-white/5 border border-white/10 text-slate-300 rounded-full px-3 py-1 mb-4">
+                      <span className="self-start text-xs bg-slate-800/70 border border-slate-700 text-slate-300 rounded-full px-3 py-1 mb-4">
                         نوع المشاركة:{' '}
                         <span className="font-semibold text-gold-200">{post.category}</span>
                       </span>
@@ -265,7 +265,7 @@ export default function PartnersSection() {
                     type="button"
                     onClick={loadMore}
                     disabled={loadingMore}
-                    className="px-8 py-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-gold-400/40 text-slate-50 font-semibold transition-all disabled:opacity-60">
+                    className="px-8 py-3 rounded-xl border border-slate-700 bg-slate-800/70 hover:bg-slate-700/60 hover:border-gold-400/40 text-slate-50 font-semibold transition-all disabled:opacity-60">
                     {loadingMore ? 'جاري التحميل...' : `عرض المزيد (${remaining})`}
                   </button>
                 </div>
@@ -392,7 +392,7 @@ export default function PartnersSection() {
               <button
                 type="submit"
                 disabled={sending}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-10 py-3.5 rounded-xl bg-linear-to-l from-blue-600 to-indigo-600 text-white font-bold shadow-lg shadow-blue-700/30 ring-1 ring-white/10 transition-all hover:-translate-y-0.5 hover:shadow-blue-600/40 disabled:opacity-60 disabled:hover:translate-y-0">
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-10 py-3.5 rounded-xl bg-linear-to-l from-blue-600 to-indigo-600 text-white font-bold shadow-lg shadow-blue-700/30 ring-1 ring-slate-700 transition-all hover:-translate-y-0.5 hover:shadow-blue-600/40 disabled:opacity-60 disabled:hover:translate-y-0">
                 <HiOutlinePaperAirplane className="h-5 w-5 rotate-90" />
                 {sending ? 'جاري الإرسال...' : 'إرسال'}
               </button>

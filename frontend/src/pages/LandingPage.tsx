@@ -86,7 +86,7 @@ export default function LandingPage() {
         transition={{ duration: 0.7, ease: EASE_OUT }}
         className={`fixed top-0 inset-x-0 z-50 transition-[background-color,border-color,box-shadow] duration-500 ${
           scrolled
-            ? 'bg-ink-950/80 backdrop-blur-xl border-b border-white/8 shadow-[0_8px_40px_rgb(61_36_93/0.10)]'
+            ? 'bg-ink-950/80 backdrop-blur-xl border-b border-slate-700 shadow-[0_8px_40px_rgb(61_36_93/0.10)]'
             : 'bg-transparent border-b border-transparent'
         }`}>
         <div
@@ -117,7 +117,7 @@ export default function LandingPage() {
             <MagneticButton strength={0.15}>
               <Link
                 to="/login"
-                className="whitespace-nowrap inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-gold-400/40 px-3.5 sm:px-5 py-2 sm:py-2.5 text-sm font-semibold text-slate-50 transition-colors">
+                className="whitespace-nowrap inline-flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-800/70 hover:bg-slate-700/60 hover:border-gold-400/40 px-3.5 sm:px-5 py-2 sm:py-2.5 text-sm font-semibold text-slate-50 transition-colors">
                 تسجيل الدخول
                 <HiOutlineArrowNarrowLeft className="h-4 w-4" />
               </Link>
@@ -166,7 +166,7 @@ export default function LandingPage() {
             <MagneticButton className="w-full sm:w-auto">
               <Link
                 to="/guest"
-                className="group relative w-full inline-flex items-center justify-center gap-2.5 overflow-hidden rounded-2xl bg-linear-to-l from-blue-600 via-indigo-600 to-violet-600 px-9 py-4 text-lg font-bold text-white shadow-xl shadow-indigo-700/30 ring-1 ring-white/10 transition-shadow hover:shadow-indigo-500/40">
+                className="group relative w-full inline-flex items-center justify-center gap-2.5 overflow-hidden rounded-2xl bg-linear-to-l from-blue-600 via-indigo-600 to-violet-600 px-9 py-4 text-lg font-bold text-white shadow-xl shadow-indigo-700/30 ring-1 ring-slate-700 transition-shadow hover:shadow-indigo-500/40">
                 <span className="absolute inset-0 -translate-x-full bg-linear-to-l from-transparent via-white/15 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
                 <HiOutlinePlay className="relative h-5 w-5 transition-transform group-hover:scale-110" />
                 <span className="relative">ابدأ الاختبار كضيف</span>
@@ -175,7 +175,7 @@ export default function LandingPage() {
             <MagneticButton className="w-full sm:w-auto">
               <Link
                 to="/login"
-                className="w-full inline-flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-9 py-4 text-lg font-bold text-slate-50 backdrop-blur transition-colors hover:border-gold-400/40 hover:bg-white/10">
+                className="w-full inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-700 bg-slate-800/70 px-9 py-4 text-lg font-bold text-slate-50 backdrop-blur transition-colors hover:border-gold-400/40 hover:bg-slate-700/60">
                 دخول الطالبات
               </Link>
             </MagneticButton>
@@ -215,7 +215,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Features ───────────────────────────────────────────────────── */}
-      <section id="features" className="relative scroll-mt-24 px-4 sm:px-6 py-20 sm:py-28 border-y border-white/5 bg-ink-900/60">
+      <section id="features" className="relative scroll-mt-24 px-4 sm:px-6 py-20 sm:py-28 border-y border-slate-700 bg-ink-900/60">
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(60%_50%_at_50%_0%,rgb(111_63_171/0.10),transparent)]" />
         <div className="max-w-7xl mx-auto">
           <SectionHeading eyebrow="لماذا منصة التحصيلي" title="كل ما تحتاجه الطالبة للاستعداد" />
@@ -248,7 +248,7 @@ export default function LandingPage() {
       <PartnersSection />
 
       {/* ── Footer ─────────────────────────────────────────────────────── */}
-      <footer className="relative border-t border-white/5 bg-ink-900/60 overflow-hidden">
+      <footer className="relative border-t border-slate-700 bg-ink-900/60 overflow-hidden">
         <div className="absolute inset-x-0 top-0 h-px bg-linear-to-l from-transparent via-gold-400/40 to-transparent" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-14 flex flex-col lg:flex-row items-center lg:items-start justify-between gap-8 text-center lg:text-start">
           <div className="flex flex-col lg:flex-row items-center gap-4">
@@ -271,7 +271,7 @@ export default function LandingPage() {
             <p className="text-slate-400">مديرة المدرسة / جميلة فهد المطيري</p>
           </div>
         </div>
-        <div className="border-t border-white/5 py-5 text-center text-xs text-slate-500">
+        <div className="border-t border-slate-700 py-5 text-center text-xs text-slate-500">
           الثانوية الحادية والعشرون — جميع الحقوق محفوظة © 2026
         </div>
       </footer>

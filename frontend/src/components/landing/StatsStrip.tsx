@@ -98,7 +98,7 @@ export default function StatsStrip() {
           <motion.div
             key={item.label}
             variants={reveal}
-            className={`group flex flex-col items-center justify-center gap-2 px-3 py-7 sm:py-9 text-center border-white/5 ${dividers(index)}`}>
+            className={`group flex flex-col items-center justify-center gap-2 px-3 py-7 sm:py-9 text-center border-slate-700 ${dividers(index)}`}>
             <item.icon className="h-6 w-6 text-gold-400/80 transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:scale-110" />
             <span className="font-display text-3xl sm:text-4xl font-bold text-slate-50 tabular-nums">
               <CountUp value={item.value} />
@@ -108,7 +108,7 @@ export default function StatsStrip() {
         ))}
       </div>
 
-      <motion.div variants={reveal} className="flex items-center justify-center gap-2.5 border-t border-white/5 px-4 py-4 text-sm text-slate-400">
+      <motion.div variants={reveal} className="flex items-center justify-center gap-2.5 border-t border-slate-700 px-4 py-4 text-sm text-slate-400">
         <HiOutlineEye className="h-5 w-5 text-gold-400/80" />
         عدد زوار الموقع
         <span className="font-display text-lg font-bold text-gold-200 tabular-nums">

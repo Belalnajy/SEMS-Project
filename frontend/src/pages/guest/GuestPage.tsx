@@ -384,7 +384,7 @@ export default function GuestPage() {
               الاسم <span className="text-red-400">*</span>
             </label>
             <input
-              className="w-full px-4 py-3 bg-ink-950 border border-white/10 rounded-xl text-slate-50 placeholder-slate-500 focus:border-gold-400/50 focus:ring-2 focus:ring-gold-400/20 focus:outline-none transition-all"
+              className="w-full px-4 py-3 bg-ink-950 border border-slate-700 rounded-xl text-slate-50 placeholder-slate-500 focus:border-gold-400/50 focus:ring-2 focus:ring-gold-400/20 focus:outline-none transition-all"
               placeholder="الاسم الثلاثي للاختبار..."
               value={guestName}
               onChange={(e) => setGuestName(e.target.value)}
@@ -397,7 +397,7 @@ export default function GuestPage() {
             </label>
 
             {exams.length === 0 ? (
-              <div className="bg-ink-950/60 rounded-xl p-6 text-center border border-white/10 border-dashed">
+              <div className="bg-ink-950/60 rounded-xl p-6 text-center border border-slate-700 border-dashed">
                 <p className="text-slate-400 text-sm">
                   {examsState === 'loading'
                     ? 'جاري تحميل الامتحانات المتاحة...'
@@ -414,7 +414,7 @@ export default function GuestPage() {
                     className={`relative flex items-center p-4 rounded-xl border cursor-pointer transition-all group overflow-hidden ${
                       selectedExam?.id === exam.id
                         ? 'bg-blue-500/10 border-blue-500'
-                        : 'bg-ink-950 border-white/10 hover:border-white/25 hover:bg-white/[0.03]'
+                        : 'bg-ink-950 border-slate-700 hover:border-slate-600 hover:bg-white/[0.03]'
                     }`}
                     onClick={() => setSelectedExam(exam)}>
                     {selectedExam?.id === exam.id && (
@@ -468,7 +468,7 @@ export default function GuestPage() {
           </div>
         </div>
 
-        <div className="mt-8 text-center pt-6 border-t border-white/10">
+        <div className="mt-8 text-center pt-6 border-t border-slate-700">
           <Link
             to="/login"
             className="text-slate-400 hover:text-slate-50 transition-colors text-sm font-medium">
