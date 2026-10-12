@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import api from '../../api/client';
 import {
   HiOutlineDownload,
@@ -18,7 +19,7 @@ import {
   Pie,
   Cell,
 } from 'recharts';
-import { Section, Subject } from '../../types/api';
+import { Section } from '../../types/api';
 
 const COLORS = [
   '#6366f1',
@@ -29,7 +30,15 @@ const COLORS = [
   '#8b5cf6',
 ];
 
+/** A subject that has exams, as returned by /reports/filters. */
+interface FilterSubject {
+  id: number;
+  name: string;
+  exams: { id: number; name: string }[];
+}
+
 interface PerformanceReport {
+  level?: 'subject' | 'exam';
   subject_id: number;
   subject_name: string;
   avg_percentage: string;
@@ -44,11 +53,33 @@ interface SectionRank {
   total_exams: string;
 }
 
+/** Axis label split over up to three lines so long exam names stay readable. */
+function WrappedTick({ x, y, payload }: any) {
+  const words = String(payload?.value ?? '').split(/\s+/).filter(Boolean);
+  const lines: string[] = [];
+  for (const word of words) {
+    const last = lines[lines.length - 1];
+    if (last && (last + ' ' + word).length <= 14) lines[lines.length - 1] = last + ' ' + word;
+    else lines.push(word);
+  }
+  if (lines.length > 3) lines.splice(2, lines.length - 2, lines.slice(2).join(' ').slice(0, 13) + '…');
+  return (
+    <text x={x} y={y + 14} textAnchor="middle" fill="#94a3b8" fontSize={11}>
+      {lines.map((line, i) => (
+        <tspan key={i} x={x} dy={i === 0 ? 0 : 13}>
+          {line}
+        </tspan>
+      ))}
+    </text>
+  );
+}
+
 export default function ReportsPage() {
   const [sections, setSections] = useState<Section[]>([]);
-  const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [subjects, setSubjects] = useState<FilterSubject[]>([]);
   const [sectionFilter, setSectionFilter] = useState('');
   const [subjectFilter, setSubjectFilter] = useState('');
+  const [examFilter, setExamFilter] = useState('');
 
   const [overall, setOverall] = useState<PerformanceReport[]>([]);
   const [studentPerf, setStudentPerf] = useState<any[]>([]);
@@ -61,27 +92,39 @@ export default function ReportsPage() {
     try {
       const [secRes, subRes] = await Promise.all([
         api.get('/sections'),
-        api.get('/subjects'),
+        api.get('/reports/filters'),
       ]);
       setSections(secRes.data);
       setSubjects(subRes.data);
-    } catch {}
+    } catch {
+      toast.error('تعذّر تحميل قوائم التصفية، حاول تحديث الصفحة.');
+    }
   };
 
   const fetchData = async () => {
     const params: any = {};
     if (sectionFilter) params.section_id = sectionFilter;
     if (subjectFilter) params.subject_id = subjectFilter;
-    try {
-      const [oRes, spRes, srRes] = await Promise.all([
-        api.get('/reports/performance', { params }),
-        api.get('/reports/students', { params }),
-        api.get('/reports/sections', { params }),
-      ]);
-      setOverall(oRes.data.stats || oRes.data || []);
-      setStudentPerf(spRes.data.reports || spRes.data || []);
-      setSectionRanking(srRes.data.ranking || srRes.data || []);
-    } catch {}
+    if (examFilter) params.exam_id = examFilter;
+    // Each report updates on its own, so one failing request can't leave the
+    // page showing the previous filter's numbers.
+    const [oRes, spRes, srRes] = await Promise.allSettled([
+      api.get('/reports/performance', { params }),
+      api.get('/reports/students', { params }),
+      api.get('/reports/sections', { params }),
+    ]);
+    setOverall(
+      oRes.status === 'fulfilled' ? oRes.value.data.stats || oRes.value.data || [] : [],
+    );
+    setStudentPerf(
+      spRes.status === 'fulfilled' ? spRes.value.data.reports || spRes.value.data || [] : [],
+    );
+    setSectionRanking(
+      srRes.status === 'fulfilled' ? srRes.value.data.ranking || srRes.value.data || [] : [],
+    );
+    if ([oRes, spRes, srRes].some((r) => r.status === 'rejected')) {
+      toast.error('تعذّر تحميل بعض التقارير، حاول مرة أخرى.');
+    }
   };
 
   useEffect(() => {
@@ -90,12 +133,18 @@ export default function ReportsPage() {
 
   useEffect(() => {
     fetchData();
-  }, [sectionFilter, subjectFilter]);
+  }, [sectionFilter, subjectFilter, examFilter]);
+
+  const examsOfSubject =
+    subjects.find((s) => String(s.id) === subjectFilter)?.exams ?? [];
+  // With a subject chosen the charts compare the exams inside it.
+  const groupLabel = overall[0]?.level === 'exam' ? 'الاختبار' : 'المادة';
 
   const handleExportExcel = () => {
     const params = new URLSearchParams();
     if (sectionFilter) params.set('section_id', sectionFilter);
     if (subjectFilter) params.set('subject_id', subjectFilter);
+    if (examFilter) params.set('exam_id', examFilter);
 
     const token = localStorage.getItem('sems_token');
     if (token) params.set('token', token);
@@ -113,6 +162,7 @@ export default function ReportsPage() {
     const params = new URLSearchParams();
     if (sectionFilter) params.set('section_id', sectionFilter);
     if (subjectFilter) params.set('subject_id', subjectFilter);
+    if (examFilter) params.set('exam_id', examFilter);
 
     const token = localStorage.getItem('sems_token');
     if (token) params.set('token', token);
@@ -173,11 +223,28 @@ export default function ReportsPage() {
         <select
           className="w-full sm:w-48 px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
           value={subjectFilter}
-          onChange={(e) => setSubjectFilter(e.target.value)}>
+          onChange={(e) => {
+            setSubjectFilter(e.target.value);
+            setExamFilter('');
+          }}>
           <option value="">كل المواد (للتصفية)</option>
           {subjects.map((s) => (
             <option key={s.id} value={s.id}>
               {s.name}
+            </option>
+          ))}
+        </select>
+        <select
+          className="w-full sm:w-64 px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all disabled:opacity-50"
+          value={examFilter}
+          disabled={!subjectFilter}
+          onChange={(e) => setExamFilter(e.target.value)}>
+          <option value="">
+            {subjectFilter ? 'كل اختبارات المادة' : 'اختر مادة أولاً لعرض اختباراتها'}
+          </option>
+          {examsOfSubject.map((e) => (
+            <option key={e.id} value={e.id}>
+              {e.name}
             </option>
           ))}
         </select>
@@ -210,9 +277,9 @@ export default function ReportsPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="bg-slate-800 rounded-xl p-6 border border-slate-700 shadow-sm print:shadow-none print:border-slate-300 print:break-inside-avoid">
               <h3 className="text-lg font-bold text-white mb-6 print:text-black">
-                متوسط الأداء للطلاب حسب المادة
+                متوسط الأداء للطلاب حسب {groupLabel}
               </h3>
-              <div className="h-[300px] w-full origin-top-right">
+              <div className="h-[320px] w-full origin-top-right">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart
                     data={overall.map((o) => ({
@@ -228,12 +295,11 @@ export default function ReportsPage() {
                       dataKey="name"
                       axisLine={false}
                       tickLine={false}
-                      tick={{
-                        fill: '#94a3b8',
-                        fontSize: 13,
-                        fontFamily: 'Tajawal, sans-serif',
-                      }}
-                      dy={10}
+                      // Show every name, wrapped: exam names are long and
+                      // Recharts otherwise drops the ones that would overlap.
+                      interval={0}
+                      height={64}
+                      tick={<WrappedTick />}
                     />
                     <YAxis
                       axisLine={false}
@@ -267,7 +333,7 @@ export default function ReportsPage() {
 
             <div className="bg-slate-800 rounded-xl p-6 border border-slate-700 shadow-sm print:shadow-none print:border-slate-300">
               <h3 className="text-lg font-bold text-white mb-6">
-                توزيع محاولات الاختبارات حسب المادة
+                توزيع محاولات الاختبارات حسب {groupLabel}
               </h3>
               <div className="h-[300px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
