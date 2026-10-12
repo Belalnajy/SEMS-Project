@@ -202,12 +202,12 @@ export default function StudentsPage() {
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-sm">
         <div>
-          <h1 className="text-2xl font-bold text-white mb-1">إدارة الطلاب</h1>
+          <h1 className="text-2xl font-bold text-slate-50 mb-1">إدارة الطلاب</h1>
           <p className="text-sm text-slate-400">إضافة وتعديل وحذف الطلاب</p>
         </div>
         <div className="flex flex-wrap w-full md:w-auto gap-3">
           <button
-            className="flex-1 sm:flex-initial justify-center flex items-center gap-2 bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+            className="flex-1 sm:flex-initial justify-center flex items-center gap-2 bg-slate-700 hover:bg-slate-600 text-slate-50 px-4 py-2 rounded-lg font-medium transition-colors"
             onClick={() => setShowImport(true)}>
             <HiOutlineUpload className="h-5 w-5" /> استيراد Excel
           </button>
@@ -245,14 +245,14 @@ export default function StudentsPage() {
         <div className="relative flex-1 max-w-sm">
           <HiOutlineSearch className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 h-5 w-5" />
           <input
-            className="w-full pl-4 pr-10 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
+            className="w-full pl-4 pr-10 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-slate-50 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
             placeholder="بحث بالاسم أو الرقم..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
         <select
-          className="w-full sm:w-48 px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
+          className="w-full sm:w-48 px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-slate-50 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
           value={sectionFilter}
           onChange={(e) => {
             setSectionFilter(e.target.value);
@@ -266,7 +266,7 @@ export default function StudentsPage() {
         </select>
         <div className="flex gap-3">
           <button
-            className="bg-slate-700 hover:bg-slate-600 text-white px-6 py-2.5 rounded-lg font-medium transition-colors whitespace-nowrap"
+            className="bg-slate-700 hover:bg-slate-600 text-slate-50 px-6 py-2.5 rounded-lg font-medium transition-colors whitespace-nowrap"
             onClick={() => fetchStudents()}>
             بحث
           </button>
@@ -306,7 +306,7 @@ export default function StudentsPage() {
                   </span>
                 </div>
                 <div>
-                  <p className="text-base font-semibold text-white">
+                  <p className="text-base font-semibold text-slate-50">
                     {s.full_name}
                   </p>
                   <p className="text-xs text-slate-400 mt-1">
@@ -363,7 +363,7 @@ export default function StudentsPage() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         {(pagination.page - 1) * 20 + i + 1}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap font-medium text-white">
+                      <td className="px-6 py-4 whitespace-nowrap font-medium text-slate-50">
                         {s.full_name}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -382,7 +382,7 @@ export default function StudentsPage() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex justify-center gap-2">
                           <button
-                            className="p-2 text-slate-400 hover:bg-slate-700 hover:text-white rounded-lg transition-all"
+                            className="p-2 text-slate-400 hover:bg-slate-700 hover:text-slate-50 rounded-lg transition-all"
                             title="تعديل"
                             onClick={() => handleEdit(s)}>
                             <HiOutlinePencil className="h-5 w-5" />
@@ -413,7 +413,7 @@ export default function StudentsPage() {
               className={`w-10 h-10 rounded-lg font-medium text-sm transition-colors ${
                 pagination.page === i + 1
                   ? 'bg-blue-600 text-white'
-                  : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white border border-slate-700'
+                  : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-50 border border-slate-700'
               }`}
               onClick={() => fetchStudents(i + 1)}>
               {i + 1}
@@ -434,7 +434,7 @@ export default function StudentsPage() {
               الاسم الكامل
             </label>
             <input
-              className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
+              className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-slate-50 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
               value={form.full_name}
               onChange={(e) => setForm({ ...form, full_name: e.target.value })}
               required
@@ -445,7 +445,7 @@ export default function StudentsPage() {
               رقم الطالب
             </label>
             <input
-              className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
+              className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-slate-50 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
               value={form.student_number}
               onChange={(e) =>
                 setForm({ ...form, student_number: e.target.value })
@@ -458,7 +458,7 @@ export default function StudentsPage() {
               الرقم الهوية
             </label>
             <input
-              className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
+              className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-slate-50 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
               value={form.national_id}
               onChange={(e) =>
                 setForm({ ...form, national_id: e.target.value })
@@ -473,7 +473,7 @@ export default function StudentsPage() {
             </label>
             <input
               type="password"
-              className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all font-mono"
+              className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-slate-50 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all font-mono"
               placeholder={editStudent ? '••••••••' : 'أدخل كلمة المرور'}
               value={form.password}
               onChange={(e) => setForm({ ...form, password: e.target.value })}
@@ -485,7 +485,7 @@ export default function StudentsPage() {
               الفصل
             </label>
             <select
-              className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
+              className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-slate-50 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
               value={form.section_id}
               onChange={(e) =>
                 setForm({ ...form, section_id: e.target.value })
@@ -519,13 +519,13 @@ export default function StudentsPage() {
             يجب أن يحتوي ملف Excel على الأعمدة التالية في الصف الأول:
             <br />
             <div className="mt-2 flex flex-wrap gap-2">
-              <code className="bg-slate-900 px-2 py-0.5 rounded text-blue-300 border border-blue-500/20">
+              <code className="bg-slate-900 px-2 py-0.5 rounded text-blue-700 border border-blue-500/20">
                 رقم الطالبة
               </code>
-              <code className="bg-slate-900 px-2 py-0.5 rounded text-blue-300 border border-blue-500/20">
+              <code className="bg-slate-900 px-2 py-0.5 rounded text-blue-700 border border-blue-500/20">
                 اسم الطالبة
               </code>
-              <code className="bg-slate-900 px-2 py-0.5 rounded text-blue-300 border border-blue-500/20">
+              <code className="bg-slate-900 px-2 py-0.5 rounded text-blue-700 border border-blue-500/20">
                 الفصل
               </code>
             </div>
@@ -557,7 +557,7 @@ export default function StudentsPage() {
               </span>
             </label>
             <select
-              className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
+              className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-slate-50 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
               value={importSection}
               onChange={(e) => setImportSection(e.target.value)}>
               <option value="">بدون فصل (أو كما هو محدد في الملف)</option>

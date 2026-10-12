@@ -65,7 +65,7 @@ export default function SectionsPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-sm">
         <div>
-          <h1 className="text-2xl font-bold text-white mb-1">إدارة الفصول</h1>
+          <h1 className="text-2xl font-bold text-slate-50 mb-1">إدارة الفصول</h1>
           <p className="text-sm text-slate-400">
             إضافة وتعديل وحذف الفصول الدراسية
           </p>
@@ -96,13 +96,13 @@ export default function SectionsPage() {
           <div
             key={s.id}
             className="bg-slate-800 rounded-xl p-6 border border-slate-700 shadow-sm hover:border-slate-600 transition-colors">
-            <h3 className="text-lg font-bold text-white mb-2">{s.name}</h3>
+            <h3 className="text-lg font-bold text-slate-50 mb-2">{s.name}</h3>
             <p className="text-sm text-slate-400 mb-6">
               {(s as any).description || 'بدون وصف'}
             </p>
             <div className="flex gap-3">
               <button
-                className="flex items-center gap-2 bg-slate-700 hover:bg-slate-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
+                className="flex items-center gap-2 bg-slate-700 hover:bg-slate-600 text-slate-50 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
                 onClick={() => {
                   setEditItem(s);
                   setForm({
@@ -139,7 +139,7 @@ export default function SectionsPage() {
               اسم الفصل
             </label>
             <input
-              className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-50 focus:ring-2 focus:ring-blue-500 focus:outline-none"
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
               required
@@ -150,7 +150,7 @@ export default function SectionsPage() {
               الوصف
             </label>
             <input
-              className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-50 focus:ring-2 focus:ring-blue-500 focus:outline-none"
               value={form.description}
               onChange={(e) =>
                 setForm({ ...form, description: e.target.value })

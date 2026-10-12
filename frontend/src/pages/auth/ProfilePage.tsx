@@ -52,7 +52,7 @@ export default function ProfilePage() {
             <HiOutlineUser className="h-6 w-6 text-blue-500" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-white">إعدادات الحساب</h1>
+            <h1 className="text-xl font-bold text-slate-50">إعدادات الحساب</h1>
             <p className="text-sm text-slate-400">
               تعديل بيانات الدخول الخاصة بك
             </p>
@@ -71,7 +71,7 @@ export default function ProfilePage() {
                 type="text"
                 value={nationalId}
                 onChange={(e) => setNationalId(e.target.value)}
-                className="w-full bg-slate-900 border border-slate-700 text-white rounded-lg py-2.5 pr-10 pl-4 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
+                className="w-full bg-slate-900 border border-slate-700 text-slate-50 rounded-lg py-2.5 pr-10 pl-4 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
                 placeholder="أدخل رقم الهوية الجديد"
                 required
               />
@@ -94,7 +94,7 @@ export default function ProfilePage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-slate-900 border border-slate-700 text-white rounded-lg py-2.5 pr-10 pl-4 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
+                className="w-full bg-slate-900 border border-slate-700 text-slate-50 rounded-lg py-2.5 pr-10 pl-4 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
                 placeholder="اتركها فارغة إذا لم تكن تريد تغييرها"
               />
             </div>
@@ -111,7 +111,7 @@ export default function ProfilePage() {
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full bg-slate-900 border border-slate-700 text-white rounded-lg py-2.5 pr-10 pl-4 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
+                className="w-full bg-slate-900 border border-slate-700 text-slate-50 rounded-lg py-2.5 pr-10 pl-4 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
                 placeholder="أعد كتابة كلمة المرور"
               />
             </div>

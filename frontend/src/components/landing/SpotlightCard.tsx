@@ -35,7 +35,7 @@ export default function SpotlightCard({
       onMouseMove={onMove}
       whileHover={{ y: -6 }}
       transition={{ type: 'spring', stiffness: 260, damping: 22 }}
-      className={`spotlight-card border-conic rounded-3xl border border-white/8 bg-white/[0.025] ${className}`}>
+      className={`spotlight-card border-conic rounded-3xl border border-slate-700 bg-white/[0.025] ${className}`}>
       {children}
     </motion.div>
   );

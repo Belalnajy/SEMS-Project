@@ -177,14 +177,14 @@ export default function PartnersPage() {
   };
 
   const inputClass =
-    'w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all';
+    'w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-slate-50 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all';
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-sm">
         <div>
-          <h1 className="text-2xl font-bold text-white mb-1">شركاؤنا في النجاح</h1>
+          <h1 className="text-2xl font-bold text-slate-50 mb-1">شركاؤنا في النجاح</h1>
           <p className="text-sm text-slate-400">
             راجعي مشاركات أولياء الأمور — لا يظهر للزوار إلا ما تنشرينه
           </p>
@@ -211,7 +211,7 @@ export default function PartnersPage() {
             className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2 rounded-lg text-sm font-bold transition-colors ${
               tab === t.key
                 ? 'bg-blue-600 text-white'
-                : 'text-slate-400 hover:text-white hover:bg-slate-700'
+                : 'text-slate-400 hover:text-slate-50 hover:bg-slate-700'
             }`}>
             {t.label}
             <span
@@ -248,7 +248,7 @@ export default function PartnersPage() {
               className="flex flex-col bg-slate-800 rounded-xl p-5 border border-slate-700">
               <div className="flex flex-wrap items-start justify-between gap-2 mb-3">
                 <div className="min-w-0">
-                  <p className="font-bold text-white break-words">
+                  <p className="font-bold text-slate-50 break-words">
                     ولي الأمر: {post.parent_name}
                   </p>
                   {post.student_name && (
@@ -258,7 +258,7 @@ export default function PartnersPage() {
                   )}
                 </div>
                 <div className="flex flex-wrap gap-1.5">
-                  <span className="text-xs bg-blue-500/10 text-blue-300 border border-blue-500/20 rounded-full px-2.5 py-1">
+                  <span className="text-xs bg-blue-500/10 text-blue-700 border border-blue-500/20 rounded-full px-2.5 py-1">
                     {post.category}
                   </span>
                   {post.source === 'admin' && (
@@ -293,7 +293,7 @@ export default function PartnersPage() {
                         runAction(post, 'unpublish', 'تم إخفاء المشاركة وإرجاعها للمراجعة')
                       }
                       disabled={busyId === post.id}
-                      className="flex items-center gap-1 bg-slate-700 hover:bg-slate-600 text-white px-3 py-1.5 rounded-lg text-sm transition-colors disabled:opacity-50">
+                      className="flex items-center gap-1 bg-slate-700 hover:bg-slate-600 text-slate-50 px-3 py-1.5 rounded-lg text-sm transition-colors disabled:opacity-50">
                       <HiOutlineEyeOff className="h-4 w-4" /> إخفاء
                     </button>
                   )}
@@ -318,7 +318,7 @@ export default function PartnersPage() {
 
       {/* Categories */}
       <div className="bg-slate-800 p-6 rounded-xl border border-slate-700">
-        <h2 className="flex items-center gap-2 text-lg font-bold text-white mb-1">
+        <h2 className="flex items-center gap-2 text-lg font-bold text-slate-50 mb-1">
           <HiOutlineTag className="h-5 w-5 text-blue-400" />
           أنواع المشاركة
         </h2>
@@ -351,7 +351,7 @@ export default function PartnersPage() {
           />
           <button
             type="submit"
-            className="flex-none flex items-center gap-1 bg-slate-700 hover:bg-slate-600 text-white px-4 rounded-lg text-sm font-medium transition-colors">
+            className="flex-none flex items-center gap-1 bg-slate-700 hover:bg-slate-600 text-slate-50 px-4 rounded-lg text-sm font-medium transition-colors">
             <HiOutlinePlus className="h-4 w-4" /> إضافة
           </button>
         </form>
