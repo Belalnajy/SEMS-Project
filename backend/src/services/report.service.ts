@@ -5,13 +5,14 @@ import ejs from 'ejs';
 import puppeteer from 'puppeteer-core';
 import { AppDataSource } from '../config/data-source';
 import { Result } from '../entities/Result';
+import { Subject } from '../entities/Subject';
 import { ApiError } from '../middleware/errorHandler';
 
 export class ReportService {
   private resultRepository = AppDataSource.getRepository(Result);
 
   async getPerformanceReports(filters: any) {
-    const { section_id, subject_id, student_id } = filters;
+    const { section_id, subject_id, exam_id, student_id } = filters;
 
     // using QueryBuilder for complex aggregations and joins
     const query = this.resultRepository
@@ -27,6 +28,9 @@ export class ReportService {
     }
     if (subject_id) {
       query.andWhere('subject.id = :subjectId', { subjectId: subject_id });
+    }
+    if (exam_id) {
+      query.andWhere('exam_model.id = :examId', { examId: exam_id });
     }
     if (student_id) {
       query.andWhere('student.id = :studentId', { studentId: student_id });
@@ -62,9 +66,66 @@ export class ReportService {
     }));
   }
 
+  /**
+   * Attempts and average score per subject. Once a subject is chosen the
+   * breakdown is per exam inside it, because some subjects (the diagnostic
+   * tests) group several separate exams that each need their own figures.
+   */
   async getOverallStats(filters: any = {}) {
-    const { section_id, subject_id } = filters;
+    const { section_id, subject_id, exam_id } = filters;
+    const byExam = Boolean(subject_id || exam_id);
 
+    const qb = this.filteredResults({ section_id, subject_id, exam_id });
+
+    if (byExam) {
+      qb.select('exam_model.id', 'id')
+        .addSelect('exam_model.name', 'name')
+        .groupBy('exam_model.id')
+        .addGroupBy('exam_model.name');
+    } else {
+      qb.select('subject.id', 'id')
+        .addSelect('subject.name', 'name')
+        .groupBy('subject.id')
+        .addGroupBy('subject.name');
+    }
+    qb.addSelect('COUNT(result.id)', 'total_attempts')
+      .addSelect('AVG(result.percentage)', 'avg_percentage')
+      .orderBy('total_attempts', 'DESC');
+
+    const stats = await qb.getRawMany();
+
+    return stats.map((s) => ({
+      level: byExam ? 'exam' : 'subject',
+      // subject_* keep their names so existing clients keep working; with a
+      // subject chosen they describe an exam.
+      subject_id: Number(s.id),
+      subject_name: s.name,
+      total_attempts: Number(s.total_attempts) || 0,
+      avg_percentage: Number(s.avg_percentage)
+        ? Number(s.avg_percentage).toFixed(2)
+        : '0.00',
+    }));
+  }
+
+  /** Subjects that have exams, each with its exams, for the report filters. */
+  async getFilterOptions() {
+    const subjects = await AppDataSource.getRepository(Subject)
+      .createQueryBuilder('subject')
+      .innerJoinAndSelect('subject.exams', 'exam')
+      .orderBy('subject.id', 'ASC')
+      .addOrderBy('exam.id', 'ASC')
+      .getMany();
+
+    return subjects.map((subject) => ({
+      id: subject.id,
+      name: subject.name,
+      exams: subject.exams.map((e) => ({ id: e.id, name: e.name })),
+    }));
+  }
+
+  /** Student (non-guest) results narrowed by the report filters. */
+  private filteredResults(filters: any) {
+    const { section_id, subject_id, exam_id } = filters;
     const qb = this.resultRepository
       .createQueryBuilder('result')
       .leftJoin('result.exam_model', 'exam_model')
@@ -79,33 +140,16 @@ export class ReportService {
     if (subject_id) {
       qb.andWhere('subject.id = :subjectId', { subjectId: subject_id });
     }
-
-    qb.select('subject.id', 'subject_id')
-      .addSelect('subject.name', 'subject_name')
-      .addSelect('COUNT(result.id)', 'total_attempts')
-      .addSelect('AVG(result.percentage)', 'avg_percentage')
-      .groupBy('subject.id')
-      .addGroupBy('subject.name')
-      .orderBy('total_attempts', 'DESC');
-
-    const stats = await qb.getRawMany();
-
-    return stats.map((s) => ({
-      subject_id: Number(s.subject_id),
-      subject_name: s.subject_name,
-      total_attempts: Number(s.total_attempts) || 0,
-      avg_percentage: Number(s.avg_percentage)
-        ? Number(s.avg_percentage).toFixed(2)
-        : '0.00',
-    }));
+    if (exam_id) {
+      qb.andWhere('exam_model.id = :examId', { examId: exam_id });
+    }
+    return qb;
   }
 
-  async getSectionRanking() {
-    const qb = this.resultRepository
-      .createQueryBuilder('result')
-      .innerJoin('result.student', 'student')
-      .innerJoin('student.section', 'section')
-      .where('result.is_guest = :isGuest', { isGuest: false })
+  async getSectionRanking(filters: any = {}) {
+    const { subject_id, exam_id } = filters;
+    const qb = this.filteredResults({ subject_id, exam_id })
+      .andWhere('section.id IS NOT NULL')
       .select('section.id', 'section_id')
       .addSelect('section.name', 'section_name')
       .addSelect('AVG(result.percentage)', 'avg_percentage')

@@ -23,10 +23,18 @@ export const getStudentsReport = async (req: Request, res: Response) => {
 
 export const getSectionRanking = async (req: Request, res: Response) => {
   try {
-    const ranking = await reportService.getSectionRanking();
+    const ranking = await reportService.getSectionRanking(req.query);
     res.json(ranking);
   } catch (error) {
     res.status(500).json({ error: 'حدث خطأ أثناء جلب ترتيب الشُعب' });
+  }
+};
+
+export const getFilterOptions = async (req: Request, res: Response) => {
+  try {
+    res.json(await reportService.getFilterOptions());
+  } catch (error) {
+    res.status(500).json({ error: 'حدث خطأ أثناء جلب خيارات التصفية' });
   }
 };
 

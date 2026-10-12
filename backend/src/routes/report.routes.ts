@@ -3,6 +3,7 @@ import {
   getPerformance,
   getStudentsReport,
   getSectionRanking,
+  getFilterOptions,
   exportExcel,
   exportPdf,
 } from '../controllers/report.controller';
@@ -18,6 +19,7 @@ router.use(roleGuard(['supervisor', 'manager']));
 router.get('/performance', getPerformance);
 router.get('/students', getStudentsReport);
 router.get('/sections', getSectionRanking);
+router.get('/filters', getFilterOptions);
 router.get('/export/excel', exportExcel);
 router.get('/export/pdf', exportPdf);
 
