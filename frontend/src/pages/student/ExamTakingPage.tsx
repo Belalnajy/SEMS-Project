@@ -115,20 +115,20 @@ export default function ExamTakingPage() {
             </div>
           </div>
 
-          <h2 className="text-3xl font-bold text-white mb-3">
+          <h2 className="text-3xl font-bold text-slate-50 mb-3">
             {isPass ? 'مبروك، لقد نجحت!' : 'للأسف، لم يحالفك الحظ'}
           </h2>
           <p className="text-slate-400 text-lg mb-8">
             لقد حصلت على{' '}
-            <span className="font-bold text-white mx-1">{result.score}</span>{' '}
+            <span className="font-bold text-slate-50 mx-1">{result.score}</span>{' '}
             درجة من أصل{' '}
-            <span className="font-bold text-white mx-1">
+            <span className="font-bold text-slate-50 mx-1">
               {result.total_questions}
             </span>
           </p>
 
           <button
-            className="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-3.5 rounded-xl transition-colors text-lg"
+            className="w-full bg-slate-700 hover:bg-slate-600 text-slate-50 font-bold py-3.5 rounded-xl transition-colors text-lg"
             onClick={() => navigate('/student')}>
             العودة للوحة التحكم
           </button>
@@ -147,7 +147,7 @@ export default function ExamTakingPage() {
             <HiOutlineClock className="h-12 w-12" />
           </div>
 
-          <h1 className="text-3xl font-bold text-white mb-4">
+          <h1 className="text-3xl font-bold text-slate-50 mb-4">
             هل أنت مستعد للبَدء؟
           </h1>
           <p className="text-slate-400 mb-2 leading-relaxed">
@@ -203,7 +203,7 @@ export default function ExamTakingPage() {
             : 'border-slate-700 shadow-sm'
         } mb-8 transition-colors`}>
         <div>
-          <h1 className="text-xl font-bold text-white">{exam?.name}</h1>
+          <h1 className="text-xl font-bold text-slate-50">{exam?.name}</h1>
           <p className="text-sm text-blue-400 mt-1">
             <div className="flex items-center gap-1">
               <HiOutlineBookOpen className="h-4 w-4" />
@@ -246,7 +246,7 @@ export default function ExamTakingPage() {
             key={q.id}
             className={`bg-slate-800 rounded-2xl p-6 border transition-colors ${
               answers[q.id]
-                ? 'border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.05)]'
+                ? 'border-blue-500/30 shadow-[0_0_15px_rgba(111,63,171,0.08)]'
                 : 'border-slate-700 shadow-sm'
             }`}
             initial={{ opacity: 0, y: 20 }}
@@ -262,7 +262,7 @@ export default function ExamTakingPage() {
                 {i + 1}
               </span>
               <div className="flex-1">
-                <p className="text-lg text-white font-medium leading-relaxed pt-0.5">
+                <p className="text-lg text-slate-50 font-medium leading-relaxed pt-0.5">
                   {q.question_text}
                 </p>
                 {q.has_image && (
@@ -325,7 +325,7 @@ export default function ExamTakingPage() {
       </div>
 
       <div className="mt-12 text-center bg-slate-800/50 p-8 rounded-2xl border border-slate-700 border-dashed">
-        <h3 className="text-xl font-bold text-white mb-2">
+        <h3 className="text-xl font-bold text-slate-50 mb-2">
           هل راجعت جميع إجاباتك؟
         </h3>
         <p className="text-slate-400 mb-6 max-w-md mx-auto">

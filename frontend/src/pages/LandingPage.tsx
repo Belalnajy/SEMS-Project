@@ -86,7 +86,7 @@ export default function LandingPage() {
         transition={{ duration: 0.7, ease: EASE_OUT }}
         className={`fixed top-0 inset-x-0 z-50 transition-[background-color,border-color,box-shadow] duration-500 ${
           scrolled
-            ? 'bg-ink-950/80 backdrop-blur-xl border-b border-white/8 shadow-[0_8px_40px_rgb(0_0_0/0.35)]'
+            ? 'bg-ink-950/80 backdrop-blur-xl border-b border-white/8 shadow-[0_8px_40px_rgb(61_36_93/0.10)]'
             : 'bg-transparent border-b border-transparent'
         }`}>
         <div
@@ -100,7 +100,7 @@ export default function LandingPage() {
               className="h-10 w-10 sm:h-11 sm:w-11 flex-none rounded-xl object-cover ring-1 ring-gold-400/40 shadow-lg shadow-gold-500/10 transition-transform duration-500 group-hover:rotate-[-4deg] group-hover:scale-105"
             />
             <div className="min-w-0 leading-tight">
-              <p className="font-display font-bold text-white text-base sm:text-lg truncate">منصة التحصيلي</p>
+              <p className="font-display font-bold text-slate-50 text-base sm:text-lg truncate">منصة التحصيلي</p>
               <p className="text-[11px] sm:text-xs text-slate-400 truncate">الثانوية الحادية والعشرون</p>
             </div>
           </Link>
@@ -117,7 +117,7 @@ export default function LandingPage() {
             <MagneticButton strength={0.15}>
               <Link
                 to="/login"
-                className="whitespace-nowrap inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-gold-400/40 px-3.5 sm:px-5 py-2 sm:py-2.5 text-sm font-semibold text-white transition-colors">
+                className="whitespace-nowrap inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-gold-400/40 px-3.5 sm:px-5 py-2 sm:py-2.5 text-sm font-semibold text-slate-50 transition-colors">
                 تسجيل الدخول
                 <HiOutlineArrowNarrowLeft className="h-4 w-4" />
               </Link>
@@ -142,7 +142,7 @@ export default function LandingPage() {
             </span>
           </motion.div>
 
-          <h1 className="font-display font-extrabold text-white text-[2.5rem] leading-[1.22] sm:text-6xl sm:leading-[1.18] lg:text-[5.25rem] tracking-tight mb-6 sm:mb-8">
+          <h1 className="font-display font-extrabold text-slate-50 text-[2.5rem] leading-[1.22] sm:text-6xl sm:leading-[1.18] lg:text-[5.25rem] tracking-tight mb-6 sm:mb-8">
             <RevealText text="مستقبلك يبدأ مع" delay={0.25} className="block" />
             <RevealText text="منصة التحصيلي" delay={0.5} className="block pb-2" wordClassName="text-gold-gradient" />
           </h1>
@@ -175,7 +175,7 @@ export default function LandingPage() {
             <MagneticButton className="w-full sm:w-auto">
               <Link
                 to="/login"
-                className="w-full inline-flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-9 py-4 text-lg font-bold text-white backdrop-blur transition-colors hover:border-gold-400/40 hover:bg-white/10">
+                className="w-full inline-flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-9 py-4 text-lg font-bold text-slate-50 backdrop-blur transition-colors hover:border-gold-400/40 hover:bg-white/10">
                 دخول الطالبات
               </Link>
             </MagneticButton>
@@ -216,7 +216,7 @@ export default function LandingPage() {
 
       {/* ── Features ───────────────────────────────────────────────────── */}
       <section id="features" className="relative scroll-mt-24 px-4 sm:px-6 py-20 sm:py-28 border-y border-white/5 bg-ink-900/60">
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(60%_50%_at_50%_0%,rgb(79_70_229/0.12),transparent)]" />
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(60%_50%_at_50%_0%,rgb(111_63_171/0.10),transparent)]" />
         <div className="max-w-7xl mx-auto">
           <SectionHeading eyebrow="لماذا منصة التحصيلي" title="كل ما تحتاجه الطالبة للاستعداد" />
 
@@ -235,7 +235,7 @@ export default function LandingPage() {
                   <feature.icon className="h-6 w-6 sm:h-7 sm:w-7 text-gold-300" />
                 </motion.div>
                 <div>
-                  <h3 className="font-display text-lg sm:text-xl font-bold text-white mb-1.5 sm:mb-3">{feature.title}</h3>
+                  <h3 className="font-display text-lg sm:text-xl font-bold text-slate-50 mb-1.5 sm:mb-3">{feature.title}</h3>
                   <p className="text-sm sm:text-base text-slate-400 leading-relaxed">{feature.description}</p>
                 </div>
               </SpotlightCard>
@@ -254,7 +254,7 @@ export default function LandingPage() {
           <div className="flex flex-col lg:flex-row items-center gap-4">
             <img src="/logo.jpeg" alt="" className="h-14 w-14 rounded-2xl object-cover ring-1 ring-gold-400/30" />
             <div>
-              <p className="font-display font-bold text-white text-lg">منصة التحصيلي</p>
+              <p className="font-display font-bold text-slate-50 text-lg">منصة التحصيلي</p>
               <p className="text-sm text-slate-400 mt-1">الثانوية الحادية والعشرون</p>
             </div>
           </div>
@@ -292,7 +292,7 @@ function SectionHeading({ eyebrow, title }: { eyebrow: string; title: string }) 
       </motion.p>
       <motion.h2
         variants={revealSoft}
-        className="font-display text-[1.75rem] leading-snug sm:text-4xl font-bold text-white">
+        className="font-display text-[1.75rem] leading-snug sm:text-4xl font-bold text-slate-50">
         {title}
       </motion.h2>
       {/* الخط الذهبي يُرسم من المنتصف للطرفين عند الظهور */}

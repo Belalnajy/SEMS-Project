@@ -100,7 +100,7 @@ export default function StatsStrip() {
             variants={reveal}
             className={`group flex flex-col items-center justify-center gap-2 px-3 py-7 sm:py-9 text-center border-white/5 ${dividers(index)}`}>
             <item.icon className="h-6 w-6 text-gold-400/80 transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:scale-110" />
-            <span className="font-display text-3xl sm:text-4xl font-bold text-white tabular-nums">
+            <span className="font-display text-3xl sm:text-4xl font-bold text-slate-50 tabular-nums">
               <CountUp value={item.value} />
             </span>
             <span className="text-sm text-slate-400">{item.label}</span>

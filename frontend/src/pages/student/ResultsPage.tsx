@@ -21,7 +21,7 @@ export default function ResultsPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-sm">
         <div>
-          <h1 className="text-2xl font-bold text-white mb-1">نتائجي</h1>
+          <h1 className="text-2xl font-bold text-slate-50 mb-1">نتائجي</h1>
           <p className="text-sm text-slate-400">
             سجل جميع نتائج امتحاناتك السابقة
           </p>
@@ -61,10 +61,10 @@ export default function ResultsPage() {
                 </div>
                 <div>
                   <p className="text-blue-400 font-semibold">{r.subject_name}</p>
-                  <p className="text-white text-sm mt-1">{r.exam_name}</p>
+                  <p className="text-slate-50 text-sm mt-1">{r.exam_name}</p>
                 </div>
                 <div className="text-sm text-slate-300">
-                  الدرجة: <span className="font-bold text-white">{r.score}</span>
+                  الدرجة: <span className="font-bold text-slate-50">{r.score}</span>
                   <span className="text-slate-500">/{r.total_questions}</span>
                 </div>
                 <p className="text-xs text-slate-400">
@@ -96,7 +96,7 @@ export default function ResultsPage() {
                     <tr key={r.id || i} className="hover:bg-slate-700/20 transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap">{i + 1}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-blue-400 font-medium">{r.subject_name}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-white">{r.exam_name}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-slate-50">{r.exam_name}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-center">
                         <span className="font-bold">{r.score}</span>
                         <span className="text-slate-500">/{r.total_questions}</span>

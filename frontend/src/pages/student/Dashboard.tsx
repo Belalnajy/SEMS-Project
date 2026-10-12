@@ -73,7 +73,7 @@ export default function StudentDashboard() {
         animate={{ opacity: 1, y: 0 }}
         className="bg-linear-to-r from-slate-800 to-slate-900 rounded-2xl p-8 border border-slate-700 shadow-xl relative overflow-hidden">
         <div className="relative z-10">
-          <h1 className="text-3xl font-extrabold text-white mb-2">مرحباً بك</h1>
+          <h1 className="text-3xl font-extrabold text-slate-50 mb-2">مرحباً بك</h1>
           <p className="text-slate-400 text-lg">
             منصة الاختبارات الذكية - اختر المادة وابدأ الامتحان
           </p>
@@ -85,7 +85,7 @@ export default function StudentDashboard() {
       {availableSubjects.length > 0 ? (
         <div className="space-y-8">
           <div className="flex items-center justify-between border-b border-slate-700 pb-2">
-            <h2 className="text-xl font-bold text-white flex items-center gap-2">
+            <h2 className="text-xl font-bold text-slate-50 flex items-center gap-2">
               <HiOutlineAcademicCap className="text-blue-500 h-6 w-6" />
               المواد الدراسية
             </h2>
@@ -96,7 +96,7 @@ export default function StudentDashboard() {
               key={subject.id}
               className="bg-slate-800/40 border border-slate-700 rounded-2xl p-4 sm:p-6 space-y-4">
               <div className="flex items-center justify-between flex-wrap gap-2">
-                <h3 className="text-lg sm:text-xl font-bold text-white">
+                <h3 className="text-lg sm:text-xl font-bold text-slate-50">
                   {subject.name}
                 </h3>
                 <span className="text-xs text-slate-400 bg-slate-900 border border-slate-700 rounded-full px-3 py-1">
@@ -138,7 +138,7 @@ export default function StudentDashboard() {
                           </div>
                         </div>
 
-                        <h4 className="text-base font-bold text-white group-hover:text-blue-400 transition-colors mb-1">
+                        <h4 className="text-base font-bold text-slate-50 group-hover:text-blue-400 transition-colors mb-1">
                           {exam.name}
                         </h4>
                       </div>
@@ -192,11 +192,11 @@ export default function StudentDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
         <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-6 text-center">
           <p className="text-slate-400 text-sm mb-1">الامتحانات المكتملة</p>
-          <p className="text-3xl font-bold text-white">{results.length}</p>
+          <p className="text-3xl font-bold text-slate-50">{results.length}</p>
         </div>
         <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-6 text-center">
           <p className="text-slate-400 text-sm mb-1">متوسط الدرجات</p>
-          <p className="text-3xl font-bold text-white">
+          <p className="text-3xl font-bold text-slate-50">
             {results.length > 0
               ? Math.round(
                   results.reduce((acc, r) => acc + r.percentage, 0) /
@@ -208,7 +208,7 @@ export default function StudentDashboard() {
         </div>
         <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-6 text-center">
           <p className="text-slate-400 text-sm mb-1">المواد المتاحة</p>
-          <p className="text-3xl font-bold text-white">
+          <p className="text-3xl font-bold text-slate-50">
             {availableSubjects.length}
           </p>
         </div>

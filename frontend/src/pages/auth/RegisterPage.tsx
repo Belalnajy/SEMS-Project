@@ -47,7 +47,7 @@ export default function RegisterPage(): ReactElement {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}>
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">📝 إنشاء حساب</h1>
+          <h1 className="text-3xl font-bold text-slate-50 mb-2">📝 إنشاء حساب</h1>
           <p className="text-slate-400">سجّل حسابك الجديد</p>
         </div>
 
@@ -65,7 +65,7 @@ export default function RegisterPage(): ReactElement {
             <input
               type="text"
               name="full_name"
-              className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+              className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
               placeholder="أدخل اسمك الكامل"
               value={form.full_name}
               onChange={handleChange}
@@ -80,7 +80,7 @@ export default function RegisterPage(): ReactElement {
             <input
               type="text"
               name="username"
-              className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+              className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
               placeholder="أدخل اسم المستخدم"
               value={form.username}
               onChange={handleChange}
@@ -95,7 +95,7 @@ export default function RegisterPage(): ReactElement {
             <input
               type="email"
               name="email"
-              className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+              className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
               placeholder="أدخل بريدك الإلكتروني"
               value={form.email}
               onChange={handleChange}
@@ -110,7 +110,7 @@ export default function RegisterPage(): ReactElement {
             <input
               type="password"
               name="password"
-              className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+              className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
               placeholder="أدخل كلمة المرور"
               value={form.password}
               onChange={handleChange}

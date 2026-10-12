@@ -81,10 +81,10 @@ export default function App() {
         position="top-center"
         toastOptions={{
           style: {
-            background: '#1e293b',
-            color: '#fff',
+            background: '#fffdf9',
+            color: '#352b45',
             borderRadius: '12px',
-            border: '1px solid #334155',
+            border: '1px solid #e4d9c7',
           },
         }}
       />

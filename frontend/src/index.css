@@ -4,25 +4,76 @@
   /* الخطوط تُحمَّل من Google Fonts في index.html — بدونها كان كل جهاز يعرض خطه */
   --font-sans: 'IBM Plex Sans Arabic', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-display: 'Noto Kufi Arabic', 'IBM Plex Sans Arabic', system-ui, sans-serif;
-  /* الذهبي: لون التوقيع في الواجهة العامة */
-  --color-gold-200: #f7e3b0;
-  --color-gold-300: #f0d08a;
-  --color-gold-400: #e3b85f;
-  --color-gold-500: #c99a3c;
-  --color-ink-950: #05080f;
-  --color-ink-900: #0a1020;
-  --color-ink-800: #111a30;
-  /* ألوان الشفق خلف الواجهة الرئيسية */
-  --color-aurora-indigo: #4f46e5;
-  --color-aurora-violet: #7c3aed;
-  --color-aurora-teal: #0d9488;
-  --color-primary-50: #eff6ff;
-  --color-primary-100: #dbeafe;
-  --color-primary-500: #3b82f6;
-  --color-primary-600: #2563eb;
-  --color-primary-700: #1d4ed8;
-  --color-bg-dark: #0f172a;
-  --color-bg-card-dark: #1e293b;
+
+  /* هوية المدرسة: بنفسجي (أساسي) + تيفاني (ثانوي) على خلفية بيج فاتح.
+     الواجهة مكتوبة بأسماء ألوان Tailwind (slate/blue/gold...)، فنعيد تعريف هذه
+     الدرجات هنا بدل تعديل كل صفحة. */
+
+  /* slate = المحايد: الدرجات الداكنة (خلفيات الوضع القديم) صارت بيج فاتح،
+     والفاتحة (نصوص الوضع القديم) صارت بنفسجي داكن مقروء */
+  --color-slate-50: #1f1829;
+  --color-slate-100: #2a2238;
+  --color-slate-200: #352b45;
+  --color-slate-300: #4a3f5c;
+  --color-slate-400: #6a5f7b;
+  --color-slate-500: #857a92;
+  --color-slate-600: #cdbfa8;
+  --color-slate-700: #e4d9c7;
+  --color-slate-800: #fffdf9;
+  --color-slate-900: #f6efe3;
+  --color-slate-950: #faf6ef;
+
+  /* blue / indigo / violet / purple = البنفسجي الأساسي */
+  --color-blue-50: #f6f1fb;
+  --color-blue-100: #ece2f7;
+  --color-blue-200: #d9c5ef;
+  --color-blue-300: #bf9de3;
+  --color-blue-400: #9f6fd2;
+  --color-blue-500: #8652c2;
+  --color-blue-600: #6f3fab;
+  --color-blue-700: #5b328d;
+  --color-blue-800: #4b2a73;
+  --color-blue-900: #3d245d;
+  --color-blue-950: #26133f;
+  --color-indigo-400: #9f6fd2;
+  --color-indigo-500: #8652c2;
+  --color-indigo-600: #6f3fab;
+  --color-violet-400: #9f6fd2;
+  --color-violet-500: #8652c2;
+  --color-violet-600: #6f3fab;
+  --color-purple-400: #9f6fd2;
+  --color-purple-500: #8652c2;
+  --color-purple-600: #6f3fab;
+
+  /* gold / teal / cyan / sky = التيفاني */
+  --color-gold-200: #a9ece8;
+  --color-gold-300: #81d8d0;
+  --color-gold-400: #2fc4be;
+  --color-gold-500: #0abab5;
+  --color-teal-300: #81d8d0;
+  --color-teal-400: #2fc4be;
+  --color-teal-500: #0abab5;
+  --color-teal-600: #089692;
+  --color-cyan-400: #2fc4be;
+  --color-cyan-500: #0abab5;
+  --color-sky-400: #2fc4be;
+  --color-sky-500: #0abab5;
+
+  /* خلفيات الواجهة العامة */
+  --color-ink-950: #faf6ef;
+  --color-ink-900: #f6efe3;
+  --color-ink-800: #ede3d3;
+  --color-aurora-indigo: #c9a9ec;
+  --color-aurora-violet: #b38ad9;
+  --color-aurora-teal: #81d8d0;
+
+  --color-primary-50: #f6f1fb;
+  --color-primary-100: #ece2f7;
+  --color-primary-500: #8652c2;
+  --color-primary-600: #6f3fab;
+  --color-primary-700: #5b328d;
+  --color-bg-dark: #faf6ef;
+  --color-bg-card-dark: #fffdf9;
 }
 
 /* Base custom styles to retain the Arabic RTL feeling globally */
@@ -30,8 +81,8 @@
   body {
     direction: rtl;
     font-family: var(--font-sans);
-    background-color: var(--color-bg-dark); /* Keeping the dark theme feeling */
-    color: #e2e8f0;
+    background-color: var(--color-bg-dark);
+    color: #352b45;
   }
 }
 
@@ -62,7 +113,7 @@
 
 /* نص بتدرّج ذهبي هادئ */
 .text-gold-gradient {
-  background: linear-gradient(120deg, #f7e3b0 0%, #e3b85f 45%, #f0d08a 100%);
+  background: linear-gradient(120deg, #6f3fab 0%, #8652c2 40%, #0abab5 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -71,8 +122,8 @@
 /* شبكة خطوط خفيفة تتلاشى نحو الأطراف — خلفية الواجهة الرئيسية */
 .bg-grid-fade {
   background-image:
-    linear-gradient(to right, rgb(148 163 184 / 0.06) 1px, transparent 1px),
-    linear-gradient(to bottom, rgb(148 163 184 / 0.06) 1px, transparent 1px);
+    linear-gradient(to right, rgb(111 63 171 / 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(111 63 171 / 0.07) 1px, transparent 1px);
   background-size: 56px 56px;
   mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, #000 40%, transparent 100%);
 }
@@ -82,7 +133,7 @@
   border: 1px solid transparent;
   background:
     linear-gradient(var(--color-ink-900), var(--color-ink-900)) padding-box,
-    linear-gradient(140deg, rgb(227 184 95 / 0.45), rgb(51 65 85 / 0.4) 40%, rgb(59 130 246 / 0.35)) border-box;
+    linear-gradient(140deg, rgb(10 186 181 / 0.55), rgb(205 191 168 / 0.6) 40%, rgb(111 63 171 / 0.45)) border-box;
 }
 
 /* ── حركة الواجهة الرئيسية ──────────────────────────────────────────────────
@@ -111,8 +162,8 @@
 /* حُبيبات خفيفة تكسر نعومة التدرّجات الرقمية — تُعطي ملمس الورق الفاخر */
 .grain {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  opacity: 0.045;
-  mix-blend-mode: overlay;
+  opacity: 0.03;
+  mix-blend-mode: multiply;
 }
 
 /* لمعة تعبر الشريط الذهبي مرة واحدة عند الظهور */
@@ -125,7 +176,7 @@
   position: absolute;
   inset: 0;
   width: 40%;
-  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.18), transparent);
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.5), transparent);
   animation: shimmer-sweep 1.6s ease-out 0.6s both;
   pointer-events: none;
 }
@@ -146,7 +197,7 @@
   inset: 0;
   border-radius: inherit;
   padding: 1px;
-  background: conic-gradient(from var(--spin), transparent 0 60%, rgb(227 184 95 / 0.9) 80%, transparent 100%);
+  background: conic-gradient(from var(--spin), transparent 0 60%, rgb(10 186 181 / 0.9) 80%, transparent 100%);
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
@@ -172,7 +223,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(260px circle at var(--mx) var(--my), rgb(227 184 95 / 0.17), transparent 60%);
+  background: radial-gradient(260px circle at var(--mx) var(--my), rgb(10 186 181 / 0.14), transparent 60%);
   opacity: 0;
   transition: opacity 0.35s;
   pointer-events: none;

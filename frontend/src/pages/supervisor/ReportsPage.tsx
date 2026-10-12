@@ -22,12 +22,12 @@ import {
 import { Section } from '../../types/api';
 
 const COLORS = [
-  '#6366f1',
-  '#0ea5e9',
-  '#10b981',
-  '#f59e0b',
-  '#ef4444',
-  '#8b5cf6',
+  '#6f3fab',
+  '#0abab5',
+  '#b38ad9',
+  '#e0a458',
+  '#d16a8f',
+  '#5fa8a3',
 ];
 
 /** A subject that has exams, as returned by /reports/filters. */
@@ -64,7 +64,7 @@ function WrappedTick({ x, y, payload }: any) {
   }
   if (lines.length > 3) lines.splice(2, lines.length - 2, lines.slice(2).join(' ').slice(0, 13) + '…');
   return (
-    <text x={x} y={y + 14} textAnchor="middle" fill="#94a3b8" fontSize={11}>
+    <text x={x} y={y + 14} textAnchor="middle" fill="#6a5f7b" fontSize={11}>
       {lines.map((line, i) => (
         <tspan key={i} x={x} dy={i === 0 ? 0 : 13}>
           {line}
@@ -181,7 +181,7 @@ export default function ReportsPage() {
       {/* Header */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-sm print:hidden">
         <div>
-          <h1 className="text-2xl font-bold text-white mb-1">
+          <h1 className="text-2xl font-bold text-slate-50 mb-1">
             التقارير والإحصائيات
           </h1>
           <p className="text-sm text-slate-400">
@@ -200,7 +200,7 @@ export default function ReportsPage() {
             <HiOutlineDocumentText className="h-4 w-4" /> تصدير PDF
           </button>
           <button
-            className="flex items-center gap-2 bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            className="flex items-center gap-2 bg-slate-700 hover:bg-slate-600 text-slate-50 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
             onClick={() => window.print()}>
             <HiOutlinePrinter className="h-4 w-4" /> طباعة
           </button>
@@ -210,7 +210,7 @@ export default function ReportsPage() {
       {/* Filters (Hidden in print) */}
       <div className="flex flex-col sm:flex-row gap-4 bg-slate-800 p-4 rounded-xl border border-slate-700 shadow-sm print:hidden">
         <select
-          className="w-full sm:w-48 px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
+          className="w-full sm:w-48 px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-50 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
           value={sectionFilter}
           onChange={(e) => setSectionFilter(e.target.value)}>
           <option value="">كل الفصول (للتصفية)</option>
@@ -221,7 +221,7 @@ export default function ReportsPage() {
           ))}
         </select>
         <select
-          className="w-full sm:w-48 px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
+          className="w-full sm:w-48 px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-50 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
           value={subjectFilter}
           onChange={(e) => {
             setSubjectFilter(e.target.value);
@@ -235,7 +235,7 @@ export default function ReportsPage() {
           ))}
         </select>
         <select
-          className="w-full sm:w-64 px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all disabled:opacity-50"
+          className="w-full sm:w-64 px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-50 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all disabled:opacity-50"
           value={examFilter}
           disabled={!subjectFilter}
           onChange={(e) => setExamFilter(e.target.value)}>
@@ -262,7 +262,7 @@ export default function ReportsPage() {
             className={`px-5 py-2.5 rounded-lg text-sm font-medium transition-all ${
               tab === t.key
                 ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
-                : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white border border-slate-700'
+                : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-50 border border-slate-700'
             }`}
             onClick={() => setTab(t.key as any)}>
             {t.label}
@@ -276,7 +276,7 @@ export default function ReportsPage() {
         {tab === 'overall' && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="bg-slate-800 rounded-xl p-6 border border-slate-700 shadow-sm print:shadow-none print:border-slate-300 print:break-inside-avoid">
-              <h3 className="text-lg font-bold text-white mb-6 print:text-black">
+              <h3 className="text-lg font-bold text-slate-50 mb-6 print:text-black">
                 متوسط الأداء للطلاب حسب {groupLabel}
               </h3>
               <div className="h-[320px] w-full origin-top-right">
@@ -288,7 +288,7 @@ export default function ReportsPage() {
                     }))}>
                     <CartesianGrid
                       strokeDasharray="3 3"
-                      stroke="#334155"
+                      stroke="#e4d9c7"
                       vertical={false}
                     />
                     <XAxis
@@ -304,24 +304,24 @@ export default function ReportsPage() {
                     <YAxis
                       axisLine={false}
                       tickLine={false}
-                      tick={{ fill: '#94a3b8', fontSize: 13 }}
+                      tick={{ fill: '#6a5f7b', fontSize: 13 }}
                       domain={[0, 100]}
                       dx={-20}
                     />
                     <Tooltip
-                      cursor={{ fill: '#334155', opacity: 0.4 }}
+                      cursor={{ fill: '#ece2f7', opacity: 0.6 }}
                       contentStyle={{
-                        backgroundColor: '#1e293b',
-                        border: '1px solid #334155',
+                        backgroundColor: '#fffdf9',
+                        border: '1px solid #e4d9c7',
                         borderRadius: '0.5rem',
-                        color: '#f8fafc',
+                        color: '#352b45',
                         boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
                       }}
-                      itemStyle={{ color: '#60a5fa' }}
+                      itemStyle={{ color: '#6f3fab' }}
                     />
                     <Bar
                       dataKey="avg"
-                      fill="#3b82f6"
+                      fill="#6f3fab"
                       radius={[6, 6, 0, 0]}
                       name="المتوسط %"
                       barSize={40}
@@ -332,7 +332,7 @@ export default function ReportsPage() {
             </div>
 
             <div className="bg-slate-800 rounded-xl p-6 border border-slate-700 shadow-sm print:shadow-none print:border-slate-300">
-              <h3 className="text-lg font-bold text-white mb-6">
+              <h3 className="text-lg font-bold text-slate-50 mb-6">
                 توزيع محاولات الاختبارات حسب {groupLabel}
               </h3>
               <div className="h-[300px] w-full">
@@ -361,10 +361,10 @@ export default function ReportsPage() {
                     </Pie>
                     <Tooltip
                       contentStyle={{
-                        backgroundColor: '#1e293b',
-                        border: '1px solid #334155',
+                        backgroundColor: '#fffdf9',
+                        border: '1px solid #e4d9c7',
                         borderRadius: '0.5rem',
-                        color: '#f8fafc',
+                        color: '#352b45',
                       }}
                     />
                   </PieChart>
@@ -409,7 +409,7 @@ export default function ReportsPage() {
                       <tr
                         key={i}
                         className="hover:bg-slate-700/20 transition-colors">
-                        <td className="px-6 py-4 whitespace-nowrap text-white font-medium">
+                        <td className="px-6 py-4 whitespace-nowrap text-slate-50 font-medium">
                           {r.student_name || r.full_name}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -492,7 +492,7 @@ export default function ReportsPage() {
                     </div>
                   )}
                 </div>
-                <h3 className="text-xl font-bold text-white mb-2">
+                <h3 className="text-xl font-bold text-slate-50 mb-2">
                   {s.section_name}
                 </h3>
 
@@ -505,14 +505,14 @@ export default function ReportsPage() {
 
                 <div className="flex justify-between mt-6 px-4 text-sm text-slate-400">
                   <div className="text-center">
-                    <span className="block font-bold text-white mb-1">
+                    <span className="block font-bold text-slate-50 mb-1">
                       {s.total_students}
                     </span>
                     طالب
                   </div>
                   <div className="w-px bg-slate-700"></div>
                   <div className="text-center">
-                    <span className="block font-bold text-white mb-1">
+                    <span className="block font-bold text-slate-50 mb-1">
                       {s.total_exams}
                     </span>
                     امتحان

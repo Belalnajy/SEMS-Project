@@ -101,7 +101,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       <button
         type="button"
         onClick={onClose}
-        className="lg:hidden absolute top-4 left-4 text-slate-300 hover:text-white"
+        className="lg:hidden absolute top-4 left-4 text-slate-300 hover:text-slate-50"
         aria-label="إغلاق القائمة">
         <HiOutlineX className="h-6 w-6" />
       </button>
@@ -112,7 +112,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             alt="Logo"
             className="w-10 h-10 rounded-lg shadow-blue-500/20 shadow-lg"
           />
-          <h2 className="text-lg font-bold text-white">منصة التحصيلي</h2>
+          <h2 className="text-lg font-bold text-slate-50">منصة التحصيلي</h2>
         </div>
         <p className="text-sm px-2 text-slate-400">
           {roleLabels[roleName] || roleName} —{' '}
@@ -131,7 +131,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
               `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm font-medium ${
                 isActive
                   ? 'bg-blue-600/10 text-blue-500'
-                  : 'text-slate-300 hover:text-white hover:bg-slate-700/50'
+                  : 'text-slate-300 hover:text-slate-50 hover:bg-slate-700/50'
               }`
             }>
             <item.icon className="h-5 w-5" />

@@ -119,7 +119,7 @@ export default function StatsOverview({ initialData }: { initialData?: Stats }) 
         className="bg-slate-900/40 backdrop-blur-md border border-slate-800 rounded-3xl p-8 relative overflow-hidden group shadow-2xl shadow-blue-500/5 text-center"
       >
         <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/10 blur-[80px] group-hover:bg-blue-600/20 transition-all duration-700" />
-        <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-3 tracking-tight">
+        <h1 className="text-3xl md:text-4xl font-extrabold text-slate-50 mb-3 tracking-tight">
           منصة التحصيلي
         </h1>
         <p className="text-slate-400 text-lg md:text-xl font-medium">
@@ -138,11 +138,11 @@ export default function StatsOverview({ initialData }: { initialData?: Stats }) 
           <motion.div
             key={i}
             variants={item}
-            whileHover={{ y: -5, borderColor: 'rgba(59, 130, 246, 0.3)' }}
+            whileHover={{ y: -5, borderColor: 'rgba(111, 63, 171, 0.3)' }}
             className="bg-slate-900/40 backdrop-blur-md border border-slate-800 rounded-3xl p-6 flex items-center justify-between group transition-all duration-300"
           >
             <div className="flex flex-col items-start gap-1">
-              <span className="text-3xl font-black text-white group-hover:scale-110 transition-transform">
+              <span className="text-3xl font-black text-slate-50 group-hover:scale-110 transition-transform">
                 {card.value}
               </span>
               <span className="text-slate-400 font-bold text-sm tracking-wide">

@@ -32,7 +32,7 @@ export default function ManagerDashboard() {
   return (
     <div className="space-y-6">
       <div className="bg-slate-800 rounded-xl p-6 border border-slate-700 shadow-sm">
-        <h1 className="text-2xl font-bold text-white mb-2">لوحة تحكم المدير</h1>
+        <h1 className="text-2xl font-bold text-slate-50 mb-2">لوحة تحكم المدير</h1>
         <p className="text-slate-400">عرض تقارير الأداء العام</p>
       </div>
 
@@ -48,7 +48,7 @@ export default function ManagerDashboard() {
               <HiOutlineChartBar className="h-8 w-8" />
             </div>
             <div>
-              <h3 className="text-2xl font-bold text-white">
+              <h3 className="text-2xl font-bold text-slate-50">
                 {parseFloat(s.avg_percentage || '0').toFixed(1)}%
               </h3>
               <p className="text-sm font-medium text-slate-400 mt-1">

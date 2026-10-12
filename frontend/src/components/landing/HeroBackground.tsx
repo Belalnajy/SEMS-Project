@@ -13,7 +13,7 @@ export default function HeroBackground() {
   // نابض بطيء: الهالة تلحق المؤشر بتأخير بسيط بدل أن تلتصق به
   const x = useSpring(rawX, { stiffness: 60, damping: 20, mass: 0.6 });
   const y = useSpring(rawY, { stiffness: 60, damping: 20, mass: 0.6 });
-  const spotlight = useMotionTemplate`radial-gradient(520px circle at ${x}px ${y}px, rgb(227 184 95 / 0.10), transparent 65%)`;
+  const spotlight = useMotionTemplate`radial-gradient(520px circle at ${x}px ${y}px, rgb(10 186 181 / 0.12), transparent 65%)`;
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

@@ -62,7 +62,7 @@ export default function LoginPage() {
             </div>
           </motion.div>
 
-          <h1 className="font-display text-2xl font-bold text-white mb-3 tracking-tight">
+          <h1 className="font-display text-2xl font-bold text-slate-50 mb-3 tracking-tight">
             منصة التحصيلي
           </h1>
           <div className="h-px w-20 mx-auto mb-4 bg-linear-to-l from-transparent via-gold-400 to-transparent" />
@@ -91,7 +91,7 @@ export default function LoginPage() {
             <input
               type="text"
               dir="rtl"
-              className="w-full px-5 py-3.5 bg-ink-950/70 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-gold-400/20 focus:border-gold-400/50 transition-all placeholder:text-slate-600"
+              className="w-full px-5 py-3.5 bg-ink-950/70 border border-white/10 rounded-xl text-slate-50 focus:outline-none focus:ring-2 focus:ring-gold-400/20 focus:border-gold-400/50 transition-all placeholder:text-slate-600"
               placeholder="أدخل الرقم هنا..."
               value={nationalId}
               onChange={(e) => setNationalId(e.target.value)}
@@ -106,7 +106,7 @@ export default function LoginPage() {
             <input
               type="password"
               dir="rtl"
-              className="w-full px-5 py-3.5 bg-ink-950/70 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-gold-400/20 focus:border-gold-400/50 transition-all placeholder:text-slate-600"
+              className="w-full px-5 py-3.5 bg-ink-950/70 border border-white/10 rounded-xl text-slate-50 focus:outline-none focus:ring-2 focus:ring-gold-400/20 focus:border-gold-400/50 transition-all placeholder:text-slate-600"
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -121,7 +121,7 @@ export default function LoginPage() {
             {loading ? (
               <span className="flex items-center justify-center gap-2">
                 <svg
-                  className="animate-spin h-5 w-5 text-white"
+                  className="animate-spin h-5 w-5 text-slate-50"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24">
@@ -148,7 +148,7 @@ export default function LoginPage() {
         <div className="mt-10 flex flex-col items-center gap-4">
           <Link
             to="/guest"
-            className="text-slate-400 hover:text-white transition-colors text-sm font-medium flex items-center gap-2 group">
+            className="text-slate-400 hover:text-slate-50 transition-colors text-sm font-medium flex items-center gap-2 group">
             <HiOutlineSparkles className="opacity-0 group-hover:opacity-100 transition-opacity h-4 w-4 text-gold-300" />
             الدخول كضيف للمنصة
             <HiOutlineSparkles className="opacity-0 group-hover:opacity-100 transition-opacity h-4 w-4 text-gold-300" />

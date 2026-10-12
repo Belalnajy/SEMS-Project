@@ -112,11 +112,11 @@ export default function PartnersSection() {
 
   const remaining = Math.max(total - posts.length, 0);
   const inputClass =
-    'w-full px-4 py-3 bg-ink-950/70 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:border-gold-400/50 focus:ring-2 focus:ring-gold-400/20 focus:outline-none transition-all';
+    'w-full px-4 py-3 bg-ink-950/70 border border-white/10 rounded-xl text-slate-50 placeholder-slate-500 focus:border-gold-400/50 focus:ring-2 focus:ring-gold-400/20 focus:outline-none transition-all';
   // القائمة المنسدلة تحتاج خلفية معتمة و color-scheme داكن: مع خلفية شفافة يرسم
   // Chrome/Edge على ويندوز الخيارات بيضاء على نص أبيض فتختفي
   const selectClass =
-    'w-full px-4 py-3 bg-ink-950 border border-white/10 rounded-xl text-white focus:border-gold-400/50 focus:ring-2 focus:ring-gold-400/20 focus:outline-none transition-all [color-scheme:dark]';
+    'w-full px-4 py-3 bg-ink-950 border border-white/10 rounded-xl text-slate-50 focus:border-gold-400/50 focus:ring-2 focus:ring-gold-400/20 focus:outline-none transition-all [color-scheme:dark]';
 
   return (
     <section id="partners" className="relative isolate py-20 sm:py-28 px-4 sm:px-6 scroll-mt-24 overflow-hidden">
@@ -140,7 +140,7 @@ export default function PartnersSection() {
             <HiOutlineSparkles className="h-4 w-4" />
             شركاؤنا في النجاح
           </motion.span>
-          <motion.h2 variants={revealSoft} className="font-display text-3xl sm:text-5xl font-bold text-white mb-3 sm:mb-4">
+          <motion.h2 variants={revealSoft} className="font-display text-3xl sm:text-5xl font-bold text-slate-50 mb-3 sm:mb-4">
             معاً نُعلّم ونُلهم
           </motion.h2>
           <motion.p variants={revealSoft} className="text-base sm:text-lg text-slate-400">
@@ -182,7 +182,7 @@ export default function PartnersSection() {
           viewport={inView}
           className="p-5 sm:p-8 rounded-3xl border border-white/8 bg-white/[0.02]">
           <div className="mb-6 sm:mb-8 border-r-2 border-gold-400 pr-4">
-            <h3 className="font-display text-xl sm:text-2xl font-bold text-white">
+            <h3 className="font-display text-xl sm:text-2xl font-bold text-slate-50">
               مشاركات أولياء الأمور
             </h3>
             <p className="text-slate-400 mt-1">
@@ -222,7 +222,7 @@ export default function PartnersSection() {
                           <HiOutlineHeart className="h-5 w-5 text-gold-300" />
                         </div>
                         <div className="min-w-0">
-                          <p className="font-bold text-white leading-snug break-words">
+                          <p className="font-bold text-slate-50 leading-snug break-words">
                             ولي الأمر: {post.parent_name}
                           </p>
                           {post.student_name && (
@@ -265,7 +265,7 @@ export default function PartnersSection() {
                     type="button"
                     onClick={loadMore}
                     disabled={loadingMore}
-                    className="px-8 py-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-gold-400/40 text-white font-semibold transition-all disabled:opacity-60">
+                    className="px-8 py-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-gold-400/40 text-slate-50 font-semibold transition-all disabled:opacity-60">
                     {loadingMore ? 'جاري التحميل...' : `عرض المزيد (${remaining})`}
                   </button>
                 </div>
@@ -282,7 +282,7 @@ export default function PartnersSection() {
           viewport={inView}
           className="p-5 sm:p-8 rounded-3xl border-gradient">
           <div className="mb-6 sm:mb-8 border-r-2 border-gold-400 pr-4">
-            <h3 className="font-display text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+            <h3 className="font-display text-xl sm:text-2xl font-bold text-slate-50 flex items-center gap-2">
               مشاركاتكم محل تقديرنا
             </h3>
             <p className="text-slate-400 mt-1">
@@ -295,7 +295,7 @@ export default function PartnersSection() {
               <div className="mx-auto mb-4 h-14 w-14 rounded-full bg-green-500/10 border border-green-500/30 flex items-center justify-center">
                 <HiOutlineCheck className="h-7 w-7 text-green-400" />
               </div>
-              <p className="text-xl font-bold text-white mb-2">شكراً لك! 🌹</p>
+              <p className="text-xl font-bold text-slate-50 mb-2">شكراً لك! 🌹</p>
               <p className="text-slate-400 mb-6">
                 تم استلام مشاركتك، وستظهر هنا بعد مراجعة إدارة المدرسة.
               </p>
@@ -325,7 +325,7 @@ export default function PartnersSection() {
                       اختر نوع المشاركة
                     </option>
                     {categories.map((c) => (
-                      <option key={c.id} value={c.name} className="bg-ink-950 text-white">
+                      <option key={c.id} value={c.name} className="bg-ink-950 text-slate-50">
                         {c.name}
                       </option>
                     ))}

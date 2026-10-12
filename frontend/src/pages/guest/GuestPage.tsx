@@ -143,14 +143,14 @@ export default function GuestPage() {
             </div>
           </div>
 
-          <h2 className="text-3xl font-bold text-white mb-3">
+          <h2 className="text-3xl font-bold text-slate-50 mb-3">
             {isPass ? `🎉 أحسنت يا ${guestName}!` : '😔 حاول مرة أخرى'}
           </h2>
           <p className="text-slate-400 text-lg mb-6">
             لقد حصلت على{' '}
-            <span className="font-bold text-white mx-1">{result.score}</span>{' '}
+            <span className="font-bold text-slate-50 mx-1">{result.score}</span>{' '}
             درجة من أصل{' '}
-            <span className="font-bold text-white mx-1">
+            <span className="font-bold text-slate-50 mx-1">
               {result.total_questions}
             </span>
           </p>
@@ -160,7 +160,7 @@ export default function GuestPage() {
           </div>
 
           <button
-            className="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-3.5 rounded-xl transition-colors text-lg mb-4"
+            className="w-full bg-slate-700 hover:bg-slate-600 text-slate-50 font-bold py-3.5 rounded-xl transition-colors text-lg mb-4"
             onClick={() => {
               setPhase('select');
               setSelectedExam(null);
@@ -173,7 +173,7 @@ export default function GuestPage() {
 
           <Link
             to="/login"
-            className="text-sm text-slate-400 hover:text-white transition-colors">
+            className="text-sm text-slate-400 hover:text-slate-50 transition-colors">
             إنشاء حساب رسمي وتسجيل الدخول
           </Link>
         </motion.div>
@@ -210,7 +210,7 @@ export default function GuestPage() {
                 : 'border-slate-700 shadow-sm'
             } mb-8 transition-colors`}>
             <div>
-              <h1 className="text-xl font-bold text-white mb-1">
+              <h1 className="text-xl font-bold text-slate-50 mb-1">
                 {selectedExam?.name}
               </h1>
               <p className="text-sm text-slate-400">
@@ -253,7 +253,7 @@ export default function GuestPage() {
                 key={q.id}
                 className={`bg-slate-800 rounded-2xl p-6 border transition-colors ${
                   answers[q.id]
-                    ? 'border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.05)]'
+                    ? 'border-blue-500/30 shadow-[0_0_15px_rgba(111,63,171,0.08)]'
                     : 'border-slate-700 shadow-sm'
                 }`}
                 initial={{ opacity: 0, y: 20 }}
@@ -269,7 +269,7 @@ export default function GuestPage() {
                     {i + 1}
                   </span>
                   <div className="flex-1">
-                    <p className="text-lg text-white font-medium leading-relaxed pt-0.5">
+                    <p className="text-lg text-slate-50 font-medium leading-relaxed pt-0.5">
                       {q.question_text}
                     </p>
                     {q.has_image && (
@@ -358,7 +358,7 @@ export default function GuestPage() {
             className="h-20 w-20 rounded-2xl object-cover ring-1 ring-gold-400/40 shadow-xl shadow-gold-500/10"
           />
         </Link>
-        <h1 className="font-display text-3xl sm:text-4xl font-bold text-white mb-3">
+        <h1 className="font-display text-3xl sm:text-4xl font-bold text-slate-50 mb-3">
           الاختبار كضيف
         </h1>
         <p className="text-slate-300 text-base sm:text-lg leading-relaxed">
@@ -384,7 +384,7 @@ export default function GuestPage() {
               الاسم <span className="text-red-400">*</span>
             </label>
             <input
-              className="w-full px-4 py-3 bg-ink-950 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:border-gold-400/50 focus:ring-2 focus:ring-gold-400/20 focus:outline-none transition-all"
+              className="w-full px-4 py-3 bg-ink-950 border border-white/10 rounded-xl text-slate-50 placeholder-slate-500 focus:border-gold-400/50 focus:ring-2 focus:ring-gold-400/20 focus:outline-none transition-all"
               placeholder="الاسم الثلاثي للاختبار..."
               value={guestName}
               onChange={(e) => setGuestName(e.target.value)}
@@ -434,7 +434,7 @@ export default function GuestPage() {
                       </div>
                       <div className="flex-1">
                         <strong
-                          className={`block text-base mb-1 ${selectedExam?.id === exam.id ? 'text-blue-400 font-bold' : 'text-white'}`}>
+                          className={`block text-base mb-1 ${selectedExam?.id === exam.id ? 'text-blue-400 font-bold' : 'text-slate-50'}`}>
                           {exam.name}
                         </strong>
                         <div className="flex items-center gap-3 text-xs text-slate-400">
@@ -471,7 +471,7 @@ export default function GuestPage() {
         <div className="mt-8 text-center pt-6 border-t border-white/10">
           <Link
             to="/login"
-            className="text-slate-400 hover:text-white transition-colors text-sm font-medium">
+            className="text-slate-400 hover:text-slate-50 transition-colors text-sm font-medium">
             هل أنت طالب مسجل؟ تسجيل الدخول
           </Link>
         </div>

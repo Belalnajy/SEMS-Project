@@ -379,7 +379,7 @@ export default function ExamsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-sm">
         <div>
-          <h1 className="text-2xl font-bold text-white mb-1">
+          <h1 className="text-2xl font-bold text-slate-50 mb-1">
             إدارة الامتحانات
           </h1>
           <p className="text-sm text-slate-400">
@@ -433,7 +433,7 @@ export default function ExamsPage() {
                 key={subject.id}
                 className="bg-slate-800 rounded-xl p-4 border border-slate-700 shadow-sm">
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-base font-bold text-white">{subject.name}</h3>
+                  <h3 className="text-base font-bold text-slate-50">{subject.name}</h3>
                   <span className="text-xs text-slate-400 bg-slate-900 border border-slate-700 rounded-full px-2 py-1">
                     {subjectExams.length} نموذج
                   </span>
@@ -450,7 +450,7 @@ export default function ExamsPage() {
                       }`}
                       onClick={() => openExam(exam)}>
                       <div className="flex justify-between items-start mb-2 gap-2">
-                        <h4 className="text-sm font-bold text-white leading-tight">
+                        <h4 className="text-sm font-bold text-slate-50 leading-tight">
                           {exam.name}
                         </h4>
                         <span
@@ -482,7 +482,7 @@ export default function ExamsPage() {
                       </div>
                       <div className="flex gap-2">
                         <button
-                          className="flex-1 flex justify-center items-center gap-1 bg-slate-700 hover:bg-slate-600 text-white px-2 py-1.5 rounded-lg text-xs transition-colors"
+                          className="flex-1 flex justify-center items-center gap-1 bg-slate-700 hover:bg-slate-600 text-slate-50 px-2 py-1.5 rounded-lg text-xs transition-colors"
                           onClick={(e) => {
                             e.stopPropagation();
                             setEditExam(exam);
@@ -531,7 +531,7 @@ export default function ExamsPage() {
           <div className="w-full lg:w-2/3 xl:w-3/4 bg-slate-800 rounded-xl border border-slate-700 shadow-sm flex flex-col">
             <div className="p-6 border-b border-slate-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
-                <h3 className="text-xl font-bold text-white">
+                <h3 className="text-xl font-bold text-slate-50">
                   أسئلة:{' '}
                   <span className="text-blue-400">{selectedExam.name}</span>
                 </h3>
@@ -555,20 +555,20 @@ export default function ExamsPage() {
                     </p>
                     <ul className="space-y-1">
                       <li>
-                        • <code className="text-white">السؤال</code>: نص السؤال
+                        • <code className="text-slate-50">السؤال</code>: نص السؤال
                       </li>
                       <li>
-                        • <code className="text-white">A, B, C, D</code>:
+                        • <code className="text-slate-50">A, B, C, D</code>:
                         الخيارات الأربعة
                       </li>
                       <li>
-                        • <code className="text-white">الإجابة الصحيحه</code>:
+                        • <code className="text-slate-50">الإجابة الصحيحه</code>:
                         حرف الخيار (A, B, C, D)
                       </li>
                     </ul>
                     <p className="mt-2 text-[11px] text-blue-300">
                       🖼️ الصور: أدرج الصورة داخل ملف Excel في نفس صف السؤال،
-                      أو أضف عمود <code className="text-white">صورة</code>{' '}
+                      أو أضف عمود <code className="text-slate-50">صورة</code>{' '}
                       يحتوي رابط الصورة — وستظهر للطالب تلقائياً.
                     </p>
                     <p className="mt-2 text-[10px] text-slate-500 italic">
@@ -578,7 +578,7 @@ export default function ExamsPage() {
                   </div>
                 </label>
                 <button
-                  className="flex items-center gap-2 bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg font-medium transition-colors whitespace-nowrap"
+                  className="flex items-center gap-2 bg-slate-700 hover:bg-slate-600 text-slate-50 px-4 py-2 rounded-lg font-medium transition-colors whitespace-nowrap"
                   onClick={() => {
                     setEditQuestion(null);
                     setQForm({
@@ -620,7 +620,7 @@ export default function ExamsPage() {
                           {i + 1}
                         </span>
                         <div>
-                          <p className="text-white font-medium text-base pt-0.5 leading-relaxed">
+                          <p className="text-slate-50 font-medium text-base pt-0.5 leading-relaxed">
                             {q.question_text}
                           </p>
                           {q.has_image && (
@@ -723,7 +723,7 @@ export default function ExamsPage() {
               المادة
             </label>
             <select
-              className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
+              className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-slate-50 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
               value={examForm.subject_id}
               onChange={(e) =>
                 setExamForm({ ...examForm, subject_id: e.target.value })
@@ -744,7 +744,7 @@ export default function ExamsPage() {
               اسم النموذج
             </label>
             <input
-              className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
+              className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-slate-50 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
               value={examForm.name}
               onChange={(e) =>
                 setExamForm({ ...examForm, name: e.target.value })
@@ -760,7 +760,7 @@ export default function ExamsPage() {
             <input
               type="number"
               min="1"
-              className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
+              className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-slate-50 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
               value={examForm.duration_minutes}
               onChange={(e) =>
                 setExamForm({
@@ -780,7 +780,7 @@ export default function ExamsPage() {
               {examForm.section_ids.length > 0 && (
                 <button
                   type="button"
-                  className="text-xs text-slate-400 hover:text-white transition-colors whitespace-nowrap"
+                  className="text-xs text-slate-400 hover:text-slate-50 transition-colors whitespace-nowrap"
                   onClick={() => setExamForm({ ...examForm, section_ids: [] })}>
                   إلغاء الكل
                 </button>
@@ -866,7 +866,7 @@ export default function ExamsPage() {
                     className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${examForm.allow_reattempt ? 'translate-x-5' : 'translate-x-0'}`}></div>
                 </div>
               </div>
-              <span className="text-slate-300 group-hover:text-white transition-colors">
+              <span className="text-slate-300 group-hover:text-slate-50 transition-colors">
                 السماح بإعادة المحاولة للطالب
               </span>
             </label>
@@ -890,7 +890,7 @@ export default function ExamsPage() {
                     className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${examForm.is_active ? 'translate-x-5' : 'translate-x-0'}`}></div>
                 </div>
               </div>
-              <span className="text-slate-300 group-hover:text-white transition-colors">
+              <span className="text-slate-300 group-hover:text-slate-50 transition-colors">
                 نموذج مفعل ويظهر للطلاب
               </span>
             </label>
@@ -919,7 +919,7 @@ export default function ExamsPage() {
               نص السؤال
             </label>
             <textarea
-              className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all resize-y min-h-[100px]"
+              className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-slate-50 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all resize-y min-h-[100px]"
               placeholder="اكتب نص السؤال هنا..."
               value={qForm.question_text}
               onChange={(e) =>
@@ -1012,7 +1012,7 @@ export default function ExamsPage() {
                     </div>
                   </label>
                   <input
-                    className={`flex-1 py-2 px-3 bg-transparent text-white focus:outline-none placeholder-slate-500 ${
+                    className={`flex-1 py-2 px-3 bg-transparent text-slate-50 focus:outline-none placeholder-slate-500 ${
                       a.is_correct ? 'font-medium' : ''
                     }`}
                     placeholder={`خيار الإجابة رقم ${i + 1}`}
