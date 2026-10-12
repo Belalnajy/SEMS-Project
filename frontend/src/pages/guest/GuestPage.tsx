@@ -291,7 +291,7 @@ export default function GuestPage() {
                         key={a.id}
                         className={`relative flex items-center p-4 rounded-xl border cursor-pointer transition-all group overflow-hidden ${
                           isSelected
-                            ? 'bg-blue-500/10 border-blue-500 text-blue-100'
+                            ? 'bg-blue-500/10 border-blue-500 text-blue-700'
                             : 'bg-slate-900 border-slate-700 hover:border-slate-500 text-slate-300 hover:bg-slate-800'
                         }`}
                         onClick={() =>

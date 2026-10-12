@@ -519,13 +519,13 @@ export default function StudentsPage() {
             يجب أن يحتوي ملف Excel على الأعمدة التالية في الصف الأول:
             <br />
             <div className="mt-2 flex flex-wrap gap-2">
-              <code className="bg-slate-900 px-2 py-0.5 rounded text-blue-300 border border-blue-500/20">
+              <code className="bg-slate-900 px-2 py-0.5 rounded text-blue-700 border border-blue-500/20">
                 رقم الطالبة
               </code>
-              <code className="bg-slate-900 px-2 py-0.5 rounded text-blue-300 border border-blue-500/20">
+              <code className="bg-slate-900 px-2 py-0.5 rounded text-blue-700 border border-blue-500/20">
                 اسم الطالبة
               </code>
-              <code className="bg-slate-900 px-2 py-0.5 rounded text-blue-300 border border-blue-500/20">
+              <code className="bg-slate-900 px-2 py-0.5 rounded text-blue-700 border border-blue-500/20">
                 الفصل
               </code>
             </div>

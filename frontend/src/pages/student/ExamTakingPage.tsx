@@ -275,7 +275,7 @@ export default function ExamTakingPage() {
                 )}
                 <button
                   type="button"
-                  className="mt-3 inline-flex items-center gap-1.5 text-xs text-amber-400 hover:text-amber-300"
+                  className="mt-3 inline-flex items-center gap-1.5 text-xs text-amber-400 hover:text-amber-600"
                   onClick={() => handleReportQuestion(q.id)}>
                   <HiOutlineExclamationCircle className="h-4 w-4" />
                   الإبلاغ عن خطأ في السؤال
@@ -291,7 +291,7 @@ export default function ExamTakingPage() {
                     key={a.id}
                     className={`relative flex items-center p-4 rounded-xl border cursor-pointer transition-all group overflow-hidden ${
                       isSelected
-                        ? 'bg-blue-500/10 border-blue-500 text-blue-100'
+                        ? 'bg-blue-500/10 border-blue-500 text-blue-700'
                         : 'bg-slate-900 border-slate-700 hover:border-slate-500 text-slate-300 hover:bg-slate-800'
                     }`}
                     onClick={() => setAnswers({ ...answers, [q.id]: a.id })}>

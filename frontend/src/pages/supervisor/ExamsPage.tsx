@@ -566,7 +566,7 @@ export default function ExamsPage() {
                         حرف الخيار (A, B, C, D)
                       </li>
                     </ul>
-                    <p className="mt-2 text-[11px] text-blue-300">
+                    <p className="mt-2 text-[11px] text-blue-700">
                       🖼️ الصور: أدرج الصورة داخل ملف Excel في نفس صف السؤال،
                       أو أضف عمود <code className="text-slate-50">صورة</code>{' '}
                       يحتوي رابط الصورة — وستظهر للطالب تلقائياً.
@@ -811,7 +811,7 @@ export default function ExamsPage() {
                         <button
                           type="button"
                           onClick={() => toggleGrade(items)}
-                          className="text-[11px] text-blue-400 hover:text-blue-300 transition-colors">
+                          className="text-[11px] text-blue-400 hover:text-blue-700 transition-colors">
                           {allSelected ? 'إلغاء الكل' : 'تحديد الكل'}
                         </button>
                       </div>

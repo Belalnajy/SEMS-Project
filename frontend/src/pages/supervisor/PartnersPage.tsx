@@ -258,7 +258,7 @@ export default function PartnersPage() {
                   )}
                 </div>
                 <div className="flex flex-wrap gap-1.5">
-                  <span className="text-xs bg-blue-500/10 text-blue-300 border border-blue-500/20 rounded-full px-2.5 py-1">
+                  <span className="text-xs bg-blue-500/10 text-blue-700 border border-blue-500/20 rounded-full px-2.5 py-1">
                     {post.category}
                   </span>
                   {post.source === 'admin' && (
